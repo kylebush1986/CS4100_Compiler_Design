@@ -90,14 +90,15 @@ namespace KyleBushCompiler
         public void PrintReserveTable()
         {
             Console.WriteLine("RESERVE TABLE");
-            Console.WriteLine("-----------------");
-            Console.WriteLine($"|{ "Name", -7 } | { "Code", 5 }|");
-            Console.WriteLine("-----------------");
+            Console.WriteLine("---------------");
+            Console.WriteLine($"|{ "Name", -7 }|{ "Code", 5 }|");
+            Console.WriteLine("---------------");
             foreach (var code in ReserveTableData)
             {
-                Console.WriteLine($"|{ code.Name, -7 } | { code.Code, 5 }|");
+                Console.WriteLine($"|{ code.Name, -7 }|{ code.Code, 5 }|");
             }
-            Console.WriteLine("-----------------");
+            Console.WriteLine("---------------");
         }
+
     }
 }

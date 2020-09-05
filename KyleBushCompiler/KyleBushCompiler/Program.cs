@@ -6,7 +6,8 @@ namespace KyleBushCompiler
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            ReserveTable table = new ReserveTable();
+            table.PrintReserveTable();
         }
     }
 }

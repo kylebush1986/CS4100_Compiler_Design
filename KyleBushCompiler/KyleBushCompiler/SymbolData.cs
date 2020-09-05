@@ -35,9 +35,6 @@ namespace KyleBushCompiler
             return stringValue;
         }
 
-        public int GetValue()
-        {
-            return intValue;
-        }
+        
     }
 }

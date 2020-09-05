@@ -86,7 +86,6 @@ namespace KyleBushCompiler
         {
             SymbolData Symbol = SymbolTableData[index];
             Symbol.Kind = kind;
-            Symbol.Value = value;
         }
 
         /// <summary>

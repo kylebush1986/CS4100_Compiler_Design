@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace KyleBushCompiler
@@ -8,20 +10,35 @@ namespace KyleBushCompiler
     {
         public List<OpCode> ReserveTableData { get; set; }
 
+        public ReserveTable()
+        {
+            Initialize();
+        }
+
         /// <summary>
         /// Constructor, as needed.
         /// </summary>
         public void Initialize()
         {
+            ReserveTableData = new List<OpCode>();
+
             Add("STOP", 0);
             Add("DIV", 1);
             Add("MUL", 2);
             Add("SUB", 3);
             Add("ADD", 4);
-            ReserveTableData.Add(new OpCode { Name = "MOV", Code = 5 });
-            ReserveTableData.Add(new OpCode { Name = "STI", Code = 6 });
-            ReserveTableData.Add(new OpCode { Name = "LDI", Code = 7 });
-
+            Add("MOV", 5);
+            Add("STI", 6);
+            Add("LDI", 7);
+            Add("BNZ", 8);
+            Add("BNP", 9);
+            Add("BNN", 10);
+            Add("BZ", 11);
+            Add("BP", 12);
+            Add("BN", 13);
+            Add("BR", 14);
+            Add("BINDR", 15);
+            Add("PRINT", 16);
         }
 
         /// <summary>
@@ -44,8 +61,12 @@ namespace KyleBushCompiler
         /// <returns></returns>
         public int LookupName(string name)
         {
-            int code = 0;
-            return code;
+            OpCode opCode = ReserveTableData.FirstOrDefault(x => x.Name == name);
+            if (opCode == null)
+            {
+                return -1;
+            }
+            return opCode.Code;
         }
 
         /// <summary>
@@ -55,8 +76,12 @@ namespace KyleBushCompiler
         /// <returns></returns>
         public string LookupCode(int code)
         {
-            string name = "";
-            return name;
+            OpCode opCode = ReserveTableData.FirstOrDefault(x => x.Code == code);
+            if (opCode == null)
+            {
+                return "";
+            }
+            return opCode.Name;
         }
 
         /// <summary>
@@ -64,7 +89,15 @@ namespace KyleBushCompiler
         /// </summary>
         public void PrintReserveTable()
         {
-
+            Console.WriteLine("RESERVE TABLE");
+            Console.WriteLine("-----------------");
+            Console.WriteLine($"|{ "Name", -7 } | { "Code", 5 }|");
+            Console.WriteLine("-----------------");
+            foreach (var code in ReserveTableData)
+            {
+                Console.WriteLine($"|{ code.Name, -7 } | { code.Code, 5 }|");
+            }
+            Console.WriteLine("-----------------");
         }
     }
 }

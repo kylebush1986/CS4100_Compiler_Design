@@ -5,8 +5,18 @@ namespace KyleBushCompiler
 {
     class Program
     {
-
         static void Main(string[] args)
+        {
+            QuadTable quadTable = BuildQuads();
+
+            SymbolTable symbolTable = BuildSymbolTable();
+
+            Interpreter interpreter = new Interpreter();
+            interpreter.InterpretQuads(quadTable, symbolTable, false);
+            interpreter.InterpretQuads(quadTable, symbolTable, true);
+        }
+
+        static QuadTable BuildQuads()
         {
             ReserveTable reserveTable = new ReserveTable();
             reserveTable.PrintReserveTable();
@@ -25,6 +35,11 @@ namespace KyleBushCompiler
             quadTable.AddQuad(0, 0, 0, 0);
             quadTable.PrintQuadTable();
 
+            return quadTable;
+        }
+
+        static SymbolTable BuildSymbolTable()
+        {
             SymbolTable symbolTable = new SymbolTable();
             symbolTable.AddSymbol("n", (int)SymbolKind.Variable, 0);
             symbolTable.AddSymbol("prod", (int)SymbolKind.Variable, 0);
@@ -35,8 +50,7 @@ namespace KyleBushCompiler
             symbolTable.AddSymbol("temp", (int)SymbolKind.Variable, 0);
             symbolTable.PrintSymbolTable();
 
-            Interpreter interpreter = new Interpreter();
-            interpreter.InterpretQuads(quadTable, symbolTable, false);
+            return symbolTable;
         }
     }
 }

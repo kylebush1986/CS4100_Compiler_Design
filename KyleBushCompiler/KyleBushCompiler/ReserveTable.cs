@@ -84,6 +84,16 @@ namespace KyleBushCompiler
             return opCode.Name;
         }
 
+        public bool isValidOpCode(int code)
+        {
+            OpCode opCode = ReserveTableData.FirstOrDefault(x => x.Code == code);
+            if (opCode == null)
+            {
+                return false;
+            }
+            return true;
+        }
+
         /// <summary>
         /// Prints the currently used contents of the Reserve table in neat tabular format
         /// </summary>

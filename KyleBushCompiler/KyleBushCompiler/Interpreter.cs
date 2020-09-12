@@ -7,115 +7,127 @@ namespace KyleBushCompiler
 {
     class Interpreter
     {
-        public int ProgramCounter { get; set; }
-        public Quad CurrentQuad { get; set; }
+        private const int LABEL = 1;
+        private const int VARIABLE = 2;
+        private const int CONSTANT = 3;
+        private int ProgramCounter { get; set; }
+        private Quad CurrentQuad { get; set; }
+        public QuadTable QuadTable { get; set; }
 
-        public void PrintTrace(string opcode, int op1, int op2, int op3)
+        public void PrintTrace(int opcode, int op1, int op2, int op3)
         {
-            Console.WriteLine($"PC = {ProgramCounter}: {opcode} {op1}, {op2}, {op3}");
+            Console.WriteLine($"PC = {ProgramCounter}: {QuadTable.GetMnemonic(opcode)} {op1}, {op2}, {op3}");
         }
 
-        public void PrintTrace(string opcode, int op1, int op2)
+        public void PrintTrace(int opcode, int op1, int op2)
         {
-            Console.WriteLine($"PC = {ProgramCounter}: {opcode} {op1}, {op2}");
+            Console.WriteLine($"PC = {ProgramCounter}: {QuadTable.GetMnemonic(opcode)} {op1}, {op2}");
         }
 
-        public void PrintTrace(string opcode, int op)
+        public void PrintTrace(int opcode, int op)
         {
-            Console.WriteLine($"PC = {ProgramCounter}: {opcode} {op}");
+            Console.WriteLine($"PC = {ProgramCounter}: {QuadTable.GetMnemonic(opcode)} {op}");
         }
 
-        public void PrintTrace(string opcode)
+        public void PrintTrace(int opcode)
         {
-            Console.WriteLine($"PC = {ProgramCounter}: {opcode}");
+            Console.WriteLine($"PC = {ProgramCounter}: {QuadTable.GetMnemonic(opcode)}");
         }
 
         public void InterpretQuads(QuadTable quadTable, SymbolTable symbolTable, bool TraceOn)
         {
+            QuadTable = quadTable;
             int value;
-            int op1;
-            int op2;
+            Symbol op1;
+            Symbol op2;
             int op3;
             ProgramCounter = 0;
-            while (ProgramCounter < quadTable.QuadTableData.Count)
+            while (ProgramCounter < QuadTable.NextQuad())
             {
-                CurrentQuad = quadTable.GetQuad(ProgramCounter);
-                string CurrentQuadOpcode = quadTable.GetMnemonic(CurrentQuad.OpCode);
-                if (true) //CurrentQuadOpcode)
+                CurrentQuad = QuadTable.GetQuad(ProgramCounter);
+                if (QuadTable.ReserveTable.isValidOpCode(CurrentQuad.OpCode))
                 {
-                    switch (CurrentQuadOpcode)
+                    switch (CurrentQuad.OpCode)
                     {
-                        case "STOP":
+                        // STOP
+                        case 0:
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuadOpcode);
+                                PrintTrace(CurrentQuad.OpCode);
                             }
-                            ProgramCounter = quadTable.QuadTableData.Count;
+                            ProgramCounter = QuadTable.NextQuad();
                             break;
-                        case "DIV":
-                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).IntValue;
-                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2).IntValue;
-                            op3 = CurrentQuad.Op3;
-                            value = op1 / op2;
-                            symbolTable.UpdateSymbol(op3, (int)SymbolKind.Variable, value);
+                        // DIV
+                        case 1:
+                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1);
+                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2);
+                            value = op1.GetValue() / op2.GetValue();
+                            symbolTable.UpdateSymbol(CurrentQuad.Op3, VARIABLE, value);
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuadOpcode, op1, op2, op3);
+                                PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                             }
                             ProgramCounter++;
                             break;
-                        case "MUL":
-                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).IntValue;
-                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2).IntValue;
+                        // MUL
+                        case 2:
+                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).GetValue();
+                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2).GetValue();
                             value = op1 * op2;
                             op3 = CurrentQuad.Op3;
-                            symbolTable.UpdateSymbol(op3, (int)SymbolKind.Variable, value);
+                            symbolTable.UpdateSymbol(op3, VARIABLE, value);
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuadOpcode, op1, op2, op3);
+                                PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                             }
                             ProgramCounter++;
                             break;
-                        case "SUB":
-                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).IntValue;
-                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2).IntValue;
+                        // SUB
+                        case 3:
+                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).GetValue();
+                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2).GetValue();
                             value = op1 - op2;
                             op3 = CurrentQuad.Op3;
-                            symbolTable.UpdateSymbol(op3, (int)SymbolKind.Variable, value);
+                            symbolTable.UpdateSymbol(op3, VARIABLE, value);
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuadOpcode, op1, op2, op3);
+                                PrintTrace(CurrentQuad.OpCode, op1, op2, op3);
                             }
                             ProgramCounter++;
                             break;
-                        case "ADD":
-                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).IntValue;
-                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2).IntValue;
+                        // ADD
+                        case 4:
+                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).GetValue();
+                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2).GetValue();
                             value = op1 + op2;
                             op3 = CurrentQuad.Op3;
-                            symbolTable.UpdateSymbol(op3, (int)SymbolKind.Variable, value);
+                            symbolTable.UpdateSymbol(op3, VARIABLE, value);
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuadOpcode, op1, op2, op3);
+                                PrintTrace(CurrentQuad.OpCode, op1, op2, op3);
                             }
                             ProgramCounter++;
                             break;
-                        case "MOV":
-                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).IntValue;
+                        // MOV
+                        case 5:
+                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).GetValue();
                             op3 = CurrentQuad.Op3;
-                            symbolTable.UpdateSymbol(op3, (int)SymbolKind.Variable, op1);
+                            symbolTable.UpdateSymbol(op3, VARIABLE, op1);
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuadOpcode, CurrentQuad.Op1, op3);
+                                PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, op3);
                             }
                             ProgramCounter++;
                             break;
-                        case "STI":
+                        // STI
+                        case 6:
                             break;
-                        case "LDI":
+                        // LDI
+                        case 7:
                             break;
-                        case "BNZ":
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].IntValue != 0)
+                        // BNZ
+                        case 8:
+                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() != 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             } 
@@ -125,11 +137,12 @@ namespace KyleBushCompiler
                             }
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuadOpcode, CurrentQuad.Op3);
+                                PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op3);
                             }
                             break;
-                        case "BNP":
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].IntValue <= 0)
+                        // BNP
+                        case 9:
+                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() <= 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             }
@@ -138,8 +151,9 @@ namespace KyleBushCompiler
                                 ProgramCounter++;
                             }
                             break;
-                        case "BNN":
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].IntValue >= 0)
+                        // BNN
+                        case 10:
+                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() >= 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             }
@@ -148,8 +162,9 @@ namespace KyleBushCompiler
                                 ProgramCounter++;
                             }
                             break;
-                        case "BZ":
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].IntValue == 0)
+                        // BZ
+                        case 11:
+                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() == 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             }
@@ -158,8 +173,9 @@ namespace KyleBushCompiler
                                 ProgramCounter++;
                             }
                             break;
-                        case "BP":
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].IntValue > 0)
+                        // BP
+                        case 12:
+                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() > 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             }
@@ -168,8 +184,9 @@ namespace KyleBushCompiler
                                 ProgramCounter++;
                             }
                             break;
-                        case "BN":
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].IntValue < 0)
+                        // BN
+                        case 13:
+                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() < 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             }
@@ -178,22 +195,25 @@ namespace KyleBushCompiler
                                 ProgramCounter++;
                             }
                             break;
-                        case "BR":
+                        // BR
+                        case 14:
                             ProgramCounter = CurrentQuad.Op3;
                             break;
-                        case "BINDR":
-                            ProgramCounter = symbolTable.SymbolTableData[CurrentQuad.Op3].IntValue;
+                        // BINDR
+                        case 15:
+                            ProgramCounter = symbolTable.SymbolTableData[CurrentQuad.Op3].GetValue();
                             break;
-                        case "PRINT":
+                        // PRINT
+                        case 16:
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuadOpcode, CurrentQuad.Op1);
+                                PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1);
                             }
-                            Console.WriteLine($"{ symbolTable.SymbolTableData[CurrentQuad.Op1].Name} {symbolTable.SymbolTableData[CurrentQuad.Op1].IntValue}");
+                            Console.WriteLine($"{ symbolTable.SymbolTableData[CurrentQuad.Op1].Name} {symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue()}");
                             ProgramCounter++;
                             break;
                         default:
-                            Console.WriteLine($"Invalid Opcode {CurrentQuadOpcode}");
+                            Console.WriteLine($"Invalid Opcode {CurrentQuad.OpCode}");
                             break;
                     }
                 }

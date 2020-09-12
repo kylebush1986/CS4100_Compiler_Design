@@ -7,7 +7,7 @@ namespace KyleBushCompiler
 {
     class QuadTable
     {
-        public List<Quad> QuadTableData { get; set; }
+        private List<Quad> QuadTableData { get; set; }
         public ReserveTable ReserveTable { get; set; }
 
         public QuadTable(ReserveTable reserveTable)

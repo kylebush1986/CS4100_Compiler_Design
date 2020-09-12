@@ -89,7 +89,7 @@ namespace KyleBushCompiler
         public void UpdateSymbol(int index, int kind, int value)
         {
             SymbolTableData[index].Kind = kind;
-            SymbolTableData[index].IntValue = value;
+            SymbolTableData[index].SetValue(value);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace KyleBushCompiler
         public void UpdateSymbol(int index, int kind, double value)
         {
             SymbolTableData[index].Kind = kind;
-            SymbolTableData[index].DoubleValue = value;
+            SymbolTableData[index].SetValue(value);
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace KyleBushCompiler
         public void UpdateSymbol(int index, int kind, string value)
         {
             SymbolTableData[index].Kind = kind;
-            SymbolTableData[index].StringValue = value;
+            SymbolTableData[index].SetValue(value);
         }
         
 
@@ -125,11 +125,11 @@ namespace KyleBushCompiler
         {
             Console.WriteLine("SYMBOL TABLE");
             Console.WriteLine("---------------------------");
-            Console.WriteLine($"|{ "Name",-7 }|{ "Kind",5 }|{ "DataType",8 }|{ "Int Value",9 }|{ "Double Value",12 }|{ "String Value",12 }|");
+            Console.WriteLine($"|{ "Name",-7 }|{ "Kind",5 }|{ "DataType",8 }|{ "Value",9 }|");
             Console.WriteLine("---------------------------");
             foreach (var symbol in SymbolTableData)
             {
-                Console.WriteLine($"|{ symbol.Name,-7 }|{ symbol.Kind,5 }|{ symbol.DataType,8 }|{ symbol.IntValue,5 }|{ symbol.DoubleValue,5 }|{ symbol.StringValue,5 }|");
+                Console.WriteLine($"|{ symbol.Name,-7 }|{ symbol.Kind,5 }|{ symbol.DataType,8 }|{ symbol.GetValue(),5 }|");
             }
             Console.WriteLine("---------------------------");
         }

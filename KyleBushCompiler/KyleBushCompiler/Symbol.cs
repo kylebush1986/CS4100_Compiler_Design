@@ -12,28 +12,22 @@ namespace KyleBushCompiler
         String
     }
 
-    enum SymbolKind
-    {
-        Label,
-        Variable,
-        Constant
-    }
     class Symbol
     {
         public string Name { get; set; }
         public int Kind { get; set; }
         public DataType DataType { get; set; }
-     
-        public int IntValue { get; set; }
-        public string StringValue { get; set; }
-        public double DoubleValue { get; set; }
+
+        private int _intValue;
+        private string _stringValue;
+        private double _doubleValue;
 
         public Symbol(string name, int kind, DataType dataType, int value)
         {
             Name = name;
             Kind = kind;
             DataType = dataType;
-            IntValue = value;
+            _intValue = value;
         }
 
         public Symbol(string name, int kind, DataType dataType, double value)
@@ -41,7 +35,7 @@ namespace KyleBushCompiler
             Name = name;
             Kind = kind;
             DataType = dataType;
-            DoubleValue = value;
+            _doubleValue = value;
         }
 
         public Symbol(string name, int kind, DataType dataType, string value)
@@ -49,7 +43,32 @@ namespace KyleBushCompiler
             Name = name;
             Kind = kind;
             DataType = dataType;
-            StringValue = value;
+            _stringValue = value;
+        }
+
+        public void SetValue(int value)
+        {
+            _intValue = value;
+        }
+
+        public void SetValue(string value)
+        {
+            _stringValue = value;
+        }
+
+        public void SetValue(double value)
+        {
+            _doubleValue = value;
+        }
+
+        public dynamic GetValue()
+        {
+            if (DataType == DataType.Integer)
+                return _intValue;
+            else if (DataType == DataType.Double)
+                return _doubleValue;
+            else
+                return _stringValue;
         }
     }
 }

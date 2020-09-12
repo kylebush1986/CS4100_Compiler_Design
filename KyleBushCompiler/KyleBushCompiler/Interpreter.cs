@@ -7,9 +7,6 @@ namespace KyleBushCompiler
 {
     class Interpreter
     {
-        private const int LABEL = 1;
-        private const int VARIABLE = 2;
-        private const int CONSTANT = 3;
         private int ProgramCounter { get; set; }
         private Quad CurrentQuad { get; set; }
         public QuadTable QuadTable { get; set; }
@@ -37,10 +34,6 @@ namespace KyleBushCompiler
         public void InterpretQuads(QuadTable quadTable, SymbolTable symbolTable, bool TraceOn)
         {
             QuadTable = quadTable;
-            int value;
-            Symbol op1;
-            Symbol op2;
-            int op3;
             ProgramCounter = 0;
             while (ProgramCounter < QuadTable.NextQuad())
             {
@@ -50,6 +43,7 @@ namespace KyleBushCompiler
                     switch (CurrentQuad.OpCode)
                     {
                         // STOP
+                        // Terminate program
                         case 0:
                             if (TraceOn)
                             {
@@ -58,11 +52,10 @@ namespace KyleBushCompiler
                             ProgramCounter = QuadTable.NextQuad();
                             break;
                         // DIV
+                        // Compute op1 / op2, place result into op3
                         case 1:
-                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1);
-                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2);
-                            value = op1.GetValue() / op2.GetValue();
-                            symbolTable.UpdateSymbol(CurrentQuad.Op3, VARIABLE, value);
+                            symbolTable.UpdateSymbol(CurrentQuad.Op3, (int)SymbolKind.Variable, 
+                                (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() / symbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
                             if (TraceOn)
                             {
                                 PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
@@ -70,12 +63,10 @@ namespace KyleBushCompiler
                             ProgramCounter++;
                             break;
                         // MUL
+                        // Compute op1 * op2, place result into op3
                         case 2:
-                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).GetValue();
-                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2).GetValue();
-                            value = op1 * op2;
-                            op3 = CurrentQuad.Op3;
-                            symbolTable.UpdateSymbol(op3, VARIABLE, value);
+                            symbolTable.UpdateSymbol(CurrentQuad.Op3, (int)SymbolKind.Variable, 
+                                (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() * symbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
                             if (TraceOn)
                             {
                                 PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
@@ -83,51 +74,51 @@ namespace KyleBushCompiler
                             ProgramCounter++;
                             break;
                         // SUB
+                        // Compute op1 - op2, place result into op3
                         case 3:
-                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).GetValue();
-                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2).GetValue();
-                            value = op1 - op2;
-                            op3 = CurrentQuad.Op3;
-                            symbolTable.UpdateSymbol(op3, VARIABLE, value);
+                            symbolTable.UpdateSymbol(CurrentQuad.Op3, (int)SymbolKind.Variable,
+                                (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() - symbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuad.OpCode, op1, op2, op3);
+                                PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                             }
                             ProgramCounter++;
                             break;
                         // ADD
+                        // Compute op1 + op2, place result into op3
                         case 4:
-                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).GetValue();
-                            op2 = symbolTable.GetSymbol(CurrentQuad.Op2).GetValue();
-                            value = op1 + op2;
-                            op3 = CurrentQuad.Op3;
-                            symbolTable.UpdateSymbol(op3, VARIABLE, value);
+                            symbolTable.UpdateSymbol(CurrentQuad.Op3, (int)SymbolKind.Variable,
+                                (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() + symbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuad.OpCode, op1, op2, op3);
+                                PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                             }
                             ProgramCounter++;
                             break;
                         // MOV
+                        // Assign the value in op1 into op3 (op2 is ignored here)
                         case 5:
-                            op1 = symbolTable.GetSymbol(CurrentQuad.Op1).GetValue();
-                            op3 = CurrentQuad.Op3;
-                            symbolTable.UpdateSymbol(op3, VARIABLE, op1);
+                            symbolTable.UpdateSymbol(CurrentQuad.Op3, (int)SymbolKind.Variable, symbolTable.GetSymbol(CurrentQuad.Op1).GetValue());
                             if (TraceOn)
                             {
-                                PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, op3);
+                                PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op3);
                             }
                             ProgramCounter++;
                             break;
                         // STI
+                        // Store indexed - Assign the value in op1 into op2 + offset op3
                         case 6:
+                            symbolTable.UpdateSymbol((CurrentQuad.Op2 + CurrentQuad.Op3), (int)SymbolKind.Variable, symbolTable.GetSymbol(CurrentQuad.Op1).GetValue());
                             break;
                         // LDI
+                        // Load indexed- Assign the value in op1 + offset op2, into op3
                         case 7:
+                            symbolTable.UpdateSymbol(CurrentQuad.Op3, (int)SymbolKind.Variable, symbolTable.GetSymbol(CurrentQuad.Op1 + CurrentQuad.Op2).GetValue());
                             break;
                         // BNZ
+                        // Branch Not Zero; if op1 value <> 0, set program counter to op3
                         case 8:
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() != 0)
+                            if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() != 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             } 
@@ -141,8 +132,9 @@ namespace KyleBushCompiler
                             }
                             break;
                         // BNP
+                        // Branch Not Positive; if op1 value <= 0, set program counter to op3
                         case 9:
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() <= 0)
+                            if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() <= 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             }
@@ -152,8 +144,9 @@ namespace KyleBushCompiler
                             }
                             break;
                         // BNN
+                        // Branch Not Negative; if op1 value >= 0, set program counter to op3
                         case 10:
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() >= 0)
+                            if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() >= 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             }
@@ -163,8 +156,9 @@ namespace KyleBushCompiler
                             }
                             break;
                         // BZ
+                        // Branch Zero; if op1 value = 0, set program counter to op3
                         case 11:
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() == 0)
+                            if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() == 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             }
@@ -174,8 +168,9 @@ namespace KyleBushCompiler
                             }
                             break;
                         // BP
+                        // Branch Positive; if op1 value > 0, set program counter to op3
                         case 12:
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() > 0)
+                            if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() > 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             }
@@ -185,8 +180,9 @@ namespace KyleBushCompiler
                             }
                             break;
                         // BN
+                        // Branch Negative; if op1 value < 0, set program counter to op3
                         case 13:
-                            if (symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue() < 0)
+                            if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() < 0)
                             {
                                 ProgramCounter = CurrentQuad.Op3;
                             }
@@ -196,20 +192,23 @@ namespace KyleBushCompiler
                             }
                             break;
                         // BR
+                        // Branch (unconditional); set program counter to op3
                         case 14:
                             ProgramCounter = CurrentQuad.Op3;
                             break;
                         // BINDR
+                        // Branch (unconditional); set program counter to op3 value contents (indirect)
                         case 15:
-                            ProgramCounter = symbolTable.SymbolTableData[CurrentQuad.Op3].GetValue();
+                            ProgramCounter = symbolTable.GetSymbol(CurrentQuad.Op3).GetValue();
                             break;
                         // PRINT
+                        // Write symbol table name and value of op 1
                         case 16:
                             if (TraceOn)
                             {
                                 PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1);
                             }
-                            Console.WriteLine($"{ symbolTable.SymbolTableData[CurrentQuad.Op1].Name} {symbolTable.SymbolTableData[CurrentQuad.Op1].GetValue()}");
+                            Console.WriteLine($"{ symbolTable.GetSymbol(CurrentQuad.Op1).Name} = {symbolTable.GetSymbol(CurrentQuad.Op1).GetValue()}");
                             ProgramCounter++;
                             break;
                         default:

@@ -12,6 +12,13 @@ namespace KyleBushCompiler
         String
     }
 
+    enum SymbolKind
+    {
+        Label,
+        Variable,
+        Constant
+    }
+
     class Symbol
     {
         public string Name { get; set; }

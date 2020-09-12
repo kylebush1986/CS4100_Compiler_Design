@@ -8,7 +8,7 @@ namespace KyleBushCompiler
 {
     class SymbolTable
     {
-        public List<Symbol> SymbolTableData { get; set; }
+        private List<Symbol> SymbolTableData { get; set; }
 
         public SymbolTable()
         {

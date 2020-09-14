@@ -5,31 +5,44 @@ using System.Text;
 
 namespace KyleBushCompiler
 {
-    enum DataType
+    /// <summary>
+    /// Used to specify data type of a symbol
+    /// </summary>
+    public enum DataType
     {
         Integer,
         Double,
         String
     }
 
-    enum SymbolKind
+    /// <summary>
+    /// Used to specify the kind of a symbol
+    /// </summary>
+    public enum SymbolKind
     {
         Label,
         Variable,
         Constant
     }
 
-    class Symbol
+    public class Symbol
     {
         public string Name { get; set; }
-        public int Kind { get; set; }
+        public SymbolKind Kind { get; set; }
         public DataType DataType { get; set; }
 
         private int _intValue;
         private string _stringValue;
         private double _doubleValue;
 
-        public Symbol(string name, int kind, DataType dataType, int value)
+        /// <summary>
+        /// Contructor to initialize a Symbol containing an integer value.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="kind"></param>
+        /// <param name="dataType"></param>
+        /// <param name="value"></param>
+        public Symbol(string name, SymbolKind kind, DataType dataType, int value)
         {
             Name = name;
             Kind = kind;
@@ -37,7 +50,14 @@ namespace KyleBushCompiler
             _intValue = value;
         }
 
-        public Symbol(string name, int kind, DataType dataType, double value)
+        /// <summary>
+        /// Contructor to initialize a Symbol containing a double value.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="kind"></param>
+        /// <param name="dataType"></param>
+        /// <param name="value"></param>
+        public Symbol(string name, SymbolKind kind, DataType dataType, double value)
         {
             Name = name;
             Kind = kind;
@@ -45,7 +65,14 @@ namespace KyleBushCompiler
             _doubleValue = value;
         }
 
-        public Symbol(string name, int kind, DataType dataType, string value)
+        /// <summary>
+        /// Contructor to initialize a Symbol containing a string value.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="kind"></param>
+        /// <param name="dataType"></param>
+        /// <param name="value"></param>
+        public Symbol(string name, SymbolKind kind, DataType dataType, string value)
         {
             Name = name;
             Kind = kind;
@@ -53,21 +80,37 @@ namespace KyleBushCompiler
             _stringValue = value;
         }
 
+        /// <summary>
+        /// Sets a Symbol with an integer value.
+        /// </summary>
+        /// <param name="value"></param>
         public void SetValue(int value)
         {
             _intValue = value;
         }
 
+        /// <summary>
+        /// Sets a Symbol with a string value.
+        /// </summary>
+        /// <param name="value"></param>
         public void SetValue(string value)
         {
             _stringValue = value;
         }
 
+        /// <summary>
+        /// Sets a Symbol with a double value.
+        /// </summary>
+        /// <param name="value"></param>
         public void SetValue(double value)
         {
             _doubleValue = value;
         }
 
+        /// <summary>
+        /// Checks the DataType of the Symbol and returns the appropriate value.
+        /// </summary>
+        /// <returns>int, string, or double depending on the DataType property.</returns>
         public dynamic GetValue()
         {
             if (DataType == DataType.Integer)

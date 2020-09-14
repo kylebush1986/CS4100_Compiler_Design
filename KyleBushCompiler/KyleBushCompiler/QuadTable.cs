@@ -5,11 +5,18 @@ using System.Text;
 
 namespace KyleBushCompiler
 {
-    class QuadTable
+    /// <summary>
+    /// Contains all the Quad Codes for a given application.
+    /// </summary>
+    public class QuadTable
     {
         private List<Quad> QuadTableData { get; set; }
         public ReserveTable ReserveTable { get; set; }
 
+        /// <summary>
+        /// Constructor which takes a Reserve Table object and initializes the Quad Table
+        /// </summary>
+        /// <param name="reserveTable"></param>
         public QuadTable(ReserveTable reserveTable)
         {
             ReserveTable = reserveTable;
@@ -17,7 +24,7 @@ namespace KyleBushCompiler
         }
 
         /// <summary>
-        /// Create a new, empty QuadTable ready for data to be added, with the specified number of rows(size).
+        /// Create a new, empty QuadTable ready for data to be added.
         /// </summary>
         public void Initialize() //size and other parameters as needed
         {
@@ -94,7 +101,7 @@ namespace KyleBushCompiler
             {
                 Console.WriteLine($"|{ GetMnemonic(quad.OpCode),-7 }|{ quad.Op1,5 }|{ quad.Op2,5 }|{ quad.Op3,5 }|");
             }
-            Console.WriteLine("---------------------------");
+            Console.WriteLine("---------------------------\n");
         }
     }
 }

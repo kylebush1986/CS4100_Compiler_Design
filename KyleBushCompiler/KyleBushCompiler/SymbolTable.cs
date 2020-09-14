@@ -6,10 +6,16 @@ using System.Text;
 
 namespace KyleBushCompiler
 {
-    class SymbolTable
+    /// <summary>
+    /// Contains all the symbols for a given application.
+    /// </summary>
+    public class SymbolTable
     {
         private List<Symbol> SymbolTableData { get; set; }
 
+        /// <summary>
+        /// Creates a new, empty Symbol Table.
+        /// </summary>
         public SymbolTable()
         {
             SymbolTableData = new List<Symbol>();
@@ -24,7 +30,7 @@ namespace KyleBushCompiler
         /// <param name="kind">The kind of symbol</param>
         /// <param name="value">The value associated with the given symbol</param>
         /// <returns>The index of the added symbol in the symbol table as an integer</returns>
-        public int AddSymbol(string symbol, int kind, int value)
+        public int AddSymbol(string symbol, SymbolKind kind, int value)
         {
             SymbolTableData.Add(new Symbol(symbol, kind, DataType.Integer, value));
             return SymbolTableData.Count - 1;
@@ -39,7 +45,7 @@ namespace KyleBushCompiler
         /// <param name="kind">The kind of symbol</param>
         /// <param name="value">The value associated with the given symbol</param>
         /// <returns>The index of the added symbol in the symbol table as an integer</returns>
-        public int AddSymbol(string symbol, int kind, double value)
+        public int AddSymbol(string symbol, SymbolKind kind, double value)
         {
             SymbolTableData.Add(new Symbol(symbol, kind, DataType.Double, value));
             return SymbolTableData.Count - 1;
@@ -54,7 +60,7 @@ namespace KyleBushCompiler
         /// <param name="kind">The kind of symbol</param>
         /// <param name="value">The value associated with the given symbol</param>
         /// <returns>The index of the added symbol in the symbol table as an integer</returns>
-        public int AddSymbol(string symbol, int kind, string value)
+        public int AddSymbol(string symbol, SymbolKind kind, string value)
         {
             SymbolTableData.Add(new Symbol(symbol, kind, DataType.String, value));
             return SymbolTableData.Count - 1;
@@ -86,7 +92,7 @@ namespace KyleBushCompiler
         /// <param name="index">The index of the symbol to update</param>
         /// <param name="kind">The kind of symbol</param>
         /// <param name="value">The value of the symbol</param>
-        public void UpdateSymbol(int index, int kind, int value)
+        public void UpdateSymbol(int index, SymbolKind kind, int value)
         {
             SymbolTableData[index].Kind = kind;
             SymbolTableData[index].SetValue(value);
@@ -98,7 +104,7 @@ namespace KyleBushCompiler
         /// <param name="index">The index of the symbol to update</param>
         /// <param name="kind">The kind of symbol</param>
         /// <param name="value">The value of the symbol</param>
-        public void UpdateSymbol(int index, int kind, double value)
+        public void UpdateSymbol(int index, SymbolKind kind, double value)
         {
             SymbolTableData[index].Kind = kind;
             SymbolTableData[index].SetValue(value);
@@ -110,7 +116,7 @@ namespace KyleBushCompiler
         /// <param name="index">The index of the symbol to update</param>
         /// <param name="kind">The kind of symbol</param>
         /// <param name="value">The value of the symbol</param>
-        public void UpdateSymbol(int index, int kind, string value)
+        public void UpdateSymbol(int index, SymbolKind kind, string value)
         {
             SymbolTableData[index].Kind = kind;
             SymbolTableData[index].SetValue(value);
@@ -124,14 +130,14 @@ namespace KyleBushCompiler
         public void PrintSymbolTable()
         {
             Console.WriteLine("SYMBOL TABLE");
-            Console.WriteLine("---------------------------");
-            Console.WriteLine($"|{ "Name",-7 }|{ "Kind",5 }|{ "DataType",8 }|{ "Value",9 }|");
-            Console.WriteLine("---------------------------");
+            Console.WriteLine("---------------------------------------------");
+            Console.WriteLine($"|{ "Name",-10 }|{ "Kind",10 }|{ "DataType",10 }|{ "Value",10 }|");
+            Console.WriteLine("---------------------------------------------");
             foreach (var symbol in SymbolTableData)
             {
-                Console.WriteLine($"|{ symbol.Name,-7 }|{ symbol.Kind,5 }|{ symbol.DataType,8 }|{ symbol.GetValue(),5 }|");
+                Console.WriteLine($"|{ symbol.Name,-10 }|{ symbol.Kind,10 }|{ symbol.DataType,10 }|{ symbol.GetValue(),10 }|");
             }
-            Console.WriteLine("---------------------------");
+            Console.WriteLine("---------------------------------------------\n");
         }
     }
 }

@@ -6,7 +6,10 @@ using System.Text;
 
 namespace KyleBushCompiler
 {
-    class ReserveTable
+    /// <summary>
+    /// Contains all the reserve words for a language.
+    /// </summary>
+    public class ReserveTable
     {
         public List<OpCode> ReserveTableData { get; set; }
 
@@ -16,7 +19,7 @@ namespace KyleBushCompiler
         }
 
         /// <summary>
-        /// Constructor, as needed.
+        /// Initializes the table with all the reserve words for the language.
         /// </summary>
         public void Initialize()
         {
@@ -84,11 +87,17 @@ namespace KyleBushCompiler
             return opCode.Name;
         }
 
+        /// <summary>
+        /// Searches the table for the given code to test if it is valid.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns>True if the code is valid, False if not.</returns>
         public bool isValidOpCode(int code)
         {
             OpCode opCode = ReserveTableData.FirstOrDefault(x => x.Code == code);
             if (opCode == null)
             {
+                Console.WriteLine($"{code} is not a valid Op Code.");
                 return false;
             }
             return true;
@@ -107,7 +116,7 @@ namespace KyleBushCompiler
             {
                 Console.WriteLine($"|{ code.Name, -7 }|{ code.Code, 5 }|");
             }
-            Console.WriteLine("---------------");
+            Console.WriteLine("---------------\n");
         }
 
     }

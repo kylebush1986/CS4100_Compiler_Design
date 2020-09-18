@@ -9,17 +9,25 @@ namespace KyleBushCompiler
         {
             Interpreter interpreter = new Interpreter();
 
-            // Build assets for factorial algorithm and run it with interpreter
+            // Build assets for factorial algorithm and run it without trace in interpreter
             QuadTable factQuadTable = BuildQuadsForFactorial();
             SymbolTable factSymbolTable = BuildSymbolTableForFactorial();
             interpreter.InterpretQuads(factQuadTable, factSymbolTable, false);
-            interpreter.InterpretQuads(factQuadTable, factSymbolTable, true);
 
-            // Build assets for summation algorithm and run it with interpreter
+            // Build assets for summation algorithm and run it with trace in interpreter
+            QuadTable factQuadTableTrace = BuildQuadsForFactorial();
+            SymbolTable factSymbolTableTrace = BuildSymbolTableForFactorial();
+            interpreter.InterpretQuads(factQuadTableTrace, factSymbolTableTrace, true);
+
+            // Build assets for summation algorithm and run it without trace in interpreter
             QuadTable sumQuadTable = BuildQuadsForSummation();
             SymbolTable sumSymbolTable = BuildSymbolTableForSummation();
             interpreter.InterpretQuads(sumQuadTable, sumSymbolTable, false);
-            interpreter.InterpretQuads(sumQuadTable, sumSymbolTable, true);
+
+            // Build assets for summation algorithm and run it with trace in interpreter
+            QuadTable sumQuadTableTrace = BuildQuadsForSummation();
+            SymbolTable sumSymbolTableTrace = BuildSymbolTableForSummation();
+            interpreter.InterpretQuads(sumQuadTableTrace, sumSymbolTableTrace, true);
         }
 
         /// <summary>
@@ -59,7 +67,7 @@ namespace KyleBushCompiler
 
             QuadTable quadTable = new QuadTable(reserveTable);
             quadTable.AddQuad(5, 4, 0, 0);
-            quadTable.AddQuad(5, 5, 0, 1);
+            quadTable.AddQuad(5, 5, 0, 7);
             quadTable.AddQuad(5, 5, 0, 2);
             quadTable.AddQuad(3, 0, 2, 6);
             quadTable.AddQuad(13, 6, 0, 8);
@@ -85,7 +93,7 @@ namespace KyleBushCompiler
             symbolTable.AddSymbol("prod", SymbolKind.Variable, 0);
             symbolTable.AddSymbol("count", SymbolKind.Variable, 0);
             symbolTable.AddSymbol("fact", SymbolKind.Variable, 0);
-            symbolTable.AddSymbol("5", SymbolKind.Constant, 5);
+            symbolTable.AddSymbol("10", SymbolKind.Constant, 10);
             symbolTable.AddSymbol("1", SymbolKind.Constant, 1);
             symbolTable.AddSymbol("temp", SymbolKind.Variable, 0);
             symbolTable.PrintSymbolTable();
@@ -104,9 +112,10 @@ namespace KyleBushCompiler
             symbolTable.AddSymbol("sum", SymbolKind.Variable, 0);
             symbolTable.AddSymbol("count", SymbolKind.Variable, 0);
             symbolTable.AddSymbol("summation", SymbolKind.Variable, 0);
-            symbolTable.AddSymbol("5", SymbolKind.Constant, 5);
+            symbolTable.AddSymbol("10", SymbolKind.Constant, 10);
             symbolTable.AddSymbol("1", SymbolKind.Constant, 1);
             symbolTable.AddSymbol("temp", SymbolKind.Variable, 0);
+            symbolTable.AddSymbol("0", SymbolKind.Variable, 0);
             symbolTable.PrintSymbolTable();
 
             return symbolTable;

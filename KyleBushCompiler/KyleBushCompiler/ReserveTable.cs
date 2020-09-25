@@ -11,37 +11,19 @@ namespace KyleBushCompiler
     /// </summary>
     public class ReserveTable
     {
-        public List<OpCode> ReserveTableData { get; set; }
+        public List<ReservedWord> ReserveTableData { get; set; }
 
         public ReserveTable()
         {
-            Initialize();
+            ReserveTableData = new List<ReservedWord>();
         }
 
         /// <summary>
         /// Initializes the table with all the reserve words for the language.
         /// </summary>
-        public void Initialize()
+        public void Initialize(List<ReservedWord> reservedWords)
         {
-            ReserveTableData = new List<OpCode>();
-
-            Add("STOP", 0);
-            Add("DIV", 1);
-            Add("MUL", 2);
-            Add("SUB", 3);
-            Add("ADD", 4);
-            Add("MOV", 5);
-            Add("STI", 6);
-            Add("LDI", 7);
-            Add("BNZ", 8);
-            Add("BNP", 9);
-            Add("BNN", 10);
-            Add("BZ", 11);
-            Add("BP", 12);
-            Add("BN", 13);
-            Add("BR", 14);
-            Add("BINDR", 15);
-            Add("PRINT", 16);
+            ReserveTableData = reservedWords;
         }
 
         /// <summary>
@@ -52,8 +34,8 @@ namespace KyleBushCompiler
         /// <returns>index of the row where the data was placed</returns>
         public int Add(string name, int code)
         {
-            OpCode opCode = new OpCode(name, code);
-            ReserveTableData.Add(opCode);
+            ReservedWord reservedWord = new ReservedWord(name, code);
+            ReserveTableData.Add(reservedWord);
             return ReserveTableData.Count - 1;
         }
 
@@ -64,12 +46,12 @@ namespace KyleBushCompiler
         /// <returns></returns>
         public int LookupName(string name)
         {
-            OpCode opCode = ReserveTableData.FirstOrDefault(x => x.Name == name);
-            if (opCode == null)
+            ReservedWord reservedWord = ReserveTableData.FirstOrDefault(x => x.Name == name);
+            if (reservedWord == null)
             {
                 return -1;
             }
-            return opCode.Code;
+            return reservedWord.Code;
         }
 
         /// <summary>
@@ -79,12 +61,12 @@ namespace KyleBushCompiler
         /// <returns></returns>
         public string LookupCode(int code)
         {
-            OpCode opCode = ReserveTableData.FirstOrDefault(x => x.Code == code);
-            if (opCode == null)
+            ReservedWord reservedWord = ReserveTableData.FirstOrDefault(x => x.Code == code);
+            if (reservedWord == null)
             {
                 return "";
             }
-            return opCode.Name;
+            return reservedWord.Name;
         }
 
         /// <summary>
@@ -94,8 +76,8 @@ namespace KyleBushCompiler
         /// <returns>True if the code is valid, False if not.</returns>
         public bool isValidOpCode(int code)
         {
-            OpCode opCode = ReserveTableData.FirstOrDefault(x => x.Code == code);
-            if (opCode == null)
+            ReservedWord reservedWord = ReserveTableData.FirstOrDefault(x => x.Code == code);
+            if (reservedWord == null)
             {
                 Console.WriteLine($"{code} is not a valid Op Code.");
                 return false;

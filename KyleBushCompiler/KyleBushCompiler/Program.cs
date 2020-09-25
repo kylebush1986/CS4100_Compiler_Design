@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.IO;
 using System.Reflection.Emit;
 
 namespace KyleBushCompiler
@@ -7,109 +10,65 @@ namespace KyleBushCompiler
     {
         static void Main(string[] args)
         {
-            Interpreter interpreter = new Interpreter();
+            ReserveTable languageReserveWords = new ReserveTable();
+            languageReserveWords.Add("STOP", 0);
+            languageReserveWords.Add("DIV", 1);
+            languageReserveWords.Add("MUL", 2);
+            languageReserveWords.Add("SUB", 3);
+            languageReserveWords.Add("ADD", 4);
+            languageReserveWords.Add("MOV", 5);
+            languageReserveWords.Add("STI", 6);
+            languageReserveWords.Add("LDI", 7);
+            languageReserveWords.Add("BNZ", 8);
+            languageReserveWords.Add("BNP", 9);
+            languageReserveWords.Add("BNN", 10);
+            languageReserveWords.Add("BZ", 11);
+            languageReserveWords.Add("BP", 12);
+            languageReserveWords.Add("BN", 13);
+            languageReserveWords.Add("BR", 14);
+            languageReserveWords.Add("BINDR", 15);
+            languageReserveWords.Add("PRINT", 16);
 
-            // Build assets for factorial algorithm and run it with interpreter
-            QuadTable factQuadTable = BuildQuadsForFactorial();
-            SymbolTable factSymbolTable = BuildSymbolTableForFactorial();
-            interpreter.InterpretQuads(factQuadTable, factSymbolTable, false);
-            interpreter.InterpretQuads(factQuadTable, factSymbolTable, true);
+            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\program.txt";
 
-            // Build assets for summation algorithm and run it with interpreter
-            QuadTable sumQuadTable = BuildQuadsForSummation();
-            SymbolTable sumSymbolTable = BuildSymbolTableForSummation();
-            interpreter.InterpretQuads(sumQuadTable, sumSymbolTable, false);
-            interpreter.InterpretQuads(sumQuadTable, sumSymbolTable, true);
-        }
-
-        /// <summary>
-        /// Builds and prints the hard coded Reserve Table and Quad Table to run the factorial algorithm. 
-        /// </summary>
-        /// <returns>The Quad Table</returns>
-        static QuadTable BuildQuadsForFactorial()
-        {
+            //Psuedocode for main program
+            SymbolTable symbolTable = new SymbolTable();
             ReserveTable reserveTable = new ReserveTable();
-            reserveTable.PrintReserveTable();
+            Scanner scanner = new Scanner();
 
-            QuadTable quadTable = new QuadTable(reserveTable);
-            quadTable.AddQuad(5, 4, 0, 0);
-            quadTable.AddQuad(5, 5, 0, 1);
-            quadTable.AddQuad(5, 5, 0, 2);
-            quadTable.AddQuad(3, 0, 2, 6);
-            quadTable.AddQuad(13, 6, 0, 8);
-            quadTable.AddQuad(2, 1, 2, 1);
-            quadTable.AddQuad(4, 2, 5, 2);
-            quadTable.AddQuad(14, 0, 0, 3);
-            quadTable.AddQuad(5, 1, 0, 3);
-            quadTable.AddQuad(16, 3, 0, 0);
-            quadTable.AddQuad(0, 0, 0, 0);
-            quadTable.PrintQuadTable();
+            InitializeInputFile(inputFilePath);
 
-            return quadTable;
+            
+            bool echoOn = true;
+
+            while (!scanner.EndOfFile)
+            {
+                scanner.GetNextToken(echoOn);
+                PrintToken(scanner.NextToken, scanner.TokenCode);
+            }
+            symbolTable.PrintSymbolTable();
+            // Terminate();
         }
 
-        /// <summary>
-        /// Builds and prints the hard coded Reserve Table and Quad Table to run the summation algorithm. 
-        /// </summary>
-        /// <returns>The Quad Table</returns>
-        static QuadTable BuildQuadsForSummation()
-        {
-            ReserveTable reserveTable = new ReserveTable();
-            reserveTable.PrintReserveTable();
-
-            QuadTable quadTable = new QuadTable(reserveTable);
-            quadTable.AddQuad(5, 4, 0, 0);
-            quadTable.AddQuad(5, 5, 0, 1);
-            quadTable.AddQuad(5, 5, 0, 2);
-            quadTable.AddQuad(3, 0, 2, 6);
-            quadTable.AddQuad(13, 6, 0, 8);
-            quadTable.AddQuad(4, 1, 2, 1);
-            quadTable.AddQuad(4, 2, 5, 2);
-            quadTable.AddQuad(14, 0, 0, 3);
-            quadTable.AddQuad(5, 1, 0, 3);
-            quadTable.AddQuad(16, 3, 0, 0);
-            quadTable.AddQuad(0, 0, 0, 0);
-            quadTable.PrintQuadTable();
-
-            return quadTable;
-        }
-
-        /// <summary>
-        /// Builds and prints the hard coded Symbol Table for the factorial algorithm.
-        /// </summary>
-        /// <returns>The Symbol Table</returns>
-        static SymbolTable BuildSymbolTableForFactorial()
+        static void InitializeStructures()
         {
             SymbolTable symbolTable = new SymbolTable();
-            symbolTable.AddSymbol("n", SymbolKind.Variable, 0);
-            symbolTable.AddSymbol("prod", SymbolKind.Variable, 0);
-            symbolTable.AddSymbol("count", SymbolKind.Variable, 0);
-            symbolTable.AddSymbol("fact", SymbolKind.Variable, 0);
-            symbolTable.AddSymbol("5", SymbolKind.Constant, 5);
-            symbolTable.AddSymbol("1", SymbolKind.Constant, 1);
-            symbolTable.AddSymbol("temp", SymbolKind.Variable, 0);
-            symbolTable.PrintSymbolTable();
-
-            return symbolTable;
+            ReserveTable reserveTable = new ReserveTable();
         }
 
-        /// <summary>
-        /// Builds and prints the hard coded Symbol Table for the summation algorithm.
-        /// </summary>
-        /// <returns>The Symbol Table</returns>
-        static SymbolTable BuildSymbolTableForSummation()
+        static void InitializeInputFile(string filePath)
         {
-            SymbolTable symbolTable = new SymbolTable();
-            symbolTable.AddSymbol("n", SymbolKind.Variable, 0);
-            symbolTable.AddSymbol("sum", SymbolKind.Variable, 0);
-            symbolTable.AddSymbol("count", SymbolKind.Variable, 0);
-            symbolTable.AddSymbol("summation", SymbolKind.Variable, 0);
-            symbolTable.AddSymbol("5", SymbolKind.Constant, 5);
-            symbolTable.AddSymbol("1", SymbolKind.Constant, 1);
-            symbolTable.AddSymbol("temp", SymbolKind.Variable, 0);
-            symbolTable.PrintSymbolTable();
+            string[] fileText = File.ReadAllLines(filePath);
 
-            return symbolTable;
+            foreach (string line in fileText)
+            {
+                Console.WriteLine(line);
+            }
+        }
+
+        static void PrintToken(string nextToken, int tokenCode)
+        {
+
         }
     }
 }

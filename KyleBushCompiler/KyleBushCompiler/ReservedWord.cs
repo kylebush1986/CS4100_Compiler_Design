@@ -7,7 +7,7 @@ namespace KyleBushCompiler
     /// <summary>
     /// Contains the string and integer representations of an OpCode.
     /// </summary>
-    public class OpCode
+    public class ReservedWord
     {
         public string Name { get; set; }
         public int Code { get; set; }
@@ -17,7 +17,7 @@ namespace KyleBushCompiler
         /// </summary>
         /// <param name="name"></param>
         /// <param name="code"></param>
-        public OpCode(string name, int code)
+        public ReservedWord(string name, int code)
         {
             Name = name;
             Code = code;

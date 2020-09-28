@@ -1,3 +1,7 @@
-This is my test data.
-Here is another line.
-And a third line for good measure.
+(* This is a hello world program*)
+
+{This is a comment}
+
+Hello =: "Hello World";
+
+WRITELN(Hello);

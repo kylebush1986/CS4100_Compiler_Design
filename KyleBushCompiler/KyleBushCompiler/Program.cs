@@ -100,7 +100,7 @@ namespace KyleBushCompiler
             {
                 string[] fileText = InitializeInputFile(inputFilePath);
                 Scanner scanner = new Scanner();
-                scanner.Initialize(fileText);
+                scanner.Initialize(fileText, symbolTable, tokenCodes);
                 bool echoOn = true;
 
                 while (!scanner.EndOfFile)

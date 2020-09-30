@@ -90,12 +90,12 @@ namespace KyleBushCompiler
                     }
                 }
                 // Check if NUMERIC CONSTANT either INTEGER or FLOATING_POINT
-                else if (char.IsDigit(CurrentChar))
+                else if (IsDigit(CurrentChar))
                 {
                     TokenFound = true;
                 }
                 // Check if IDENTIFIER
-                else if (char.IsLetter(CurrentChar))
+                else if (IsLetter(CurrentChar))
                 {
                     while (!IsWhitespace(CurrentChar) && IsLetter(CurrentChar) || IsDigit(CurrentChar) || CurrentChar == '_' || CurrentChar == '$')
                     {
@@ -117,19 +117,47 @@ namespace KyleBushCompiler
                         AddCharToNextToken();
                     }
                     TokenCode = STRING;
-                    ReserveTable.Add(NextToken, TokenCode);
+                    AddTokenToSymbolTable();
                     TokenFound = true;
+                    GetNextChar();
                 }
                 else
                 {
-
+                    GetNextChar();
                 }
             }
         }
 
+        //private bool IsOtherIdentifier(char currentChar)
+        //{
+        //    ReserveTable
+        //}
+
+        /// <summary>
+        /// Checks if the token is already in the symbol table.
+        /// If it is not then it is added, otherwise it does nothing.
+        /// </summary>
         private void AddTokenToSymbolTable()
         {
-            SymbolTable.AddSymbol(NextToken, SymbolKind.Variable, TokenCode);
+            int symbolIndex = SymbolTable.LookupSymbol(NextToken);
+            if (symbolIndex == -1)
+            {
+                switch (TokenCode)
+                {
+                    case IDENTIFIER:
+                        SymbolTable.AddSymbol(NextToken, SymbolKind.Variable, 0);
+                        break;
+                    case INTEGER:
+                        SymbolTable.AddSymbol(NextToken, SymbolKind.Constant, Int32.Parse(NextToken));
+                        break;
+                    case FLOATING_POINT:
+                        SymbolTable.AddSymbol(NextToken, SymbolKind.Constant, Double.Parse(NextToken));
+                        break;
+                    case STRING:
+                        SymbolTable.AddSymbol(NextToken, SymbolKind.Constant, NextToken);
+                        break;
+                }
+            }
         }
 
         private int GetIdentifierCode()
@@ -185,10 +213,12 @@ namespace KyleBushCompiler
             else
             {
                 GetNextLine();
-                CurrentCharIndex = 0;
-                CurrentChar = CurrentLine[CurrentCharIndex];
+                if (!EndOfFile)
+                {
+                    CurrentCharIndex = 0;
+                    CurrentChar = CurrentLine[CurrentCharIndex];
+                }
             }
-
         }
 
         /// <summary>

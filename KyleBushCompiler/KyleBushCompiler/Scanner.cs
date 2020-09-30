@@ -86,7 +86,8 @@ namespace KyleBushCompiler
                     }
                     else
                     {
-                        Console.WriteLine("Invalid Character - Expected '*' to begin comment.");
+                        NextToken += '(';
+                        TokenFound = true;
                     }
                 }
                 // Check if NUMERIC CONSTANT either INTEGER or FLOATING_POINT
@@ -121,6 +122,12 @@ namespace KyleBushCompiler
                     TokenFound = true;
                     GetNextChar();
                 }
+                else if (IsSingleCharToken(CurrentChar))
+                {
+                    NextToken += CurrentChar;
+                    TokenFound = true;
+                    GetNextChar();
+                }
                 else
                 {
                     GetNextChar();
@@ -128,10 +135,30 @@ namespace KyleBushCompiler
             }
         }
 
-        //private bool IsOtherIdentifier(char currentChar)
-        //{
-        //    ReserveTable
-        //}
+        private bool IsSingleCharToken(char c)
+        {
+            switch(c)
+            {
+                case '/':
+                case '*':
+                case '+':
+                case '-':
+                case '(':
+                case ')':
+                case ';':
+                case '>':
+                case '<':
+                case '=':
+                case ',':
+                case '[':
+                case ']':
+                case ':':
+                case '.':
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         /// <summary>
         /// Checks if the token is already in the symbol table.
@@ -179,7 +206,7 @@ namespace KyleBushCompiler
 
         private void GetNextLine()
         {
-            if (CurrentLineIndex <= FileText.Length)
+            if (CurrentLineIndex < FileText.Length)
             {
                 if (CurrentCharIndex >= CurrentLine.Length || CurrentLineIndex == 0)
                 {

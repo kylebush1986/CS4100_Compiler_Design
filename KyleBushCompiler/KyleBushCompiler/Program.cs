@@ -90,7 +90,11 @@ namespace KyleBushCompiler
             // String
             tokenCodes.Add("STRING", 53);
 
-            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\program.txt";
+            // My test file
+            // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\program.txt";
+
+            // Provided test file
+            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\LexicalTestF20.txt";
 
             //Psuedocode for main program
             SymbolTable symbolTable = new SymbolTable();

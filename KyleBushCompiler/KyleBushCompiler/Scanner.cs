@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace KyleBushCompiler
         private const int FLOATING_POINT = 52;
         private const int STRING = 53;
         private const int UNDEFINED = 99;
+        private const int MAXLENGTH = 30;
 
         public string NextToken { get; set; }
         public int TokenCode { get; set; }
@@ -37,7 +39,7 @@ namespace KyleBushCompiler
             FileText = fileText;
             CurrentLineIndex = 0;
             CurrentCharIndex = 0;
-            CurrentLine = FileText[CurrentLineIndex];
+            GetNextLine();
             CurrentChar = CurrentLine[CurrentCharIndex];
         }
 
@@ -47,12 +49,12 @@ namespace KyleBushCompiler
         /// <param name="echoOn"> selects whether input lines are echoed when read</param>
         public void GetNextToken(bool echoOn)
         {
+            SkipBlanks();
             EchoOn = echoOn;
             NextToken = "";
             TokenFound = false;
             while (!EndOfFile && !TokenFound)
             {
-                SkipBlanks();
                 // Check for single character comment identifier
                 if (CurrentChar == '{')
                 {
@@ -66,8 +68,7 @@ namespace KyleBushCompiler
                 // Check for 2 character comment identifier
                 else if (CurrentChar == '(')
                 {
-                    GetNextChar();
-                    if (CurrentChar == '*')
+                    if (LookAhead() == '*')
                     {
                         GetNextChar();
                         while (CurrentChar != '*') 
@@ -84,15 +85,40 @@ namespace KyleBushCompiler
                             Console.WriteLine("Invalid Character - Expected ')' to close comment.");
                         }
                     }
+                    // Found single character token '('
                     else
                     {
-                        NextToken += '(';
+                        NextToken += CurrentChar;
                         TokenFound = true;
                     }
                 }
                 // Check if NUMERIC CONSTANT either INTEGER or FLOATING_POINT
                 else if (IsDigit(CurrentChar))
                 {
+                    TokenCode = INTEGER;
+                    while (IsDigit(CurrentChar))
+                    {
+                        NextToken += CurrentChar;
+                        GetNextChar();
+                    }
+                    if (CurrentChar == '.')
+                    {
+                        TokenCode = FLOATING_POINT;
+                        GetNextChar();
+                        if (IsDigit(CurrentChar))
+                        {
+                            while (IsDigit(CurrentChar))
+                            {
+                                NextToken += CurrentChar;
+                                GetNextChar();
+                            }
+                        } 
+                        else if (CurrentChar == 'E')
+                        {
+
+                        }
+                    }
+                    TruncateToken();
                     TokenFound = true;
                 }
                 // Check if IDENTIFIER
@@ -105,6 +131,7 @@ namespace KyleBushCompiler
                     TokenCode = GetIdentifierCode();
                     if (TokenCode == IDENTIFIER)
                     {
+                        TruncateToken();
                         AddTokenToSymbolTable();
                     }
                     TokenFound = true;
@@ -118,13 +145,13 @@ namespace KyleBushCompiler
                         AddCharToNextToken();
                     }
                     TokenCode = STRING;
+                    TruncateToken();
                     AddTokenToSymbolTable();
                     TokenFound = true;
                     GetNextChar();
                 }
-                else if (IsSingleCharToken(CurrentChar))
+                else if (IsOtherToken(CurrentChar))
                 {
-                    NextToken += CurrentChar;
                     TokenFound = true;
                     TokenCode = ReserveTable.LookupName(NextToken);
                     GetNextChar();
@@ -139,7 +166,15 @@ namespace KyleBushCompiler
             }
         }
 
-        private bool IsSingleCharToken(char c)
+        private void TruncateToken()
+        {
+            if (NextToken.Length > MAXLENGTH)
+            {
+                return NextToken.Substring(0, MAXLENGTH);
+            } 
+        }
+
+        private bool IsOtherToken(char c)
         {
             switch(c)
             {
@@ -150,18 +185,63 @@ namespace KyleBushCompiler
                 case '(':
                 case ')':
                 case ';':
-                case '>':
-                case '<':
                 case '=':
                 case ',':
                 case '[':
                 case ']':
-                case ':':
                 case '.':
-                    return true;
+                    NextToken += CurrentChar;
+                    break;
+                case ':':
+                    if (LookAhead() == '=')
+                    {
+                        NextToken += CurrentChar;
+                        GetNextChar();
+                        NextToken += CurrentChar;
+                    }
+                    else
+                    {
+                        NextToken += CurrentChar;
+                    }
+                    break;
+                case '>':
+                    if (LookAhead() == '=')
+                    {
+                        NextToken += CurrentChar;
+                        GetNextChar();
+                        NextToken += CurrentChar;
+                    }
+                    else
+                    {
+                        NextToken += CurrentChar;
+                    }
+                    break;
+                case '<':
+                    if (LookAhead() == '=' || LookAhead() == '>')
+                    {
+                        NextToken += CurrentChar;
+                        GetNextChar();
+                        NextToken += CurrentChar;
+                    }
+                    else
+                    {
+                        NextToken += CurrentChar;
+                    }
+                    break;
                 default:
                     return false;
             }
+            return true;
+        }
+
+        private char LookAhead()
+        {
+            char lookAhead = ' ';
+            if (CurrentCharIndex + 1 < CurrentLine.Length)
+            {
+                lookAhead = CurrentLine[CurrentCharIndex + 1];
+            }
+            return lookAhead;
         }
 
         /// <summary>
@@ -212,7 +292,7 @@ namespace KyleBushCompiler
         {
             if (CurrentLineIndex < FileText.Length)
             {
-                if (CurrentCharIndex >= CurrentLine.Length || CurrentLineIndex == 0)
+                if (CurrentLineIndex == 0 || CurrentCharIndex >= CurrentLine.Length)
                 {
                     do
                     {
@@ -233,7 +313,7 @@ namespace KyleBushCompiler
             }   
         }
 
-        public void GetNextChar()
+        private void GetNextChar()
         {
             CurrentCharIndex++;
 
@@ -252,21 +332,8 @@ namespace KyleBushCompiler
             }
         }
 
-        /// <summary>
-        ///  Prints in straight columns the lexeme, the token code, 
-        ///  a table-looked-up 4-character mnemonic for that code and,
-        ///  for identifiers and literals added to the SymbolTable,
-        ///  the SymbolTable location index of the token.
-        /// </summary>
-        public void PrintToken()
-        {
-            // TODO
-            Console.WriteLine("Lexeme, TokenCode, 4 Char Mnemonic, SymbolTable Index");
-        }
 
-        
-
-        public void SkipBlanks()
+        private void SkipBlanks()
         {
             while (IsWhitespace(CurrentChar))
             {
@@ -274,17 +341,17 @@ namespace KyleBushCompiler
             }
         }
 
-        public bool IsLetter(char c)
+        private bool IsLetter(char c)
         {
             return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
         }
 
-        public bool IsDigit(char c)
+        private bool IsDigit(char c)
         {
             return (c >= '0' && c <= '9');
         }
 
-        public bool IsWhitespace(char c)
+        private bool IsWhitespace(char c)
         {
             return char.IsWhiteSpace(c);
         }

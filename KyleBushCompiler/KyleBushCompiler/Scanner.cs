@@ -126,10 +126,14 @@ namespace KyleBushCompiler
                 {
                     NextToken += CurrentChar;
                     TokenFound = true;
+                    TokenCode = ReserveTable.LookupName(NextToken);
                     GetNextChar();
                 }
                 else
                 {
+                    NextToken += CurrentChar;
+                    TokenCode = UNDEFINED;
+                    TokenFound = true;
                     GetNextChar();
                 }
             }

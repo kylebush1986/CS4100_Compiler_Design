@@ -106,7 +106,7 @@ namespace KyleBushCompiler
                 while (!scanner.EndOfFile)
                 {
                     scanner.GetNextToken(echoOn);
-                    PrintToken(scanner.NextToken, scanner.TokenCode);
+                    PrintToken(scanner.NextToken, scanner.TokenCode, tokenCodes, symbolTable);
                 }
                 symbolTable.PrintSymbolTable();
                 // Terminate();
@@ -128,9 +128,20 @@ namespace KyleBushCompiler
             return File.ReadAllLines(filePath);
         }
 
-        static void PrintToken(string nextToken, int tokenCode)
+        static void PrintToken(string nextToken, int tokenCode, ReserveTable tokenCodes, SymbolTable symbolTable)
         {
-            Console.WriteLine($"Token: {nextToken}, Token Code: {tokenCode}");
+            string mneumonic = tokenCodes.LookupCode(tokenCode);
+
+            if (tokenCode >= 50 && tokenCode <= 53)
+            {
+                Console.WriteLine($"Token: {nextToken}, Token Code: {tokenCode}, Mneumonic: {mneumonic}, Symbol Table Index: {symbolTable.LookupSymbol(nextToken)}");
+            }
+            else
+            {
+                Console.WriteLine($"Token: {nextToken}, Token Code: {tokenCode}, Mneumonic: {mneumonic}");
+            }
+
+            
         }
     }
 }

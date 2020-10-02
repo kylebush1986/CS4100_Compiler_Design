@@ -90,6 +90,7 @@ namespace KyleBushCompiler
                     {
                         NextToken += CurrentChar;
                         TokenFound = true;
+                        GetNextChar();
                     }
                 }
                 // Check if NUMERIC CONSTANT either INTEGER or FLOATING_POINT
@@ -170,7 +171,8 @@ namespace KyleBushCompiler
         {
             if (NextToken.Length > MAXLENGTH)
             {
-                return NextToken.Substring(0, MAXLENGTH);
+                Console.WriteLine("Token length exceeds " + MAXLENGTH + ". Token has been truncated.");
+                NextToken = NextToken.Substring(0, MAXLENGTH);
             } 
         }
 
@@ -273,7 +275,7 @@ namespace KyleBushCompiler
 
         private int GetIdentifierCode()
         {
-            int code = ReserveTable.LookupName(NextToken);
+            int code = ReserveTable.LookupName(NextToken.ToUpper());
             if (code == -1)
             {
                 return IDENTIFIER;

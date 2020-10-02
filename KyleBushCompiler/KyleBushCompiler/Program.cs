@@ -91,7 +91,7 @@ namespace KyleBushCompiler
             tokenCodes.Add("STRING", 53);
 
             // My test file
-            // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\program.txt";
+            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\program.txt";
 
             // Provided test file
             string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\LexicalTestF20.txt";

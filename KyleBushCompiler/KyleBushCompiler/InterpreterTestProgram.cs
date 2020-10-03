@@ -7,6 +7,25 @@ namespace KyleBushCompiler
     {
         //static void Main(string[] args)
         //{
+
+        //ReserveTable OpCodes = new ReserveTable();
+        //OpCodes.Add("STOP", 0);
+        //OpCodes.Add("DIV", 1);
+        //OpCodes.Add("MUL", 2);
+        //OpCodes.Add("SUB", 3);
+        //OpCodes.Add("ADD", 4);
+        //OpCodes.Add("MOV", 5);
+        //OpCodes.Add("STI", 6);
+        //OpCodes.Add("LDI", 7);
+        //OpCodes.Add("BNZ", 8);
+        //OpCodes.Add("BNP", 9);
+        //OpCodes.Add("BNN", 10);
+        //OpCodes.Add("BZ", 11);
+        //OpCodes.Add("BP", 12);
+        //OpCodes.Add("BN", 13);
+        //OpCodes.Add("BR", 14);
+        //OpCodes.Add("BINDR", 15);
+        //OpCodes.Add("PRINT", 16);
         //    Interpreter interpreter = new Interpreter();
 
         //    // Build assets for factorial algorithm and run it with interpreter

@@ -10,6 +10,8 @@ namespace KyleBushCompiler
     /// </summary>
     public class QuadTable
     {
+        private const int TABLEWIDTH = 27;
+        private const char DIVIDER_CHAR = '-';
         private List<Quad> QuadTableData { get; set; }
         public ReserveTable ReserveTable { get; set; }
 
@@ -94,14 +96,28 @@ namespace KyleBushCompiler
         public void PrintQuadTable()
         {
             Console.WriteLine("QUAD TABLE");
-            Console.WriteLine("---------------------------");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
             Console.WriteLine($"|{ "Opcode",-7 }|{ "Op1",5 }|{ "Op2",5 }|{ "Op3",5 }|");
-            Console.WriteLine("---------------------------");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
             foreach (var quad in QuadTableData)
             {
                 Console.WriteLine($"|{ GetMnemonic(quad.OpCode),-7 }|{ quad.Op1,5 }|{ quad.Op2,5 }|{ quad.Op3,5 }|");
             }
-            Console.WriteLine("---------------------------\n");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
+        }
+
+        /// <summary>
+        /// Draws a horizontal border using the given character repeated by the given length
+        /// </summary>
+        /// <param name="length">number of times to repeat character</param>
+        /// <param name="character">character used to draw the border</param>
+        public void DrawHorizontalBorder(int length, char character)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                Console.Write(character);
+            }
+            Console.WriteLine();
         }
     }
 }

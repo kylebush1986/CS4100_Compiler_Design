@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,30 @@ namespace KyleBushCompiler
 {
     class Scanner
     {
+        enum State
+        {
+            START,
+            INTEGER_START,
+            INTEGER_ACCEPT,
+            FLOATING_POINT_START,
+            FLOATING_POINT_SCI_NOTATION,
+            FLOATING_POINT_SCI_NOTATION_SIGN,
+            FLOATING_POINT_SCI_NOTATION_DIGIT,
+            FLOATING_POINT_FRACTIONAL_DIGIT,
+            FLOATING_POINT_ACCEPT,
+            IDENTIFIER_START,
+            IDENTIFIER_ACCEPT,
+            STRING_START,
+            STRING_ACCEPT,
+            COMMENT_2_START,
+            COMMENT_2_BODY,
+            COMMENT_2_CLOSE,
+            COMMENT_1_BODY,
+            ONE_OR_TWO_CHAR_TOKEN_ACCEPT,
+            UNDEFINED
+        }
+
+        private State CurrentState;
         private const int IDENTIFIER = 50;
         private const int INTEGER = 51;
         private const int FLOATING_POINT = 52;
@@ -39,8 +64,7 @@ namespace KyleBushCompiler
             FileText = fileText;
             CurrentLineIndex = 0;
             CurrentCharIndex = 0;
-            GetNextLine();
-            CurrentChar = CurrentLine[CurrentCharIndex];
+            CurrentLine = FileText[CurrentLineIndex];
         }
 
         /// <summary>
@@ -49,125 +73,209 @@ namespace KyleBushCompiler
         /// <param name="echoOn"> selects whether input lines are echoed when read</param>
         public void GetNextToken(bool echoOn)
         {
-            SkipBlanks();
+            CurrentState = State.START;
             EchoOn = echoOn;
             NextToken = "";
             TokenFound = false;
+
+            GetNextChar();
+
             while (!EndOfFile && !TokenFound)
             {
                 // Check for single character comment identifier
                 if (CurrentChar == '{')
                 {
-                    GetNextChar();
-                    while (CurrentChar != '}') 
-                    {
-                        GetNextChar();
-                    };
-                    GetNextChar();
+                    CommentStyleOne();
                 }
                 // Check for 2 character comment identifier
-                else if (CurrentChar == '(')
+                else if (CurrentChar == '(' && LookAhead() == '*')
                 {
-                    if (LookAhead() == '*')
-                    {
-                        GetNextChar();
-                        while (CurrentChar != '*') 
-                        {
-                            GetNextChar();
-                        };
-                        GetNextChar();
-                        if (CurrentChar == ')')
-                        {
-                            GetNextChar();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid Character - Expected ')' to close comment.");
-                        }
-                    }
-                    // Found single character token '('
-                    else
-                    {
-                        NextToken += CurrentChar;
-                        TokenFound = true;
-                        GetNextChar();
-                    }
+                    CommentStyleTwo();
+                }
+                // Check for one or two char tokens
+                else if (IsOneOrTwoCharTokenStart(CurrentChar))
+                {
+                    GetOneOrTwoCharToken(CurrentChar);
+
                 }
                 // Check if NUMERIC CONSTANT either INTEGER or FLOATING_POINT
                 else if (IsDigit(CurrentChar))
                 {
-                    TokenCode = INTEGER;
-                    while (IsDigit(CurrentChar))
-                    {
-                        NextToken += CurrentChar;
-                        GetNextChar();
-                    }
-                    if (CurrentChar == '.')
-                    {
-                        TokenCode = FLOATING_POINT;
-                        GetNextChar();
-                        if (IsDigit(CurrentChar))
-                        {
-                            while (IsDigit(CurrentChar))
-                            {
-                                NextToken += CurrentChar;
-                                GetNextChar();
-                            }
-                        } 
-                        else if (CurrentChar == 'E')
-                        {
-
-                        }
-                    }
-                    TruncateToken();
-                    TokenFound = true;
+                    GetNumericToken();
                 }
                 // Check if IDENTIFIER
                 else if (IsLetter(CurrentChar))
                 {
-                    while (!IsWhitespace(CurrentChar) && IsLetter(CurrentChar) || IsDigit(CurrentChar) || CurrentChar == '_' || CurrentChar == '$')
-                    {
-                        AddCharToNextToken();
-                    }
-                    TokenCode = GetIdentifierCode();
-                    if (TokenCode == IDENTIFIER)
-                    {
-                        TruncateToken();
-                        AddTokenToSymbolTable();
-                    }
-                    TokenFound = true;
+                    GetIdentifierToken();
                 }
                 // Check if STRING
                 else if (CurrentChar == '"')
                 {
-                    GetNextChar();
-                    while (CurrentChar != '"')
-                    {
-                        AddCharToNextToken();
-                    }
-                    TokenCode = STRING;
-                    TruncateToken();
-                    AddTokenToSymbolTable();
-                    TokenFound = true;
-                    GetNextChar();
-                }
-                else if (IsOtherToken(CurrentChar))
-                {
-                    TokenFound = true;
-                    TokenCode = ReserveTable.LookupName(NextToken);
-                    GetNextChar();
+                    GetStringToken();
                 }
                 else
                 {
-                    NextToken += CurrentChar;
-                    TokenCode = UNDEFINED;
-                    TokenFound = true;
-                    GetNextChar();
+                    AcceptToken(UNDEFINED, State.UNDEFINED);
                 }
+            }
+
+            if (EndOfFile)
+            {
+                CheckForEndOfFileErrors();
             }
         }
 
-        private void TruncateToken()
+        private void CheckForEndOfFileErrors()
+        {
+            switch (CurrentState)
+            {
+                case State.COMMENT_1_BODY:
+                case State.COMMENT_2_BODY:
+                    Console.WriteLine("WARNING: End of file found before comment terminated");
+                    break;
+                case State.STRING_START:
+                    Console.WriteLine("WARNING: Unterminated string found");
+                    break;
+            }
+        }
+
+        private void GetStringToken()
+        {
+            CurrentState = State.STRING_START;
+            GetNextChar();
+            while (!EndOfFile || CurrentChar != '"')
+            {
+                AddCharToNextToken();
+                GetNextChar();
+            }
+            AcceptToken(STRING, State.STRING_ACCEPT);
+            AddTokenToSymbolTable();
+        }
+
+        private void GetIdentifierToken()
+        {
+            CurrentState = State.IDENTIFIER_START;
+            while (!EndOfFile && !IsWhitespace(CurrentChar) && IsLetter(CurrentChar) || IsDigit(CurrentChar) || CurrentChar == '_' || CurrentChar == '$')
+            {
+                AddCharToNextToken();
+                GetNextChar();
+            }
+            AcceptToken(GetIdentifierCode(), State.IDENTIFIER_ACCEPT);
+            AddTokenToSymbolTable();
+        }
+
+
+        private void GetNumericToken()
+        {
+            CurrentState = State.INTEGER_START;
+            while (!EndOfFile && IsDigit(CurrentChar))
+            {
+                AddCharToNextToken();
+                GetNextChar();
+            }
+            if (CurrentChar == '.')
+            {
+                GenerateFloatingPointToken();
+            }
+            else
+            {
+                AcceptToken(INTEGER, State.INTEGER_ACCEPT);
+            }
+        }
+
+        private void GenerateFloatingPointToken()
+        {
+            CurrentState = State.FLOATING_POINT_START;
+            GetNextChar();
+            if (IsDigit(CurrentChar))
+            {
+                while (!EndOfFile && IsDigit(CurrentChar))
+                {
+                    AddCharToNextToken();
+                    GetNextChar();
+                }
+                if (CurrentChar == 'E')
+                {
+                    GenerateFloatingPointScientificNotationToken();
+                }
+            }
+            else if (CurrentChar == 'E')
+            {
+                GenerateFloatingPointScientificNotationToken();
+            }
+            else
+            {
+                AcceptToken(TokenCode, State.FLOATING_POINT_ACCEPT);
+            }
+        }
+
+        private void GenerateFloatingPointScientificNotationToken()
+        {
+            CurrentState = State.FLOATING_POINT_SCI_NOTATION;
+            GetNextChar();
+            if (CurrentChar == '-' || CurrentChar == '+')
+            {
+                CurrentState = State.FLOATING_POINT_SCI_NOTATION_SIGN;
+                GetNextChar();
+                if (IsDigit(CurrentChar))
+                {
+                    CurrentState = State.FLOATING_POINT_SCI_NOTATION_DIGIT;
+                    while (!EndOfFile && IsDigit(CurrentChar))
+                    {
+                        AddCharToNextToken();
+                        GetNextChar();
+                    }
+                    AcceptToken(TokenCode, State.FLOATING_POINT_ACCEPT);
+                }
+                else
+                {
+                    Console.WriteLine("ERROR: Expected at least one digit.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("ERROR: Expected + or - character.");
+            }
+        }
+
+        private void AcceptToken(int tokenCode, State state)
+        {
+            TokenFound = true;
+            CurrentState = state;
+            TokenCode = tokenCode;
+            TruncateTokenIfTooLong();
+        }
+
+        private void CommentStyleTwo()
+        {
+            CurrentState = State.COMMENT_2_BODY;
+            GetNextChar();
+            GetNextChar();
+
+            while (!EndOfFile && CurrentChar != '*' && LookAhead() != ')')
+            {
+                GetNextChar();
+            };
+
+            GetNextChar();
+            GetNextChar();
+
+            CurrentState = State.START;   
+        }
+
+        /// <summary>
+        /// The token is a comment so all characters are ignored until a '}' is found to close the comment
+        /// </summary>
+        private void CommentStyleOne()
+        {
+            CurrentState = State.COMMENT_1_BODY;
+            while (!EndOfFile && CurrentChar != '}')
+            {
+                GetNextChar();
+            };
+        }
+
+        private void TruncateTokenIfTooLong()
         {
             if (NextToken.Length > MAXLENGTH)
             {
@@ -176,9 +284,34 @@ namespace KyleBushCompiler
             } 
         }
 
-        private bool IsOtherToken(char c)
+        private bool IsOneOrTwoCharTokenStart(char c)
         {
             switch(c)
+            {
+                case '/':
+                case '*':
+                case '+':
+                case '-':
+                case '(':
+                case ')':
+                case ';':
+                case '=':
+                case ',':
+                case '[':
+                case ']':
+                case '.':
+                case ':':
+                case '>':
+                case '<':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private void GetOneOrTwoCharToken(char c)
+        {
+            switch (c)
             {
                 case '/':
                 case '*':
@@ -230,18 +363,16 @@ namespace KyleBushCompiler
                         NextToken += CurrentChar;
                     }
                     break;
-                default:
-                    return false;
             }
-            return true;
+            AcceptToken(ReserveTable.LookupName(NextToken), State.ONE_OR_TWO_CHAR_TOKEN_ACCEPT);
         }
 
         private char LookAhead()
         {
             char lookAhead = ' ';
-            if (CurrentCharIndex + 1 < CurrentLine.Length)
+            if (CurrentCharIndex < CurrentLine.Length)
             {
-                lookAhead = CurrentLine[CurrentCharIndex + 1];
+                lookAhead = CurrentLine[CurrentCharIndex];
             }
             return lookAhead;
         }
@@ -287,61 +418,60 @@ namespace KyleBushCompiler
         private void AddCharToNextToken()
         {
             NextToken += CurrentChar;
-            GetNextChar();
         }
 
         private void GetNextLine()
         {
-            if (CurrentLineIndex < FileText.Length)
+            do
             {
-                if (CurrentLineIndex == 0 || CurrentCharIndex >= CurrentLine.Length)
+                CurrentLine = FileText[CurrentLineIndex];
+                CurrentLineIndex++;
+                if (EchoOn)
                 {
-                    do
-                    {
-                        CurrentLine = FileText[CurrentLineIndex];
-                        CurrentLineIndex++;
-                    } while (CurrentLine.Length == 0);
-                             
-
-                    if (EchoOn)
-                    {
-                        Console.WriteLine(CurrentLine);
-                    }
+                    Console.WriteLine(CurrentLine);
                 }
-            }
-            else
-            {
-                EndOfFile = true;
-            }   
+            } while (String.IsNullOrWhiteSpace(CurrentLine) || String.IsNullOrEmpty(CurrentLine));      
         }
 
         private void GetNextChar()
         {
-            CurrentCharIndex++;
-
-            if (CurrentCharIndex < CurrentLine.Length && CurrentLine.Length > 0)
+            if (IsEndOfFile())
             {
-                CurrentChar = CurrentLine[CurrentCharIndex];
+                EndOfFile = true;
+                return;
             }
-            else
+            if (IsEndOfLine())
             {
                 GetNextLine();
-                if (!EndOfFile)
-                {
-                    CurrentCharIndex = 0;
-                    CurrentChar = CurrentLine[CurrentCharIndex];
-                }
+                CurrentCharIndex = 0;
             }
-        }
 
+            CurrentChar = CurrentLine[CurrentCharIndex];
+            CurrentCharIndex++;
+
+            SkipBlanks();
+        }
 
         private void SkipBlanks()
         {
-            while (IsWhitespace(CurrentChar))
+            while (!EndOfFile && IsWhitespace(CurrentChar))
             {
+                CurrentCharIndex++;
                 GetNextChar();
             }
         }
+
+        private bool IsEndOfFile()
+        {
+            return (CurrentLineIndex == FileText.Length && CurrentCharIndex == CurrentLine.Length);
+        }
+
+        private bool IsEndOfLine()
+        {
+            return (CurrentLine.Length == 0 || CurrentCharIndex == CurrentLine.Length);
+        }
+
+        
 
         private bool IsLetter(char c)
         {

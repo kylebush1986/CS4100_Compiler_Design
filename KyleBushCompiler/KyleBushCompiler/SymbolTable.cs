@@ -11,6 +11,8 @@ namespace KyleBushCompiler
     /// </summary>
     public class SymbolTable
     {
+        private const int TABLEWIDTH = 85;
+        private const char DIVIDER_CHAR = '-';
         private List<Symbol> SymbolTableData { get; set; }
 
         /// <summary>
@@ -130,14 +132,28 @@ namespace KyleBushCompiler
         public void PrintSymbolTable()
         {
             Console.WriteLine("SYMBOL TABLE");
-            Console.WriteLine("---------------------------------------------");
-            Console.WriteLine($"|{ "Name",-10 }|{ "Kind",10 }|{ "DataType",10 }|{ "Value",10 }|");
-            Console.WriteLine("---------------------------------------------");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
+            Console.WriteLine($"|{ "Name",-30 }|{ "Kind",10 }|{ "DataType",10 }|{ "Value",30 }|");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
             foreach (var symbol in SymbolTableData)
             {
-                Console.WriteLine($"|{ symbol.Name,-10 }|{ symbol.Kind,10 }|{ symbol.DataType,10 }|{ symbol.GetValue(),10 }|");
+                Console.WriteLine($"|{ symbol.Name,-30 }|{ symbol.Kind,10 }|{ symbol.DataType,10 }|{ symbol.GetValue(),30 }|");
             }
-            Console.WriteLine("---------------------------------------------\n");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
+        }
+
+        /// <summary>
+        /// Draws a horizontal border using the given character repeated by the given length
+        /// </summary>
+        /// <param name="length">number of times to repeat character</param>
+        /// <param name="character">character used to draw the border</param>
+        public void DrawHorizontalBorder(int length, char character)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                Console.Write(character);
+            }
+            Console.WriteLine();
         }
     }
 }

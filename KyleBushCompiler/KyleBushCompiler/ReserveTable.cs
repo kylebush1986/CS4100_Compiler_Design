@@ -11,6 +11,8 @@ namespace KyleBushCompiler
     /// </summary>
     public class ReserveTable
     {
+        private const int TABLEWIDTH = 16;
+        private const char DIVIDER_CHAR = '-';
         public List<ReservedWord> ReserveTableData { get; set; }
 
         public ReserveTable()
@@ -91,14 +93,28 @@ namespace KyleBushCompiler
         public void PrintReserveTable()
         {
             Console.WriteLine("RESERVE TABLE");
-            Console.WriteLine("---------------");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
             Console.WriteLine($"|{ "Name", -7 }|{ "Code", 5 }|");
-            Console.WriteLine("---------------");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
             foreach (var code in ReserveTableData)
             {
                 Console.WriteLine($"|{ code.Name, -7 }|{ code.Code, 5 }|");
             }
-            Console.WriteLine("---------------\n");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
+        }
+
+        /// <summary>
+        /// Draws a horizontal border using the given character repeated by the given length
+        /// </summary>
+        /// <param name="length">number of times to repeat character</param>
+        /// <param name="character">character used to draw the border</param>
+        public void DrawHorizontalBorder(int length, char character)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                Console.Write(character);
+            }
+            Console.WriteLine();
         }
 
     }

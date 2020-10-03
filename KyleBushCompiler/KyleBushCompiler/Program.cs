@@ -10,25 +10,42 @@ namespace KyleBushCompiler
     {
         static void Main(string[] args)
         {
-            ReserveTable OpCodes = new ReserveTable();
-            OpCodes.Add("STOP", 0);
-            OpCodes.Add("DIV", 1);
-            OpCodes.Add("MUL", 2);
-            OpCodes.Add("SUB", 3);
-            OpCodes.Add("ADD", 4);
-            OpCodes.Add("MOV", 5);
-            OpCodes.Add("STI", 6);
-            OpCodes.Add("LDI", 7);
-            OpCodes.Add("BNZ", 8);
-            OpCodes.Add("BNP", 9);
-            OpCodes.Add("BNN", 10);
-            OpCodes.Add("BZ", 11);
-            OpCodes.Add("BP", 12);
-            OpCodes.Add("BN", 13);
-            OpCodes.Add("BR", 14);
-            OpCodes.Add("BINDR", 15);
-            OpCodes.Add("PRINT", 16);
+            // My test file
+            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\program.txt";
 
+            // My test file
+            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\GetNextCharTest.txt";
+
+            // Provided test file
+            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\LexicalTestF20.txt";
+
+            //Psuedocode for main program
+            ReserveTable tokenCodes = InitializeReserveWordTable();
+            SymbolTable symbolTable = new SymbolTable();
+
+            try
+            {
+                string[] fileText = InitializeInputFile(inputFilePath);
+                Scanner scanner = new Scanner();
+                scanner.Initialize(fileText, symbolTable, tokenCodes);
+                bool echoOn = true;
+
+                while (!scanner.EndOfFile)
+                {
+                    scanner.GetNextToken(echoOn);
+                    PrintToken(scanner.NextToken, scanner.TokenCode, tokenCodes, symbolTable);
+                }
+                symbolTable.PrintSymbolTable();
+                // Terminate();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        static ReserveTable InitializeReserveWordTable()
+        {
             ReserveTable tokenCodes = new ReserveTable();
 
             // Reserved Words
@@ -90,41 +107,7 @@ namespace KyleBushCompiler
             // String
             tokenCodes.Add("STRING", 53);
 
-            // My test file
-            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\program.txt";
-
-            // Provided test file
-            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\LexicalTestF20.txt";
-
-            //Psuedocode for main program
-            SymbolTable symbolTable = new SymbolTable();
-            ReserveTable reserveTable = new ReserveTable();
-
-            try
-            {
-                string[] fileText = InitializeInputFile(inputFilePath);
-                Scanner scanner = new Scanner();
-                scanner.Initialize(fileText, symbolTable, tokenCodes);
-                bool echoOn = true;
-
-                while (!scanner.EndOfFile)
-                {
-                    scanner.GetNextToken(echoOn);
-                    PrintToken(scanner.NextToken, scanner.TokenCode, tokenCodes, symbolTable);
-                }
-                symbolTable.PrintSymbolTable();
-                // Terminate();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
-
-        static void InitializeStructures()
-        {
-            SymbolTable symbolTable = new SymbolTable();
-            ReserveTable reserveTable = new ReserveTable();
+            return tokenCodes;
         }
 
         static string[] InitializeInputFile(string filePath)
@@ -132,6 +115,14 @@ namespace KyleBushCompiler
             return File.ReadAllLines(filePath);
         }
 
+        /// <summary>
+        /// Prints the Lexeme, the token code, a table-looked-up 4-character mnemonic for that code,
+        /// and for identifiers and literals added to the symbol table, the symbol table location index of the token.
+        /// </summary>
+        /// <param name="nextToken"></param>
+        /// <param name="tokenCode"></param>
+        /// <param name="tokenCodes"></param>
+        /// <param name="symbolTable"></param>
         static void PrintToken(string nextToken, int tokenCode, ReserveTable tokenCodes, SymbolTable symbolTable)
         {
             string mneumonic = tokenCodes.LookupCode(tokenCode);
@@ -143,9 +134,7 @@ namespace KyleBushCompiler
             else
             {
                 Console.WriteLine($"Token: {nextToken}, Token Code: {tokenCode}, Mneumonic: {mneumonic}");
-            }
-
-            
+            }  
         }
     }
 }

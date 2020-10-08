@@ -1,4 +1,5 @@
 
+x:=1;
 (*Comment*)
 
 Hello := "Hello World";

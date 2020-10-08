@@ -38,10 +38,10 @@ namespace KyleBushCompiler
         /// <summary>
         /// Contructor to initialize a Symbol containing an integer value.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="kind"></param>
-        /// <param name="dataType"></param>
-        /// <param name="value"></param>
+        /// <param name="name">String name of symbol</param>
+        /// <param name="kind">Defines the kind of the symbol</param>
+        /// <param name="dataType">Defines the data type of the symbol</param>
+        /// <param name="value">The integer value of the symbol</param>
         public Symbol(string name, SymbolKind kind, DataType dataType, int value)
         {
             Name = name;
@@ -53,10 +53,10 @@ namespace KyleBushCompiler
         /// <summary>
         /// Contructor to initialize a Symbol containing a double value.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="kind"></param>
-        /// <param name="dataType"></param>
-        /// <param name="value"></param>
+        /// <param name="name">String name of symbol</param>
+        /// <param name="kind">Defines the kind of the symbol</param>
+        /// <param name="dataType">Defines the data type of the symbol</param>
+        /// <param name="value">The double value of the symbol</param>
         public Symbol(string name, SymbolKind kind, DataType dataType, double value)
         {
             Name = name;
@@ -68,10 +68,10 @@ namespace KyleBushCompiler
         /// <summary>
         /// Contructor to initialize a Symbol containing a string value.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="kind"></param>
-        /// <param name="dataType"></param>
-        /// <param name="value"></param>
+        /// <param name="name">String name of symbol</param>
+        /// <param name="kind">Defines the kind of the symbol</param>
+        /// <param name="dataType">Defines the data type of the symbol</param>
+        /// <param name="value">The string value of the symbol</param>
         public Symbol(string name, SymbolKind kind, DataType dataType, string value)
         {
             Name = name;
@@ -83,7 +83,7 @@ namespace KyleBushCompiler
         /// <summary>
         /// Sets a Symbol with an integer value.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">The integer value of the symbol</param>
         public void SetValue(int value)
         {
             _intValue = value;
@@ -92,7 +92,7 @@ namespace KyleBushCompiler
         /// <summary>
         /// Sets a Symbol with a string value.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">The string value of the symbol</param>
         public void SetValue(string value)
         {
             _stringValue = value;
@@ -101,7 +101,7 @@ namespace KyleBushCompiler
         /// <summary>
         /// Sets a Symbol with a double value.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">The double value of the symbol</param>
         public void SetValue(double value)
         {
             _doubleValue = value;

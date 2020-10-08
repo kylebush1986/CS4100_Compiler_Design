@@ -15,6 +15,9 @@ namespace KyleBushCompiler
         private const char DIVIDER_CHAR = '-';
         public List<ReservedWord> ReserveTableData { get; set; }
 
+        /// <summary>
+        /// Creates a new ReserveTable and initializes a list of ReservedWords.
+        /// </summary>
         public ReserveTable()
         {
             ReserveTableData = new List<ReservedWord>();
@@ -31,8 +34,8 @@ namespace KyleBushCompiler
         /// <summary>
         /// Returns the index of the row where the data was place, just adds to end of list.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="code"></param>
+        /// <param name="name">String name of reserved word</param>
+        /// <param name="code">Integer code of reserved word</param>
         /// <returns>index of the row where the data was placed</returns>
         public int Add(string name, int code)
         {
@@ -44,7 +47,7 @@ namespace KyleBushCompiler
         /// <summary>
         /// Returns the code associated with name if name is in the table, else returns -1
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">String name of reserved word</param>
         /// <returns></returns>
         public int LookupName(string name)
         {
@@ -59,7 +62,7 @@ namespace KyleBushCompiler
         /// <summary>
         /// Returns the associated name if code is there, else an empty string
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="code">Intger code of reserved word</param>
         /// <returns></returns>
         public string LookupCode(int code)
         {
@@ -74,7 +77,7 @@ namespace KyleBushCompiler
         /// <summary>
         /// Searches the table for the given code to test if it is valid.
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="code">Integer code of reserved word</param>
         /// <returns>True if the code is valid, False if not.</returns>
         public bool isValidOpCode(int code)
         {

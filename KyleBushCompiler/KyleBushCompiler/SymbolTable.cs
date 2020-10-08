@@ -11,7 +11,7 @@ namespace KyleBushCompiler
     /// </summary>
     public class SymbolTable
     {
-        private const int TABLEWIDTH = 85;
+        private const int TABLEWIDTH = 105;
         private const char DIVIDER_CHAR = '-';
         private List<Symbol> SymbolTableData { get; set; }
 
@@ -133,11 +133,11 @@ namespace KyleBushCompiler
         {
             Console.WriteLine("SYMBOL TABLE");
             DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
-            Console.WriteLine($"|{ "Name",-30 }|{ "Kind",10 }|{ "DataType",10 }|{ "Value",30 }|");
+            Console.WriteLine($"|{ "Name",-40 }|{ "Kind",10 }|{ "DataType",10 }|{ "Value",40 }|");
             DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
             foreach (var symbol in SymbolTableData)
             {
-                Console.WriteLine($"|{ symbol.Name,-30 }|{ symbol.Kind,10 }|{ symbol.DataType,10 }|{ symbol.GetValue(),30 }|");
+                Console.WriteLine($"|{ symbol.Name,-40 }|{ symbol.Kind,10 }|{ symbol.DataType,10 }|{ symbol.GetValue(),40 }|");
             }
             DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
         }

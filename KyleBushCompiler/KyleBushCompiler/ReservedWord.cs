@@ -13,10 +13,10 @@ namespace KyleBushCompiler
         public int Code { get; set; }
 
         /// <summary>
-        /// Creates a new OpCode object.
+        /// Creates a new ReservedWord object.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="code"></param>
+        /// <param name="name">String name of reserved word</param>
+        /// <param name="code">Integer code of reserved word</param>
         public ReservedWord(string name, int code)
         {
             Name = name;

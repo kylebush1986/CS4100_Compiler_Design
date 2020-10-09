@@ -1,0 +1,47 @@
+
+
+
+
+{Here is Lexical Test file 1 # *) which 
+  has a comment that
+  spans 3 lines }
+{}
+
+a:=1;
+b:=a+b-c*21.7/22;
+     12345678911234567892123456789312 (*this number is 32 chars *)
+     12345678911234567892123456789333 (*this number is 32 chars, but should be same as above in symbol table *)
+hereisareallylongidentifierthatistoolong := 66;
+  hereisareallylongidentifierthatissameasabovetruncated := 76.5E-22;
+
+   *) {<-- Orphaned closed comment is just '*' and ')' returned as separate tokens}
+           myString_1 : = "an unfinished string makes an error ;
+  test of single #and two char tokens 
+     # /*^&%+-  and some more (   ) (**) ;:=><>=<==<>,[]:.
+(*reserve words 
+below........................... *)  "but first is a good string"
+  GOTO JumpOut;  INTEGER TO DO
+	begin  if not this then that else nothing
+THEN ELSE
+For I := 1 to 100.E7 of float do
+    WRITELN
+    BEGIN
+    END
+  declare  ARRAY 
+   VAR WHILE  UNIT LABEL  REPEAT  UNTIL done = TRUE;
+
+ PROCEDURE  DOWNTO does READLN   RETURN
+	FLOAT
+	STRING
+
+Beginning not reserve writeln.   !@#$%^&*()_+
+sum := 0.0;
+sum := sum + 2;
+What if 2. is found?
+
+(* end of file comes
+   before the end of this 
+   comment-- Throw an Error! *
+
+
+                     

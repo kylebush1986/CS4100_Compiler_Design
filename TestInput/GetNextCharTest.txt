@@ -1,0 +1,14 @@
+
+x:=1;
+(*Comment*)
+
+Hello := "Hello World";
+
+{This is a comment}
+
+"This is a string
+that carries over to another line"
+
+WRITELN(Hello);
+
+(*end*	

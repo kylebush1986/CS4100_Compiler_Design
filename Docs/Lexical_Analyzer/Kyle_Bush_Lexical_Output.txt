@@ -1,0 +1,251 @@
+
+
+
+
+{Here is Lexical Test file 1 # *) which
+  has a comment that
+  spans 3 lines }
+{}
+
+a:=1;
+        |Token: a                                        | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index:  0|
+        |Token: :=                                       | Token Code: 37 | Mneumonic: ASGN | Symbol Table Index:   |
+        |Token: 1                                        | Token Code: 51 | Mneumonic: INTC | Symbol Table Index:  1|
+        |Token: ;                                        | Token Code: 36 | Mneumonic: SEMI | Symbol Table Index:   |
+b:=a+b-c*21.7/22;
+        |Token: b                                        | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index:  2|
+        |Token: :=                                       | Token Code: 37 | Mneumonic: ASGN | Symbol Table Index:   |
+        |Token: a                                        | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index:  0|
+        |Token: +                                        | Token Code: 32 | Mneumonic: _ADD | Symbol Table Index:   |
+        |Token: b                                        | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index:  2|
+        |Token: -                                        | Token Code: 33 | Mneumonic: _SUB | Symbol Table Index:   |
+        |Token: c                                        | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index:  3|
+        |Token: *                                        | Token Code: 31 | Mneumonic: _MUL | Symbol Table Index:   |
+        |Token: 21.7                                     | Token Code: 52 | Mneumonic: FLTC | Symbol Table Index:  4|
+        |Token: /                                        | Token Code: 30 | Mneumonic: _DIV | Symbol Table Index:   |
+        |Token: 22                                       | Token Code: 51 | Mneumonic: INTC | Symbol Table Index:  5|
+        |Token: ;                                        | Token Code: 36 | Mneumonic: SEMI | Symbol Table Index:   |
+     12345678911234567892123456789312 (*this number is 32 chars *)
+        WARNING: Token length exceeds 16. Token has been truncated.
+        |Token: 1234567891123456                         | Token Code: 51 | Mneumonic: INTC | Symbol Table Index:  6|
+     12345678911234567892123456789333 (*this number is 32 chars, but should be same as above in symbol table *)
+        WARNING: Token length exceeds 16. Token has been truncated.
+        |Token: 1234567891123456                         | Token Code: 51 | Mneumonic: INTC | Symbol Table Index:  6|
+hereisareallylongidentifierthatistoolong := 66;
+        WARNING: Token length exceeds 30. Token has been truncated.
+        |Token: hereisareallylongidentifiertha           | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index:  7|
+        |Token: :=                                       | Token Code: 37 | Mneumonic: ASGN | Symbol Table Index:   |
+        |Token: 66                                       | Token Code: 51 | Mneumonic: INTC | Symbol Table Index:  8|
+        |Token: ;                                        | Token Code: 36 | Mneumonic: SEMI | Symbol Table Index:   |
+  hereisareallylongidentifierthatissameasabovetruncated := 76.5E-22;
+        WARNING: Token length exceeds 30. Token has been truncated.
+        |Token: hereisareallylongidentifiertha           | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index:  7|
+        |Token: :=                                       | Token Code: 37 | Mneumonic: ASGN | Symbol Table Index:   |
+        |Token: 76.5E-22                                 | Token Code: 52 | Mneumonic: FLTC | Symbol Table Index:  9|
+        |Token: ;                                        | Token Code: 36 | Mneumonic: SEMI | Symbol Table Index:   |
+
+   *) {<-- Orphaned closed comment is just '*' and ')' returned as separate tokens}
+        |Token: *                                        | Token Code: 31 | Mneumonic: _MUL | Symbol Table Index:   |
+        |Token: )                                        | Token Code: 35 | Mneumonic: RPAR | Symbol Table Index:   |
+           myString_1 : = "an unfinished string makes an error ;
+        |Token: myString_1                               | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 10|
+        |Token: :                                        | Token Code: 47 | Mneumonic: COLN | Symbol Table Index:   |
+        |Token: =                                        | Token Code: 42 | Mneumonic: __EQ | Symbol Table Index:   |
+        WARNING: End of line was reached before " was found to close string.
+        |Token: an unfinished string makes an error ;    | Token Code: 53 | Mneumonic: STRC | Symbol Table Index: 11|
+  test of single #and two char tokens
+        |Token: test                                     | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 12|
+        |Token: of                                       | Token Code:  8 | Mneumonic: __OF | Symbol Table Index:   |
+        |Token: single                                   | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 13|
+        |Token: #                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: and                                      | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 14|
+        |Token: two                                      | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 15|
+        |Token: char                                     | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 16|
+        |Token: tokens                                   | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 17|
+     # /*^&%+-  and some more (   ) (**) ;:=><>=<==<>,[]:.
+        |Token: #                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: /                                        | Token Code: 30 | Mneumonic: _DIV | Symbol Table Index:   |
+        |Token: *                                        | Token Code: 31 | Mneumonic: _MUL | Symbol Table Index:   |
+        |Token: ^                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: &                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: %                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: +                                        | Token Code: 32 | Mneumonic: _ADD | Symbol Table Index:   |
+        |Token: -                                        | Token Code: 33 | Mneumonic: _SUB | Symbol Table Index:   |
+        |Token: and                                      | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 14|
+        |Token: some                                     | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 18|
+        |Token: more                                     | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 19|
+        |Token: (                                        | Token Code: 34 | Mneumonic: LPAR | Symbol Table Index:   |
+        |Token: )                                        | Token Code: 35 | Mneumonic: RPAR | Symbol Table Index:   |
+        |Token: ;                                        | Token Code: 36 | Mneumonic: SEMI | Symbol Table Index:   |
+        |Token: :=                                       | Token Code: 37 | Mneumonic: ASGN | Symbol Table Index:   |
+        |Token: >                                        | Token Code: 38 | Mneumonic: __GT | Symbol Table Index:   |
+        |Token: <>                                       | Token Code: 43 | Mneumonic: NTEQ | Symbol Table Index:   |
+        |Token: =                                        | Token Code: 42 | Mneumonic: __EQ | Symbol Table Index:   |
+        |Token: <=                                       | Token Code: 41 | Mneumonic: LTEQ | Symbol Table Index:   |
+        |Token: =                                        | Token Code: 42 | Mneumonic: __EQ | Symbol Table Index:   |
+        |Token: <>                                       | Token Code: 43 | Mneumonic: NTEQ | Symbol Table Index:   |
+        |Token: ,                                        | Token Code: 44 | Mneumonic: COMM | Symbol Table Index:   |
+        |Token: [                                        | Token Code: 45 | Mneumonic: LBRC | Symbol Table Index:   |
+        |Token: ]                                        | Token Code: 46 | Mneumonic: RBRC | Symbol Table Index:   |
+        |Token: :                                        | Token Code: 47 | Mneumonic: COLN | Symbol Table Index:   |
+        |Token: .                                        | Token Code: 48 | Mneumonic: _DOT | Symbol Table Index:   |
+(*reserve words
+below........................... *)  "but first is a good string"
+        |Token: but first is a good string               | Token Code: 53 | Mneumonic: STRC | Symbol Table Index: 20|
+  GOTO JumpOut;  INTEGER TO DO
+        |Token: GOTO                                     | Token Code:  0 | Mneumonic: GOTO | Symbol Table Index:   |
+        |Token: JumpOut                                  | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 21|
+        |Token: ;                                        | Token Code: 36 | Mneumonic: SEMI | Symbol Table Index:   |
+        |Token: INTEGER                                  | Token Code:  1 | Mneumonic: _INT | Symbol Table Index:   |
+        |Token: TO                                       | Token Code:  2 | Mneumonic: __TO | Symbol Table Index:   |
+        |Token: DO                                       | Token Code:  3 | Mneumonic: __DO | Symbol Table Index:   |
+        begin  if not this then that else nothing
+        |Token: begin                                    | Token Code: 11 | Mneumonic: _BEG | Symbol Table Index:   |
+        |Token: if                                       | Token Code:  4 | Mneumonic: __IF | Symbol Table Index:   |
+        |Token: not                                      | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 22|
+        |Token: this                                     | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 23|
+        |Token: then                                     | Token Code:  5 | Mneumonic: THEN | Symbol Table Index:   |
+        |Token: that                                     | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 24|
+        |Token: else                                     | Token Code:  6 | Mneumonic: ELSE | Symbol Table Index:   |
+        |Token: nothing                                  | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 25|
+THEN ELSE
+        |Token: THEN                                     | Token Code:  5 | Mneumonic: THEN | Symbol Table Index:   |
+        |Token: ELSE                                     | Token Code:  6 | Mneumonic: ELSE | Symbol Table Index:   |
+For I := 1 to 100.E7 of float do
+        |Token: For                                      | Token Code:  7 | Mneumonic: _FOR | Symbol Table Index:   |
+        |Token: I                                        | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 26|
+        |Token: :=                                       | Token Code: 37 | Mneumonic: ASGN | Symbol Table Index:   |
+        |Token: 1                                        | Token Code: 51 | Mneumonic: INTC | Symbol Table Index:  1|
+        |Token: to                                       | Token Code:  2 | Mneumonic: __TO | Symbol Table Index:   |
+        |Token: 100.E7                                   | Token Code: 52 | Mneumonic: FLTC | Symbol Table Index: 27|
+        |Token: of                                       | Token Code:  8 | Mneumonic: __OF | Symbol Table Index:   |
+        |Token: float                                    | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 28|
+        |Token: do                                       | Token Code:  3 | Mneumonic: __DO | Symbol Table Index:   |
+    WRITELN
+        |Token: WRITELN                                  | Token Code:  9 | Mneumonic: WTLN | Symbol Table Index:   |
+    BEGIN
+        |Token: BEGIN                                    | Token Code: 11 | Mneumonic: _BEG | Symbol Table Index:   |
+    END
+        |Token: END                                      | Token Code: 12 | Mneumonic: _END | Symbol Table Index:   |
+  declare  ARRAY
+        |Token: declare                                  | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 29|
+        |Token: ARRAY                                    | Token Code: 25 | Mneumonic: ARRY | Symbol Table Index:   |
+   VAR WHILE  UNIT LABEL  REPEAT  UNTIL done = TRUE;
+        |Token: VAR                                      | Token Code: 13 | Mneumonic: _VAR | Symbol Table Index:   |
+        |Token: WHILE                                    | Token Code: 14 | Mneumonic: WHIL | Symbol Table Index:   |
+        |Token: UNIT                                     | Token Code: 15 | Mneumonic: UNIT | Symbol Table Index:   |
+        |Token: LABEL                                    | Token Code: 16 | Mneumonic: LABL | Symbol Table Index:   |
+        |Token: REPEAT                                   | Token Code: 17 | Mneumonic: REPT | Symbol Table Index:   |
+        |Token: UNTIL                                    | Token Code: 18 | Mneumonic: UNTL | Symbol Table Index:   |
+        |Token: done                                     | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 30|
+        |Token: =                                        | Token Code: 42 | Mneumonic: __EQ | Symbol Table Index:   |
+        |Token: TRUE                                     | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 31|
+        |Token: ;                                        | Token Code: 36 | Mneumonic: SEMI | Symbol Table Index:   |
+
+ PROCEDURE  DOWNTO does READLN   RETURN
+        |Token: PROCEDURE                                | Token Code: 19 | Mneumonic: PROC | Symbol Table Index:   |
+        |Token: DOWNTO                                   | Token Code: 20 | Mneumonic: DOWN | Symbol Table Index:   |
+        |Token: does                                     | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 32|
+        |Token: READLN                                   | Token Code: 10 | Mneumonic: RDLN | Symbol Table Index:   |
+        |Token: RETURN                                   | Token Code: 22 | Mneumonic: RTRN | Symbol Table Index:   |
+        FLOAT
+        |Token: FLOAT                                    | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 28|
+        STRING
+        |Token: STRING                                   | Token Code: 24 | Mneumonic: _STR | Symbol Table Index:   |
+
+Beginning not reserve writeln.   !@#$%^&*()_+
+        |Token: Beginning                                | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 33|
+        |Token: not                                      | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 22|
+        |Token: reserve                                  | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 34|
+        |Token: writeln                                  | Token Code:  9 | Mneumonic: WTLN | Symbol Table Index:   |
+        |Token: .                                        | Token Code: 48 | Mneumonic: _DOT | Symbol Table Index:   |
+        |Token: !                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: @                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: #                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: $                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: %                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: ^                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: &                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: *                                        | Token Code: 31 | Mneumonic: _MUL | Symbol Table Index:   |
+        |Token: (                                        | Token Code: 34 | Mneumonic: LPAR | Symbol Table Index:   |
+        |Token: )                                        | Token Code: 35 | Mneumonic: RPAR | Symbol Table Index:   |
+        |Token: _                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+        |Token: +                                        | Token Code: 32 | Mneumonic: _ADD | Symbol Table Index:   |
+sum := 0.0;
+        |Token: sum                                      | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 35|
+        |Token: :=                                       | Token Code: 37 | Mneumonic: ASGN | Symbol Table Index:   |
+        |Token: 0.0                                      | Token Code: 52 | Mneumonic: FLTC | Symbol Table Index: 36|
+        |Token: ;                                        | Token Code: 36 | Mneumonic: SEMI | Symbol Table Index:   |
+sum := sum + 2;
+        |Token: sum                                      | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 35|
+        |Token: :=                                       | Token Code: 37 | Mneumonic: ASGN | Symbol Table Index:   |
+        |Token: sum                                      | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 35|
+        |Token: +                                        | Token Code: 32 | Mneumonic: _ADD | Symbol Table Index:   |
+        |Token: 2                                        | Token Code: 51 | Mneumonic: INTC | Symbol Table Index: 37|
+        |Token: ;                                        | Token Code: 36 | Mneumonic: SEMI | Symbol Table Index:   |
+What if 2. is found?
+        |Token: What                                     | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 38|
+        |Token: if                                       | Token Code:  4 | Mneumonic: __IF | Symbol Table Index:   |
+        |Token: 2.                                       | Token Code: 52 | Mneumonic: FLTC | Symbol Table Index: 39|
+        |Token: is                                       | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 40|
+        |Token: found                                    | Token Code: 50 | Mneumonic: IDNT | Symbol Table Index: 41|
+        |Token: ?                                        | Token Code: 99 | Mneumonic: UNDF | Symbol Table Index:   |
+
+(* end of file comes
+   before the end of this
+   comment-- Throw an Error! *
+
+
+
+        WARNING: End of file found before comment terminated
+SYMBOL TABLE
+---------------------------------------------------------------------------------------------------------
+|Name                                    |      Kind|  DataType|                                   Value|
+---------------------------------------------------------------------------------------------------------
+|A                                       |  Variable|   Integer|                                       0|
+|1                                       |  Constant|    Double|                                       1|
+|B                                       |  Variable|   Integer|                                       0|
+|C                                       |  Variable|   Integer|                                       0|
+|21.7                                    |  Constant|    Double|                                    21.7|
+|22                                      |  Constant|    Double|                                      22|
+|1234567891123456                        |  Constant|    Double|                        1234567891123456|
+|HEREISAREALLYLONGIDENTIFIERTHA          |  Variable|   Integer|                                       0|
+|66                                      |  Constant|    Double|                                      66|
+|76.5E-22                                |  Constant|    Double|                                7.65E-21|
+|MYSTRING_1                              |  Variable|   Integer|                                       0|
+|an unfinished string makes an error ;   |  Constant|    String|   an unfinished string makes an error ;|
+|TEST                                    |  Variable|   Integer|                                       0|
+|SINGLE                                  |  Variable|   Integer|                                       0|
+|AND                                     |  Variable|   Integer|                                       0|
+|TWO                                     |  Variable|   Integer|                                       0|
+|CHAR                                    |  Variable|   Integer|                                       0|
+|TOKENS                                  |  Variable|   Integer|                                       0|
+|SOME                                    |  Variable|   Integer|                                       0|
+|MORE                                    |  Variable|   Integer|                                       0|
+|but first is a good string              |  Constant|    String|              but first is a good string|
+|JUMPOUT                                 |  Variable|   Integer|                                       0|
+|NOT                                     |  Variable|   Integer|                                       0|
+|THIS                                    |  Variable|   Integer|                                       0|
+|THAT                                    |  Variable|   Integer|                                       0|
+|NOTHING                                 |  Variable|   Integer|                                       0|
+|I                                       |  Variable|   Integer|                                       0|
+|100.E7                                  |  Constant|    Double|                              1000000000|
+|FLOAT                                   |  Variable|   Integer|                                       0|
+|DECLARE                                 |  Variable|   Integer|                                       0|
+|DONE                                    |  Variable|   Integer|                                       0|
+|TRUE                                    |  Variable|   Integer|                                       0|
+|DOES                                    |  Variable|   Integer|                                       0|
+|BEGINNING                               |  Variable|   Integer|                                       0|
+|RESERVE                                 |  Variable|   Integer|                                       0|
+|SUM                                     |  Variable|   Integer|                                       0|
+|0.0                                     |  Constant|    Double|                                       0|
+|2                                       |  Constant|    Double|                                       2|
+|WHAT                                    |  Variable|   Integer|                                       0|
+|2.                                      |  Constant|    Double|                                       2|
+|IS                                      |  Variable|   Integer|                                       0|
+|FOUND                                   |  Variable|   Integer|                                       0|
+---------------------------------------------------------------------------------------------------------
+
+C:\projects\CS4100_Compiler_Design\KyleBushCompiler\KyleBushCompiler\bin\Debug\netcoreapp3.1\KyleBushCompiler.exe (process 35956) exited with code 0.
+To automatically close the console when debugging stops, enable Tools->Options->Debugging->Automatically close the console when debugging stops.
+Press any key to close this window . . .

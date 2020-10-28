@@ -8,6 +8,23 @@ namespace KyleBushCompiler
 {
     class Program
     {
+        /*
+         * CFG for Language Definition
+         * <program> -> $UNIT <prog-identifier> $SEMICOLON <block> $PERIOD
+         * <block> -> $BEGIN <statement> {$SEMICOLON <statement>}* $END
+         * <prog-identifier> -> <identifier>
+         * <statement> -> <variable> $COLON-EQUALS <simple expression>
+         * <variable> -> <identifier>
+         * <simple expression> -> [<sign>] <term> {<addop> <term>}*
+         * <addop> -> $PLUS | $MINUS
+         * <sign> -> $PLUS | $MINUS
+         * <term> -> <factor> {<mulop> <factor> }*
+         * <mulop> -> $MULTIPLY | $DIVIDE
+         * <factor> -> <unsigned constant> | <variable> | $LPAR <simple expression> $RPAR
+         * <unsigned constant>-> <unsigned number>
+         * <unsigned number>-> $FLOAT | $INTTYPE
+         * <identifier> -> $IDENTIFIER
+         */
         static void Main(string[] args)
         {
             // My test file

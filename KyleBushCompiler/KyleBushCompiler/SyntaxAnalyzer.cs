@@ -81,7 +81,11 @@ namespace KyleBushCompiler
             {
                 Scanner.GetNextToken(ScannerEchoOn);
                 int x = Statement();
-                // TODO: Implement {$SEMICOLON <statement>}*
+                while (Scanner.TokenCode == SEMICOLON)
+                {
+                    Scanner.GetNextToken(ScannerEchoOn);
+                    x = Statement();
+                }
 
                 if (Scanner.TokenCode == END)
                     Scanner.GetNextToken(ScannerEchoOn);
@@ -158,7 +162,22 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "SimpleExpression()");
-            // TODO: Implement CFG Rule
+
+            int x;
+
+            if (isSign())
+            {
+                x = Sign();
+            }
+
+            x = Term();
+
+            while (isAddOp())
+            {
+                x = AddOp();
+                x = Term();
+            }
+
             Debug(false, "SimpleExpression()");
             return -1;
         }
@@ -173,14 +192,24 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "AddOp()");
-            if (Scanner.TokenCode == PLUS)
-                Scanner.GetNextToken(ScannerEchoOn);
-            else if (Scanner.TokenCode == MINUS)
+            if (Scanner.TokenCode == PLUS || Scanner.TokenCode == MINUS)
                 Scanner.GetNextToken(ScannerEchoOn);
             else
                 Error("PLUS or MINUS");
             Debug(false, "AddOp()");
             return -1;
+        }
+
+        /// <summary>
+        /// Checks if the next token is an AddOp token.
+        /// </summary>
+        /// <returns></returns>
+        private bool isAddOp()
+        {
+            if (Scanner.TokenCode == PLUS || Scanner.TokenCode == MINUS)
+                return true;
+            else
+                return false;
         }
 
         /// <summary>
@@ -204,57 +233,163 @@ namespace KyleBushCompiler
         }
 
         /// <summary>
-        /// Implements CFG Rule: 
+        /// Checks if the next token is a Sign token.
+        /// </summary>
+        /// <returns></returns>
+        private bool isSign()
+        {
+            if (Scanner.TokenCode == PLUS || Scanner.TokenCode == MINUS)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Implements CFG Rule: <term> -> <factor> {<mulop> <factor> }*
         /// </summary>
         /// <returns></returns>
         private int Term()
         {
-            throw new NotImplementedException();
+            if (IsError)
+                return -1;
+
+            Debug(true, "Term()");
+            int x = Factor();
+
+            while (isMulOp())
+            {
+                x = MulOp();
+                x = Factor();
+            }
+
+            Debug(false, "Term()");
+            return -1;
         }
 
         /// <summary>
-        /// Implements CFG Rule: 
+        /// Implements CFG Rule: <mulop> -> $MULTIPLY | $DIVIDE
         /// </summary>
         /// <returns></returns>
         private int MulOp()
         {
-            throw new NotImplementedException();
+            if (IsError)
+                return -1;
+
+            Debug(true, "MulOp()");
+
+            if (Scanner.TokenCode == MULTIPLY || Scanner.TokenCode == DIVIDE)
+                Scanner.GetNextToken(ScannerEchoOn);
+            else
+                Error("MULTIPLY or DIVIDE");
+
+            Debug(false, "MulOp()");
+            return -1;
         }
 
         /// <summary>
-        /// Implements CFG Rule: 
+        /// Checks if the next token is a MulOp token.
+        /// </summary>
+        /// <returns></returns>
+        private bool isMulOp()
+        {
+            if (Scanner.TokenCode == MULTIPLY || Scanner.TokenCode == DIVIDE)
+                return true;
+            else
+                return false;
+        }
+
+
+        /// <summary>
+        /// Implements CFG Rule: <factor> -> <unsigned constant> | <variable> | $LPAR <simple expression> $RPAR
         /// </summary>
         /// <returns></returns>
         private int Factor()
         {
-            throw new NotImplementedException();
+            if (IsError)
+                return -1;
+
+            Debug(true, "Factor()");
+
+            int x;
+
+            // TOOD: Implement isUnsignedConstant() and isVariable()
+            if (isUnsignedConstant())
+            {
+                x = UnsignedConstant();
+            }
+            else if (isVariable())
+            {
+                Variable();
+            }
+            else if (Scanner.TokenCode == LPAR)
+            {
+                Scanner.GetNextToken(ScannerEchoOn);
+                SimpleExpression();
+                if (Scanner.TokenCode == RPAR)
+                    Scanner.GetNextToken(ScannerEchoOn);
+                else
+                    Error("RPAR");
+            }
+            else
+                Error("UNSIGNED CONSTANT or VARIABLE or LPAR");
+
+            Debug(false, "Factor()");
+            return -1;
         }
 
         /// <summary>
-        /// Implements CFG Rule: 
+        /// Implements CFG Rule: <unsigned constant>-> <unsigned number>
         /// </summary>
         /// <returns></returns>
         private int UnsignedConstant()
         {
-            throw new NotImplementedException();
+            if (IsError)
+                return -1;
+
+            Debug(true, "UnsignedConstant()");
+            UnsignedNumber();
+            Debug(false, "UnsignedConstant()");
+            return -1;
         }
 
         /// <summary>
-        /// Implements CFG Rule: 
+        /// Implements CFG Rule: <unsigned number>-> $FLOAT | $INTTYPE
         /// </summary>
         /// <returns></returns>
         private int UnsignedNumber()
         {
-            throw new NotImplementedException();
+            if (IsError)
+                return -1;
+
+            Debug(true, "UnsignedNumber()");
+
+            if (Scanner.TokenCode == FLOAT || Scanner.TokenCode == INTTYPE)
+                Scanner.GetNextToken(ScannerEchoOn);
+            else
+                Error("FLOAT or INTTYPE");
+
+            Debug(false, "UnsignedNumber()");
+            return -1;
         }
 
         /// <summary>
-        /// Implements CFG Rule: 
+        /// Implements CFG Rule: <identifier> -> $IDENTIFIER
         /// </summary>
         /// <returns></returns>
         private int Identifier()
         {
-            throw new NotImplementedException();
+            if (IsError)
+                return -1;
+
+            Debug(true, "Identifier()");
+
+            if (Scanner.TokenCode == IDENTIFIER)
+                Scanner.GetNextToken(ScannerEchoOn);
+            else
+                Error("IDENTIFIER");
+
+            Debug(false, "Identifier()");
+            return -1;
         }
 
         #endregion

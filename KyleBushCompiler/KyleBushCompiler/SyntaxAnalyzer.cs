@@ -198,7 +198,7 @@ namespace KyleBushCompiler
         }
 
         /// <summary>
-        /// 
+        /// Implements CFG Rule: <label-declaration> -> $LABEL <identifier> {$COMMA <identifier>}* $SEMICOLON
         /// </summary>
         /// <returns></returns>
         private int LabelDeclaration()

@@ -14,6 +14,7 @@ namespace KyleBushCompiler
          * <program> -> $UNIT <prog-identifier> $SEMICOLON <block> $PERIOD
          * <block> -> [<label-declaration>] {<variable-dec-sec>}* <block-body>
          * <block-body> -> $BEGIN <statement> {$SEMICOLON <statement>}* $END
+         * <label-declaration> -> $LABEL <identifier> {$COMMA <identifier>}* $SEMICOLON
          * <prog-identifier> -> <identifier>
          * <statement> -> <variable> $COLON_EQUALS <simple expression>
          * <variable> -> <identifier>

@@ -1,0 +1,16 @@
+
+
+unit goodtree;
+
+(* This Part A test file should have NO errors! *)
+
+begin
+{ The only statements for Part A are ASSIGNMENTS with EXPRESSIONS }
+
+sum:=(27*first)+ 3.14*radius*radius;
+a :=(a+c)*(b-d)                ;
+
+quad1 := -b +(b*b) - 4 * a* c / 2*a;
+final := this - (that*other)
+end.
+

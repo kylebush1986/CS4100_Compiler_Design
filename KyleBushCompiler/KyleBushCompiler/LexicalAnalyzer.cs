@@ -79,6 +79,8 @@ namespace KyleBushCompiler
             CurrentLineIndex = 0;
             CurrentCharIndex = 0;
             CurrentLine = FileText[CurrentLineIndex];
+            CurrentLineIndex++;
+            PrintLine();
         }
 
         /// <summary>
@@ -322,6 +324,7 @@ namespace KyleBushCompiler
             CurrentState = state;
             TokenCode = tokenCode;
             TruncateTokenIfTooLong();
+            
         }
 
         /// <summary>
@@ -522,7 +525,7 @@ namespace KyleBushCompiler
                         SymbolTable.AddSymbol(tokenToAdd, SymbolKind.Variable, 0);
                         break;
                     case INTEGER:
-                        SymbolTable.AddSymbol(tokenToAdd, SymbolKind.Constant, Int64.Parse(tokenToAdd));
+                        SymbolTable.AddSymbol(tokenToAdd, SymbolKind.Constant, Int32.Parse(tokenToAdd));
                         break;
                     case FLOATING_POINT:
                         SymbolTable.AddSymbol(tokenToAdd, SymbolKind.Constant, Double.Parse(tokenToAdd));
@@ -572,8 +575,16 @@ namespace KyleBushCompiler
             
             if (EchoOn)
             {
-                Console.WriteLine(CurrentLine);
+                PrintLine();
             }
+        }
+
+        /// <summary>
+        /// Prints the current line.
+        /// </summary>
+        private void PrintLine()
+        {
+            Console.WriteLine("Line #{0} {1}", CurrentLineIndex, CurrentLine);
         }
 
         /// <summary>
@@ -639,7 +650,7 @@ namespace KyleBushCompiler
         /// </summary>
         private void SkipBlanks()
         {
-            while (!EndOfFile && IsWhitespace(CurrentChar) || string.IsNullOrEmpty(CurrentLine))
+            while (!EndOfFile && (IsWhitespace(CurrentChar) || string.IsNullOrEmpty(CurrentLine)))
             {
                 GetNextChar();
             }

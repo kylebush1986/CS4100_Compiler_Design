@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design;
 using System.IO;
 using System.Reflection.Emit;
@@ -11,9 +12,10 @@ namespace KyleBushCompiler
         /*
          * CFG for Language Definition
          * <program> -> $UNIT <prog-identifier> $SEMICOLON <block> $PERIOD
-         * <block> -> $BEGIN <statement> {$SEMICOLON <statement>}* $END
+         * <block> -> [<label-declaration>] {<variable-dec-sec>}* <block-body>
+         * <block-body> -> $BEGIN <statement> {$SEMICOLON <statement>}* $END
          * <prog-identifier> -> <identifier>
-         * <statement> -> <variable> $COLON-EQUALS <simple expression>
+         * <statement> -> <variable> $COLON_EQUALS <simple expression>
          * <variable> -> <identifier>
          * <simple expression> -> [<sign>] <term> {<addop> <term>}*
          * <addop> -> $PLUS | $MINUS
@@ -27,14 +29,14 @@ namespace KyleBushCompiler
          */
         static void Main(string[] args)
         {
-            // My test file
-            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\program.txt";
+            // Provided GOOD test file
+            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\GoodtreeA.txt";
 
-            // My test file
-            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\GetNextCharTest.txt";
+            // Provided BAD test file with syntax error
+            // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\BadProg1.txt";
 
-            // Provided test file
-            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\LexicalTestF20.txt";
+            // Provided BAD test file with lexical and syntax error
+            // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\BadProg2.txt";
 
             // Initialize structures
             ReserveTable reserveWords = InitializeReserveWordTable();
@@ -48,15 +50,15 @@ namespace KyleBushCompiler
 
                 // Initialize the Lexical Analyzer (Scanner)
                 LexicalAnalyzer scanner = new LexicalAnalyzer();
+
                 scanner.Initialize(fileText, symbolTable, reserveWords);
                 bool echoOn = true;
 
-                while (!scanner.EndOfFile)
-                {
-                    scanner.GetNextToken(echoOn);
-                    if (!scanner.EndOfFile)
-                        PrintToken(scanner.NextToken, scanner.TokenCode, tokenCodes, symbolTable);
-                }
+                SyntaxAnalyzer parser = new SyntaxAnalyzer(scanner, tokenCodes, echoOn);
+
+                scanner.GetNextToken(echoOn);
+                parser.TraceOn = true;
+                int val = parser.Program();
 
                 symbolTable.PrintSymbolTable();
             }
@@ -207,34 +209,6 @@ namespace KyleBushCompiler
         static string[] InitializeInputFile(string filePath)
         {
             return File.ReadAllLines(filePath);
-        }
-
-        /// <summary>
-        /// Prints the Lexeme, the token code, a table-looked-up 4-character mnemonic for that code,
-        /// and for identifiers and literals added to the symbol table, the symbol table location index of the token.
-        /// </summary>
-        /// <param name="nextToken">The token most recently found</param>
-        /// <param name="tokenCode">The token code of the most recently found token</param>
-        /// <param name="mnemonicTable">Table containing the mnemonic associated with each token code</param>
-        /// <param name="symbolTable">Table containing identifiers, numeric constants, and string constants</param>
-        static void PrintToken(string nextToken, int tokenCode, ReserveTable mnemonicTable, SymbolTable symbolTable)
-        {
-            string mneumonic = mnemonicTable.LookupCode(tokenCode);
-            int symbolTableIndex;
-
-            if (tokenCode == 50)
-                symbolTableIndex = symbolTable.LookupSymbol(nextToken.ToUpper());
-            else
-                symbolTableIndex = symbolTable.LookupSymbol(nextToken);
-
-            if (symbolTableIndex == -1)
-            {
-                Console.WriteLine($"\t|Token: {nextToken, -40} | Token Code: {tokenCode, 2} | Mneumonic: {mneumonic, 4} | Symbol Table Index:   |");
-            }
-            else
-            {
-                Console.WriteLine($"\t|Token: {nextToken, -40} | Token Code: {tokenCode, 2} | Mneumonic: {mneumonic, 4} | Symbol Table Index: {symbolTableIndex, 2}|");
-            }
         }
     }
 }

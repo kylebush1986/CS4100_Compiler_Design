@@ -1,0 +1,4 @@
+UNIT my_prog;
+	BEGIN
+	a := 5
+	END.

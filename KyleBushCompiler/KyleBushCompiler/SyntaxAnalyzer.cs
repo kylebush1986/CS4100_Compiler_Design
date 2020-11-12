@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Linq.Expressions;
 using System.Security.Cryptography.X509Certificates;
@@ -9,18 +10,74 @@ namespace KyleBushCompiler
 {
     class SyntaxAnalyzer
     {
+        #region Token Constants
+        private const int GOTO = 0;
+        private const int INTEGER = 1;
+        private const int TO = 2;
+        private const int DO = 3;
+        private const int IF = 4;
+        private const int THEN = 5;
+        private const int ELSE = 6;
+        private const int FOR = 7;
+        private const int OF = 8;
+        private const int WRITELN = 9;
+        private const int READLN = 10;
+        private const int BEGIN = 11;
+        private const int END = 12;
+        private const int VAR = 13;
+        private const int WHILE = 14;
+        private const int UNIT = 15;
+        private const int LABEL = 16;
+        private const int REPEAT = 17;
+        private const int UNTIL = 18;
+        private const int PROCEDURE = 19;
+        private const int DOWNTO = 20;
+        private const int FUNCTION = 21;
+        private const int RETURN = 22;
+        private const int REAL = 23;
+        private const int STRING = 24;
+        private const int ARRAY = 25;
+        private const int DIVIDE = 30;
+        private const int MULTIPLY = 31;
+        private const int PLUS = 32;
+        private const int MINUS = 33;
+        private const int LPAR = 34;
+        private const int RPAR = 35;
+        private const int SEMICOLON = 36;
+        private const int COLON_EQUALS = 37;
+        private const int GREATER_THAN = 38;
+        private const int LESS_THAN = 39;
+        private const int GREATER_THAN_OR_EQUAL = 40;
+        private const int LESS_THAN_OR_EQUAL = 41;
+        private const int EQUAL = 42;
+        private const int NOT = 43;
+        private const int COMMA = 44;
+        private const int LEFT_BRACKET = 45;
+        private const int RIGHT_BRACKET = 46;
+        private const int COLON = 47;
+        private const int PERIOD = 48;
+        private const int IDENTIFIER = 50;
+        private const int INTTYPE = 51;
+        private const int FLOAT = 52;
+        private const int STRINGTYPE = 53;
+        private const int UNDEFINED = 99;
+        #endregion
+
         #region Properties
         public bool TraceOn { get; set; }
         public bool IsError { get; set; }
         private LexicalAnalyzer Scanner { get; set; }
+        private ReserveTable TokenCodes { get; set; }
         private bool ScannerEchoOn { get; set; }
+        private bool Verbose { get; set; }
 
         #endregion
 
-        public SyntaxAnalyzer(LexicalAnalyzer scanner, bool scannerEchoOn)
+        public SyntaxAnalyzer(LexicalAnalyzer scanner, ReserveTable tokenCodes, bool scannerEchoOn)
         {
             Scanner = scanner;
             ScannerEchoOn = scannerEchoOn;
+            TokenCodes = tokenCodes;
         }
 
         #region CFG Methods
@@ -34,19 +91,19 @@ namespace KyleBushCompiler
             if (IsError)
                 return -1;
 
-            Debug(true, "Program()")
+            Debug(true, "Program()");
 
             if (Scanner.TokenCode == UNIT)
             {
-                Scanner.GetNextToken(ScannerEchoOn);
+                GetNextToken();
                 int x = ProgIdentifier();
                 if (Scanner.TokenCode == SEMICOLON)
                 {
-                    Scanner.GetNextToken(ScannerEchoOn);
+                    GetNextToken();
                     x = Block();
                     if (Scanner.TokenCode == PERIOD)
                     {
-                        Scanner.GetNextToken(ScannerEchoOn);
+                        GetNextToken();
                     }
                     else
                     {
@@ -67,8 +124,10 @@ namespace KyleBushCompiler
             return -1;
         }
 
+
         /// <summary>
-        /// Implements CFG Rule: <block> -> $BEGIN <statement> {$SEMICOLON <statement>}* $END
+        /// Implements CFG Rule: <block> -> [<label-declaration>] {<variable-dec-sec>}* <block-body>
+        /// Also contains main error handling logic.
         /// </summary>
         /// <returns></returns>
         private int Block()
@@ -77,25 +136,96 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "Block()");
+            if (Scanner.TokenCode == LABEL)
+            {
+                GetNextToken();
+                LabelDeclaration();
+            }
+
+            while(Scanner.TokenCode == VAR && !IsError)
+            {
+                GetNextToken();
+                VariableDeclarationSection();
+            }
+
+            BlockBody();
+
+            // Error handling and resyncing
+            while(IsError == true && !Scanner.EndOfFile)
+            {
+                Resync();
+                IsError = false;
+                while (IsError == false && !Scanner.EndOfFile)
+                {
+                    Statement();
+                }
+            }
+
+            Debug(false, "Block()");
+            return -1;
+        }
+
+        /// <summary>
+        /// Implements CFG Rule: <block-body> -> $BEGIN <statement> {$SEMICOLON <statement>}* $END
+        /// </summary>
+        /// <returns></returns>
+        private int BlockBody()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "BlockBody()");
             if (Scanner.TokenCode == BEGIN)
             {
-                Scanner.GetNextToken(ScannerEchoOn);
+                GetNextToken();
                 int x = Statement();
-                while (Scanner.TokenCode == SEMICOLON)
+                while (Scanner.TokenCode == SEMICOLON && !IsError)
                 {
-                    Scanner.GetNextToken(ScannerEchoOn);
+                    GetNextToken();
                     x = Statement();
                 }
 
                 if (Scanner.TokenCode == END)
-                    Scanner.GetNextToken(ScannerEchoOn);
+                    GetNextToken();
                 else
                     Error("END");
             }
             else
                 Error("BEGIN");
 
-            Debug(false, "Block()");
+            Debug(false, "BlockBody()");
+            return -1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private int LabelDeclaration()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "LabelDeclaration()");
+            if (Scanner.TokenCode == LABEL)
+            {
+                GetNextToken();
+                int x = Identifier();
+                while (Scanner.TokenCode == COMMA && !IsError)
+                {
+                    GetNextToken();
+                    x = Identifier();
+                }
+
+                if (Scanner.TokenCode == SEMICOLON)
+                    GetNextToken();
+                else
+                    Error("SEMICOLON");
+            }
+            else
+                Error("LABEL");
+
+            Debug(false, "LabelDeclaration()");
             return -1;
         }
 
@@ -115,7 +245,7 @@ namespace KyleBushCompiler
         }
 
         /// <summary>
-        /// Implements CFG Rule: <statement> -> <variable> $COLON-EQUALS <simple expression>
+        /// Implements CFG Rule: <statement> -> <variable> $COLON_EQUALS <simple expression>
         /// </summary>
         /// <returns></returns>
         private int Statement()
@@ -125,13 +255,13 @@ namespace KyleBushCompiler
 
             Debug(true, "Statement()");
             int x = Variable();
-            if (Scanner.TokenCode == COLON-EQUALS)
+            if (Scanner.TokenCode == COLON_EQUALS)
             {
-                Scanner.GetNextToken(ScannerEchoOn);
+                GetNextToken();
                 x = SimpleExpression();
             }
             else
-                Error("COLON-EQUALS")
+                Error("COLON-EQUALS");
 
             Debug(false, "Statement()");
             return -1;
@@ -172,7 +302,7 @@ namespace KyleBushCompiler
 
             x = Term();
 
-            while (isAddOp())
+            while (isAddOp() && !IsError)
             {
                 x = AddOp();
                 x = Term();
@@ -193,7 +323,7 @@ namespace KyleBushCompiler
 
             Debug(true, "AddOp()");
             if (Scanner.TokenCode == PLUS || Scanner.TokenCode == MINUS)
-                Scanner.GetNextToken(ScannerEchoOn);
+                GetNextToken();
             else
                 Error("PLUS or MINUS");
             Debug(false, "AddOp()");
@@ -223,9 +353,9 @@ namespace KyleBushCompiler
 
             Debug(true, "Sign()");
             if (Scanner.TokenCode == PLUS)
-                Scanner.GetNextToken(ScannerEchoOn);
+                GetNextToken();
             else if (Scanner.TokenCode == MINUS)
-                Scanner.GetNextToken(ScannerEchoOn);
+                GetNextToken();
             else
                 Error("PLUS or MINUS");
             Debug(false, "Sign()");
@@ -256,7 +386,7 @@ namespace KyleBushCompiler
             Debug(true, "Term()");
             int x = Factor();
 
-            while (isMulOp())
+            while (isMulOp() && !IsError)
             {
                 x = MulOp();
                 x = Factor();
@@ -278,7 +408,7 @@ namespace KyleBushCompiler
             Debug(true, "MulOp()");
 
             if (Scanner.TokenCode == MULTIPLY || Scanner.TokenCode == DIVIDE)
-                Scanner.GetNextToken(ScannerEchoOn);
+                GetNextToken();
             else
                 Error("MULTIPLY or DIVIDE");
 
@@ -312,7 +442,6 @@ namespace KyleBushCompiler
 
             int x;
 
-            // TOOD: Implement isUnsignedConstant() and isVariable()
             if (isUnsignedConstant())
             {
                 x = UnsignedConstant();
@@ -323,10 +452,10 @@ namespace KyleBushCompiler
             }
             else if (Scanner.TokenCode == LPAR)
             {
-                Scanner.GetNextToken(ScannerEchoOn);
+                GetNextToken();
                 SimpleExpression();
                 if (Scanner.TokenCode == RPAR)
-                    Scanner.GetNextToken(ScannerEchoOn);
+                    GetNextToken();
                 else
                     Error("RPAR");
             }
@@ -335,6 +464,20 @@ namespace KyleBushCompiler
 
             Debug(false, "Factor()");
             return -1;
+        }
+
+        
+
+        /// <summary>
+        /// Checks if the next token is an Unsigned Constant
+        /// </summary>
+        /// <returns></returns>
+        private bool isUnsignedConstant()
+        {
+            if (Scanner.TokenCode == FLOAT || Scanner.TokenCode == INTTYPE)
+                return true;
+            else
+                return false;
         }
 
         /// <summary>
@@ -364,12 +507,24 @@ namespace KyleBushCompiler
             Debug(true, "UnsignedNumber()");
 
             if (Scanner.TokenCode == FLOAT || Scanner.TokenCode == INTTYPE)
-                Scanner.GetNextToken(ScannerEchoOn);
+                GetNextToken();
             else
                 Error("FLOAT or INTTYPE");
 
             Debug(false, "UnsignedNumber()");
             return -1;
+        }
+
+        /// <summary>
+        /// Checks if the next token is a Variable
+        /// </summary>
+        /// <returns></returns>
+        private bool isVariable()
+        {
+            if (Scanner.TokenCode == IDENTIFIER)
+                return true;
+            else
+                return false;
         }
 
         /// <summary>
@@ -384,7 +539,7 @@ namespace KyleBushCompiler
             Debug(true, "Identifier()");
 
             if (Scanner.TokenCode == IDENTIFIER)
-                Scanner.GetNextToken(ScannerEchoOn);
+                GetNextToken();
             else
                 Error("IDENTIFIER");
 
@@ -403,7 +558,8 @@ namespace KyleBushCompiler
         private void Error(string expectedToken)
         {
             IsError = true;
-            Console.WriteLine("ERROR: {0} expected, but {1} found.", (expectedToken, Scanner.NextToken));
+            Console.WriteLine("Line #{0}: {1}", Scanner.CurrentLineIndex + 1, Scanner.CurrentLine);
+            Console.WriteLine("ERROR: {0} expected, but {1} found.", expectedToken, Scanner.NextToken);
         }
         
 
@@ -420,6 +576,49 @@ namespace KyleBushCompiler
                     Console.WriteLine("ENTERING " + name);
                 else
                     Console.WriteLine("EXITING " + name);
+            }
+        }
+
+        /// <summary>
+        /// Gets the next token and prints the token lexeme and mneumonic if Trace is on.
+        /// </summary>
+        private void GetNextToken()
+        {
+            Scanner.GetNextToken(ScannerEchoOn);
+            if (TraceOn)
+                Console.WriteLine("Lexeme: {0} Mnemonic: {1}", Scanner.NextToken, TokenCodes.LookupCode(Scanner.TokenCode));
+        }
+
+        /// <summary>
+        /// After an error occurs this finds the begining of the next statement.
+        /// </summary>
+        private void Resync()
+        {
+            while(!IsStatementStart() && !Scanner.EndOfFile)
+            {
+                GetNextToken();
+            }
+        }
+
+        /// <summary>
+        /// Determines if the current token could be the start of a statement.
+        /// </summary>
+        /// <returns>True if the token could start a statement, False if not.</returns>
+        private bool IsStatementStart()
+        {
+            switch(Scanner.TokenCode)
+            {
+                case IDENTIFIER:
+                case BEGIN:
+                case IF:
+                case WHILE:
+                case REPEAT:
+                case FOR:
+                case GOTO:
+                case WRITELN:
+                    return true;
+                default:
+                    return false;
             }
         }
 

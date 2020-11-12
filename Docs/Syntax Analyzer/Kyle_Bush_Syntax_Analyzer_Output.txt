@@ -1,0 +1,428 @@
+----------------------------------
+ GoodTreeA.txt - Verbose - Output
+----------------------------------
+Line #1
+Line #2
+Line #3 unit goodtree;
+ENTERING Program()
+Lexeme: goodtree Mnemonic: IDNT
+ENTERING ProgIdentifier()
+ENTERING Identifier()
+Lexeme: ; Mnemonic: SEMI
+EXITING Identifier()
+EXITING ProgIdentifier()
+Line #4
+Line #5 (* This Part A test file should have NO errors! *)
+Line #6
+Line #7 begin
+Lexeme: begin Mnemonic: _BEG
+ENTERING Block()
+Line #8 { The only statements for Part A are ASSIGNMENTS with EXPRESSIONS }
+Line #9
+Line #10 sum:=(27*first)+ 3.14*radius*radius;
+Lexeme: sum Mnemonic: IDNT
+ENTERING Statement()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: := Mnemonic: ASGN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: ( Mnemonic: LPAR
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+Lexeme: 27 Mnemonic: INTC
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: * Mnemonic: _MUL
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: first Mnemonic: IDNT
+EXITING MulOp()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: ) Mnemonic: RPAR
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+Lexeme: + Mnemonic: _ADD
+EXITING Factor()
+EXITING Term()
+ENTERING AddOp()
+Lexeme: 3.14 Mnemonic: FLTC
+EXITING AddOp()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: * Mnemonic: _MUL
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: radius Mnemonic: IDNT
+EXITING MulOp()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: * Mnemonic: _MUL
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: radius Mnemonic: IDNT
+EXITING MulOp()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: ; Mnemonic: SEMI
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Statement()
+Line #11 a :=(a+c)*(b-d)                ;
+Lexeme: a Mnemonic: IDNT
+ENTERING Statement()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: := Mnemonic: ASGN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: ( Mnemonic: LPAR
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+Lexeme: a Mnemonic: IDNT
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: + Mnemonic: _ADD
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+ENTERING AddOp()
+Lexeme: c Mnemonic: IDNT
+EXITING AddOp()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: ) Mnemonic: RPAR
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+Lexeme: * Mnemonic: _MUL
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: ( Mnemonic: LPAR
+EXITING MulOp()
+ENTERING Factor()
+Lexeme: b Mnemonic: IDNT
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: - Mnemonic: _SUB
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+ENTERING AddOp()
+Lexeme: d Mnemonic: IDNT
+EXITING AddOp()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: ) Mnemonic: RPAR
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+Lexeme: ; Mnemonic: SEMI
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Statement()
+Line #12
+Line #13 quad1 := -b +(b*b) - 4 * a* c / 2*a;
+Lexeme: quad1 Mnemonic: IDNT
+ENTERING Statement()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: := Mnemonic: ASGN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: - Mnemonic: _SUB
+ENTERING SimpleExpression()
+ENTERING Sign()
+Lexeme: b Mnemonic: IDNT
+EXITING Sign()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: + Mnemonic: _ADD
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+ENTERING AddOp()
+Lexeme: ( Mnemonic: LPAR
+EXITING AddOp()
+ENTERING Term()
+ENTERING Factor()
+Lexeme: b Mnemonic: IDNT
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: * Mnemonic: _MUL
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: b Mnemonic: IDNT
+EXITING MulOp()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: ) Mnemonic: RPAR
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+Lexeme: - Mnemonic: _SUB
+EXITING Factor()
+EXITING Term()
+ENTERING AddOp()
+Lexeme: 4 Mnemonic: INTC
+EXITING AddOp()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: * Mnemonic: _MUL
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: a Mnemonic: IDNT
+EXITING MulOp()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: * Mnemonic: _MUL
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: c Mnemonic: IDNT
+EXITING MulOp()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: / Mnemonic: _DIV
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: 2 Mnemonic: INTC
+EXITING MulOp()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: * Mnemonic: _MUL
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: a Mnemonic: IDNT
+EXITING MulOp()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: ; Mnemonic: SEMI
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Statement()
+Line #14 final := this - (that*other)
+Lexeme: final Mnemonic: IDNT
+ENTERING Statement()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: := Mnemonic: ASGN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: this Mnemonic: IDNT
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: - Mnemonic: _SUB
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+ENTERING AddOp()
+Lexeme: ( Mnemonic: LPAR
+EXITING AddOp()
+ENTERING Term()
+ENTERING Factor()
+Lexeme: that Mnemonic: IDNT
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: * Mnemonic: _MUL
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: other Mnemonic: IDNT
+EXITING MulOp()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: ) Mnemonic: RPAR
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+Line #15 end.
+Lexeme: end Mnemonic: _END
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Statement()
+Lexeme: . Mnemonic: _DOT
+EXITING Block()
+Line #16
+Lexeme: . Mnemonic: _DOT
+EXITING Program()
+
+SYMBOL TABLE
+---------------------------------------------------------------------------------------------------------
+|Name                                    |      Kind|  DataType|                                   Value|
+---------------------------------------------------------------------------------------------------------
+|GOODTREE                                |  Variable|   Integer|                                       0|
+|SUM                                     |  Variable|   Integer|                                       0|
+|27                                      |  Constant|   Integer|                                      27|
+|FIRST                                   |  Variable|   Integer|                                       0|
+|3.14                                    |  Constant|    Double|                                    3.14|
+|RADIUS                                  |  Variable|   Integer|                                       0|
+|A                                       |  Variable|   Integer|                                       0|
+|C                                       |  Variable|   Integer|                                       0|
+|B                                       |  Variable|   Integer|                                       0|
+|D                                       |  Variable|   Integer|                                       0|
+|QUAD1                                   |  Variable|   Integer|                                       0|
+|4                                       |  Constant|   Integer|                                       4|
+|2                                       |  Constant|   Integer|                                       2|
+|FINAL                                   |  Variable|   Integer|                                       0|
+|THIS                                    |  Variable|   Integer|                                       0|
+|THAT                                    |  Variable|   Integer|                                       0|
+|OTHER                                   |  Variable|   Integer|                                       0|
+---------------------------------------------------------------------------------------------------------
+
+-------------------------------------
+ BadProg1.txt - Non-verbose - Output
+-------------------------------------
+Line #1
+Line #2 unit BadProg1;
+Line #3
+Line #4 (* This Part A test file should have one syntax error! *)
+Line #5
+Line #6 begin
+Line #7 { The only statements for Part A are ASSIGNMENTS with EXPRESSIONS }
+Line #8
+Line #9 sum:=(27*first)+ 3.14*radius*radius;
+Line #10 (* missing left paren below... where is it discovered? *)
+Line #11 a :=(a+c)*b-d)                ;
+Line #12: a :=(a+c)*b-d)                ;
+ERROR: END expected, but ) found.
+Line #12: a :=(a+c)*b-d)                ;
+ERROR: PERIOD expected, but ) found.
+
+SYMBOL TABLE
+---------------------------------------------------------------------------------------------------------
+|Name                                    |      Kind|  DataType|                                   Value|
+---------------------------------------------------------------------------------------------------------
+|BADPROG1                                |  Variable|   Integer|                                       0|
+|SUM                                     |  Variable|   Integer|                                       0|
+|27                                      |  Constant|   Integer|                                      27|
+|FIRST                                   |  Variable|   Integer|                                       0|
+|3.14                                    |  Constant|    Double|                                    3.14|
+|RADIUS                                  |  Variable|   Integer|                                       0|
+|A                                       |  Variable|   Integer|                                       0|
+|C                                       |  Variable|   Integer|                                       0|
+|B                                       |  Variable|   Integer|                                       0|
+|D                                       |  Variable|   Integer|                                       0|
+---------------------------------------------------------------------------------------------------------
+
+-------------------------------------
+ BadProg2.txt - Non-verbose - Output
+-------------------------------------
+Line #1
+Line #2 unit BadProg2;
+Line #3
+Line #4 (* This Part A test file should has one syntax error after the lexical truncation... should continue! *)
+Line #5
+Line #6 begin
+Line #7 { The only statements for Part A are ASSIGNMENTS with EXPRESSIONS - long number below }
+Line #8
+Line #9 sum:=(27.1234567890123456 *first)+ 3.14*radius*radius; (* A long number; syntax flags it and keeps going. *)
+        WARNING: Token length exceeds 16. Token has been truncated.
+Line #10
+Line #11 a :=(a+c)* (b-d)                ;
+Line #12 (* There is a double ** error below *)
+Line #13 quad1 := -b +(b**b) - 4 * a* c / 2*a;
+Line #14: quad1 := -b +(b**b) - 4 * a* c / 2*a;
+ERROR: UNSIGNED CONSTANT or VARIABLE or LPAR expected, but * found.
+Line #14: quad1 := -b +(b**b) - 4 * a* c / 2*a;
+ERROR: RPAR expected, but * found.
+Line #14: quad1 := -b +(b**b) - 4 * a* c / 2*a;
+ERROR: END expected, but * found.
+Line #14: quad1 := -b +(b**b) - 4 * a* c / 2*a;
+ERROR: PERIOD expected, but * found.
+
+SYMBOL TABLE
+---------------------------------------------------------------------------------------------------------
+|Name                                    |      Kind|  DataType|                                   Value|
+---------------------------------------------------------------------------------------------------------
+|BADPROG2                                |  Variable|   Integer|                                       0|
+|SUM                                     |  Variable|   Integer|                                       0|
+|27.1234567890123                        |  Constant|    Double|                        27.1234567890123|
+|FIRST                                   |  Variable|   Integer|                                       0|
+|3.14                                    |  Constant|    Double|                                    3.14|
+|RADIUS                                  |  Variable|   Integer|                                       0|
+|A                                       |  Variable|   Integer|                                       0|
+|C                                       |  Variable|   Integer|                                       0|
+|B                                       |  Variable|   Integer|                                       0|
+|D                                       |  Variable|   Integer|                                       0|
+|QUAD1                                   |  Variable|   Integer|                                       0|
+---------------------------------------------------------------------------------------------------------

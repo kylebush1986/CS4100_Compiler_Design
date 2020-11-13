@@ -44,7 +44,7 @@ namespace KyleBushCompiler
         private const int LPAR = 34;
         private const int RPAR = 35;
         private const int SEMICOLON = 36;
-        private const int COLON_EQUALS = 37;
+        private const int ASSIGN = 37;
         private const int GREATER_THAN = 38;
         private const int LESS_THAN = 39;
         private const int GREATER_THAN_OR_EQUAL = 40;
@@ -66,6 +66,8 @@ namespace KyleBushCompiler
         #region Properties
         public bool TraceOn { get; set; }
         public bool IsError { get; set; }
+        public bool ErrorOcurred { get; set; }
+        private bool PrintError { get; set; }
         private LexicalAnalyzer Scanner { get; set; }
         private ReserveTable TokenCodes { get; set; }
         private bool ScannerEchoOn { get; set; }
@@ -145,7 +147,7 @@ namespace KyleBushCompiler
             while(Scanner.TokenCode == VAR && !IsError)
             {
                 GetNextToken();
-                VariableDeclarationSection();
+                VariableDecSec();
             }
 
             BlockBody();
@@ -230,6 +232,230 @@ namespace KyleBushCompiler
         }
 
         /// <summary>
+        /// Implements CFG Rule: <variable-dec-sec> -> $VAR <variable-declaration>
+        /// </summary>
+        /// <returns></returns>
+        private int VariableDecSec()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "VariableDecSec()");
+            if (Scanner.TokenCode == VAR)
+            {
+                GetNextToken();
+                int x = VariableDeclaration();
+            }
+            else
+                Error("VAR");
+
+            Debug(false, "VariableDecSec()");
+            return -1;
+        }
+
+        /// <summary>
+        /// Implements CFG Rule: <variable-declaration> -> {<identifier> {$COMMA <identifier>}* $COLON <type> $SEMICOLON}+
+        /// </summary>
+        /// <returns></returns>
+        private int VariableDeclaration()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "VariableDeclaration()");
+            do
+            {
+                int x = Identifier();
+                while (Scanner.TokenCode == COMMA && !IsError)
+                {
+                    GetNextToken();
+                    x = Identifier();
+                }
+                if (Scanner.TokenCode == COLON)
+                {
+                    GetNextToken();
+                    x = Type();
+                    if (Scanner.TokenCode == SEMICOLON)
+                    {
+                        GetNextToken();
+                    }
+                    else
+                    {
+                        Error("SEMICOLON");
+                    }    
+                }
+                else
+                {
+                    Error("COMMA");
+                }
+            } while (Scanner.TokenCode == IDENTIFIER && !IsError);
+
+                Debug(false, "VariableDeclaration()");
+            return -1;
+        }
+
+
+        /// <summary>
+        /// Implements CFG Rule: <statement>-> {<label> $COLON]}*
+        ///                                    [
+        ///                                        <variable> $ASSIGN (<simple expression> | <string literal>) |
+        ///                                        <block-body> |
+        ///                                        $IF <relexpression> $THEN <statement> [$ELSE <statement>] |
+        ///                                        $WHILE <relexpression> $DO <statement> |
+        ///                                        $REPEAT <statement> $UNTIL <relexpression> |
+        ///                                        $FOR <variable> $ASSIGN <simple expression> $TO <simple expression> $DO <statement> |
+        ///                                        $GOTO <label> |
+        ///                                        $WRITELN $LPAR (<simple expression> | <identifier> | <stringconst>) $RPAR
+        ///                                    ]+
+        /// </summary>
+        /// <returns></returns>
+        private int Statement()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "Statement()");
+            while (Scanner.TokenCode == IDENTIFIER && !IsError)
+            {
+                int x = Label();
+                if (Scanner.TokenCode == COLON)
+                    GetNextToken();
+            }
+            if (Scanner.TokenCode == IDENTIFIER)
+            {
+                GetNextToken();
+                Variable();
+                if (Scanner.TokenCode == ASSIGN)
+                {
+                    GetNextToken();
+                    if (IsSimpleExpression())
+                        SimpleExpression();
+                    else if (Scanner.TokenCode == STRINGTYPE)
+                        StringConst();
+                    else
+                        Error("SIMPLE EXPRESSION or STRING");
+                }
+                else if (Scanner.TokenCode == BEGIN)
+                {
+                    BlockBody();
+                }
+                else if (Scanner.TokenCode == IF)
+                {
+                    GetNextToken();
+                    RelExpression();
+                    if (Scanner.TokenCode == THEN)
+                    {
+                        GetNextToken();
+                        Statement();
+                        if (Scanner.TokenCode == ELSE)
+                        {
+                            GetNextToken();
+                            Statement();
+                        }
+                    }
+                    else
+                        Error("THEN");
+                }
+                else if (Scanner.TokenCode == WHILE)
+                {
+                    GetNextToken();
+                    RelExpression();
+                    if (Scanner.TokenCode == DO)
+                    {
+                        GetNextToken();
+                        Statement();
+                    }
+                    else
+                        Error("DO")
+                }
+                else if (Scanner.TokenCode == REPEAT)
+                {
+                    GetNextToken();
+                    Statement();
+                    if (Scanner.TokenCode == UNTIL)
+                    {
+                        GetNextToken();
+                        RelExpression();
+                    }
+                    else
+                        Error("UNTIL");
+                }
+                else if (Scanner.TokenCode == FOR)
+                {
+                    GetNextToken();
+                    Variable();
+                    if (Scanner.TokenCode == ASSIGN)
+                    {
+                        GetNextToken();
+                        SimpleExpression();
+                        if (Scanner.TokenCode == TO)
+                        {
+                            GetNextToken();
+                            SimpleExpression();
+                            if (Scanner.TokenCode == DO)
+                            {
+                                GetNextToken();
+                                Statement();
+                            }
+                            else
+                                Error("DO");
+                        }
+                        else
+                            Error("TO");
+                    }
+                    else
+                        Error("ASSIGN");
+                }
+                else if (Scanner.TokenCode == GOTO)
+                {
+                    GetNextToken();
+                    Label();
+                }
+                else if (Scanner.TokenCode == WRITELN)
+                {
+                    GetNextToken();
+                    if (Scanner.TokenCode == LPAR)
+                    {
+                        GetNextToken();
+                        if (IsSimpleExpression())
+                        {
+                            SimpleExpression();
+                            if (Scanner.TokenCode == RPAR)
+                                GetNextToken();
+                            else
+                                Error("RPAR");
+                        }
+                        else if (Scanner.TokenCode == IDENTIFIER)
+                        {
+                            Identifier();
+                            if (Scanner.TokenCode == RPAR)
+                                GetNextToken();
+                            else
+                                Error("RPAR");
+                        }
+                        else if (Scanner.TokenCode == STRINGTYPE)
+                        {
+                            StringConst();
+                            if (Scanner.TokenCode == RPAR)
+                                GetNextToken();
+                            else
+                                Error("RPAR");
+                        }
+                        else
+                            Error("SimpleExpression or IDENTIFIER or STRINGTYPE");
+                    }
+                    else
+                        Error("LPAR");
+                }
+                else
+                    Error("Statement Token");
+            }
+
+            Debug(false, "Statement()");
+            return -1;
+        }
+
+        /// <summary>
         /// Implements CFG Rule: <prog-identifier> -> <identifier>
         /// </summary>
         /// <returns></returns>
@@ -245,30 +471,7 @@ namespace KyleBushCompiler
         }
 
         /// <summary>
-        /// Implements CFG Rule: <statement> -> <variable> $COLON_EQUALS <simple expression>
-        /// </summary>
-        /// <returns></returns>
-        private int Statement()
-        {
-            if (IsError)
-                return -1;
-
-            Debug(true, "Statement()");
-            int x = Variable();
-            if (Scanner.TokenCode == COLON_EQUALS)
-            {
-                GetNextToken();
-                x = SimpleExpression();
-            }
-            else
-                Error("COLON-EQUALS");
-
-            Debug(false, "Statement()");
-            return -1;
-        }
-
-        /// <summary>
-        /// Implements CFG Rule: <variable> -> <identifier>
+        /// Implements CFG Rule: <variable> -> <identifier> [$LEFT_BRACKET <simple expression> $RIGHT_BRACKET]
         /// </summary>
         /// <returns></returns>
         private int Variable()
@@ -278,6 +481,17 @@ namespace KyleBushCompiler
 
             Debug(true, "Variable()");
             Identifier();
+
+            if (Scanner.TokenCode == LEFT_BRACKET)
+            {
+                GetNextToken();
+                SimpleExpression();
+                if (Scanner.TokenCode == RIGHT_BRACKET)
+                    GetNextToken();
+                else
+                    Error("RIGHT_BRACKET")
+            }
+            
             Debug(false, "Variable()");
             return -1;
         }
@@ -330,17 +544,7 @@ namespace KyleBushCompiler
             return -1;
         }
 
-        /// <summary>
-        /// Checks if the next token is an AddOp token.
-        /// </summary>
-        /// <returns></returns>
-        private bool isAddOp()
-        {
-            if (Scanner.TokenCode == PLUS || Scanner.TokenCode == MINUS)
-                return true;
-            else
-                return false;
-        }
+
 
         /// <summary>
         /// Implements CFG Rule: <sign> -> $PLUS | $MINUS
@@ -362,17 +566,6 @@ namespace KyleBushCompiler
             return -1;
         }
 
-        /// <summary>
-        /// Checks if the next token is a Sign token.
-        /// </summary>
-        /// <returns></returns>
-        private bool isSign()
-        {
-            if (Scanner.TokenCode == PLUS || Scanner.TokenCode == MINUS)
-                return true;
-            else
-                return false;
-        }
 
         /// <summary>
         /// Implements CFG Rule: <term> -> <factor> {<mulop> <factor> }*
@@ -416,17 +609,7 @@ namespace KyleBushCompiler
             return -1;
         }
 
-        /// <summary>
-        /// Checks if the next token is a MulOp token.
-        /// </summary>
-        /// <returns></returns>
-        private bool isMulOp()
-        {
-            if (Scanner.TokenCode == MULTIPLY || Scanner.TokenCode == DIVIDE)
-                return true;
-            else
-                return false;
-        }
+
 
 
         /// <summary>
@@ -468,17 +651,6 @@ namespace KyleBushCompiler
 
         
 
-        /// <summary>
-        /// Checks if the next token is an Unsigned Constant
-        /// </summary>
-        /// <returns></returns>
-        private bool isUnsignedConstant()
-        {
-            if (Scanner.TokenCode == FLOAT || Scanner.TokenCode == INTTYPE)
-                return true;
-            else
-                return false;
-        }
 
         /// <summary>
         /// Implements CFG Rule: <unsigned constant>-> <unsigned number>
@@ -515,17 +687,7 @@ namespace KyleBushCompiler
             return -1;
         }
 
-        /// <summary>
-        /// Checks if the next token is a Variable
-        /// </summary>
-        /// <returns></returns>
-        private bool isVariable()
-        {
-            if (Scanner.TokenCode == IDENTIFIER)
-                return true;
-            else
-                return false;
-        }
+        
 
         /// <summary>
         /// Implements CFG Rule: <identifier> -> $IDENTIFIER
@@ -601,6 +763,66 @@ namespace KyleBushCompiler
         }
 
         /// <summary>
+        /// Checks if the next token is a Sign token.
+        /// </summary>
+        /// <returns></returns>
+        private bool isSign()
+        {
+            if (Scanner.TokenCode == PLUS || Scanner.TokenCode == MINUS)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Checks if the next token is an AddOp token.
+        /// </summary>
+        /// <returns></returns>
+        private bool isAddOp()
+        {
+            if (Scanner.TokenCode == PLUS || Scanner.TokenCode == MINUS)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Checks if the next token is a MulOp token.
+        /// </summary>
+        /// <returns></returns>
+        private bool isMulOp()
+        {
+            if (Scanner.TokenCode == MULTIPLY || Scanner.TokenCode == DIVIDE)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Checks if the next token is a Variable
+        /// </summary>
+        /// <returns></returns>
+        private bool isVariable()
+        {
+            if (Scanner.TokenCode == IDENTIFIER)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Checks if the next token is an Unsigned Constant
+        /// </summary>
+        /// <returns></returns>
+        private bool isUnsignedConstant()
+        {
+            if (Scanner.TokenCode == FLOAT || Scanner.TokenCode == INTTYPE)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
         /// Determines if the current token could be the start of a statement.
         /// </summary>
         /// <returns>True if the token could start a statement, False if not.</returns>
@@ -619,6 +841,21 @@ namespace KyleBushCompiler
                     return true;
                 default:
                     return false;
+            }
+        }
+
+        private bool IsSimpleExpression()
+        {
+            switch (Scanner.TokenCode)
+            {
+                case isSign():
+                case isUnsignedConstant():
+                case isVariable():
+                case LPAR:
+                    return true;
+                default:
+                    return false;
+
             }
         }
 

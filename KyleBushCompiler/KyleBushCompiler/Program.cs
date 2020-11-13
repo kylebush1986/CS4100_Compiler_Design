@@ -15,9 +15,23 @@ namespace KyleBushCompiler
          * <block> -> [<label-declaration>] {<variable-dec-sec>}* <block-body>
          * <block-body> -> $BEGIN <statement> {$SEMICOLON <statement>}* $END
          * <label-declaration> -> $LABEL <identifier> {$COMMA <identifier>}* $SEMICOLON
+         * <variable-dec-sec> -> $VAR <variable-declaration>
+         * <variable-declaration> -> {<identifier> {$COMMA <identifier>}* $COLON <type> $SEMICOLON}+
+         * <statement>-> {<label> $COLON]}*
+                         [
+                             <variable> $ASSIGN (<simple expression> | 
+                             <string literal>) |
+                             <block-body> |
+                             $IF <relexpression> $THEN <statement> [$ELSE <statement>] |
+                             $WHILE <relexpression> $DO <statement> |
+                             $REPEAT <statement> $UNTIL <relexpression> |
+                             $FOR <variable> $ASSIGN <simple expression> $TO <simple expression> $DO <statement> |
+                             $GOTO <label> |
+                             $WRITELN $LPAR (<simple expression> | <identifier> | <stringconst>) $RPAR
+                         ]+
          * <prog-identifier> -> <identifier>
-         * <statement> -> <variable> $COLON_EQUALS <simple expression>
-         * <variable> -> <identifier>
+         * <statement> -> <variable> $ASSIGN <simple expression>
+         * <variable> -> <identifier> [$LEFT_BRACKET <simple expression> $RIGHT_BRACKET]
          * <simple expression> -> [<sign>] <term> {<addop> <term>}*
          * <addop> -> $PLUS | $MINUS
          * <sign> -> $PLUS | $MINUS

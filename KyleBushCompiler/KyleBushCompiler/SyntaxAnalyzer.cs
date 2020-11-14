@@ -50,7 +50,7 @@ namespace KyleBushCompiler
         private const int GREATER_THAN_OR_EQUAL = 40;
         private const int LESS_THAN_OR_EQUAL = 41;
         private const int EQUAL = 42;
-        private const int NOT = 43;
+        private const int NOT_EQUAL = 43;
         private const int COMMA = 44;
         private const int LEFT_BRACKET = 45;
         private const int RIGHT_BRACKET = 46;
@@ -144,7 +144,7 @@ namespace KyleBushCompiler
                 LabelDeclaration();
             }
 
-            while(Scanner.TokenCode == VAR && !IsError)
+            while (Scanner.TokenCode == VAR && !IsError)
             {
                 GetNextToken();
                 VariableDecSec();
@@ -153,7 +153,7 @@ namespace KyleBushCompiler
             BlockBody();
 
             // Error handling and resyncing
-            while(IsError == true && !Scanner.EndOfFile)
+            while (IsError == true && !Scanner.EndOfFile)
             {
                 Resync();
                 IsError = false;
@@ -282,7 +282,7 @@ namespace KyleBushCompiler
                     else
                     {
                         Error("SEMICOLON");
-                    }    
+                    }
                 }
                 else
                 {
@@ -290,7 +290,7 @@ namespace KyleBushCompiler
                 }
             } while (Scanner.TokenCode == IDENTIFIER && !IsError);
 
-                Debug(false, "VariableDeclaration()");
+            Debug(false, "VariableDeclaration()");
             return -1;
         }
 
@@ -315,7 +315,7 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "Statement()");
-            while (Scanner.TokenCode == IDENTIFIER && !IsError)
+            while (IsLabel() && !IsError)
             {
                 int x = Label();
                 if (Scanner.TokenCode == COLON)
@@ -366,7 +366,7 @@ namespace KyleBushCompiler
                         Statement();
                     }
                     else
-                        Error("DO")
+                        Error("DO");
                 }
                 else if (Scanner.TokenCode == REPEAT)
                 {
@@ -489,10 +489,75 @@ namespace KyleBushCompiler
                 if (Scanner.TokenCode == RIGHT_BRACKET)
                     GetNextToken();
                 else
-                    Error("RIGHT_BRACKET")
+                    Error("RIGHT_BRACKET");
             }
-            
+
             Debug(false, "Variable()");
+            return -1;
+        }
+
+        /// <summary>
+        /// Implements CFG Rule: <label> -> <identifier>
+        /// </summary>
+        /// <returns></returns>
+        private int Label()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "Label()");
+            // Must check that the indentifier has been declared as type label 
+            if (IsLabel())
+                Identifier();
+            else
+                Error("LABEL");
+                
+            Debug(false, "Label()");
+            return -1;
+        }
+
+        /// <summary>
+        /// Implements CFG Rule: <relexpression> -> <simple expression> <relop> <simple expression>
+        /// </summary>
+        /// <returns></returns>
+        private int RelExpression()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "Label()");
+            SimpleExpression();
+            RelOp();
+            SimpleExpression();
+            Debug(false, "Label()");
+            return -1;
+        }
+
+        /// <summary>
+        /// Implements CFG Rule: <relop> -> $EQ | $LSS | $GTR | $NEQ | $LEQ | $GEQ
+        /// </summary>
+        /// <returns></returns>
+        private int RelOp()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "Label()");
+            switch (Scanner.TokenCode)
+            {
+                case EQUAL:
+                case LESS_THAN:
+                case GREATER_THAN:
+                case LESS_THAN_OR_EQUAL:
+                case GREATER_THAN_OR_EQUAL:
+                case NOT_EQUAL:
+                    GetNextToken();
+                    break;
+                default:
+                    Error("Relational Operator");
+                    break;
+            }
+            Debug(false, "Label()");
             return -1;
         }
 
@@ -609,9 +674,6 @@ namespace KyleBushCompiler
             return -1;
         }
 
-
-
-
         /// <summary>
         /// Implements CFG Rule: <factor> -> <unsigned constant> | <variable> | $LPAR <simple expression> $RPAR
         /// </summary>
@@ -649,8 +711,97 @@ namespace KyleBushCompiler
             return -1;
         }
 
-        
+        /// <summary>
+        /// Implements CFG Rule: <type> -> <simple type> | $ARRAY $LBRACK $INTTYPE $RBRACK $OF $INTEGER
+        /// </summary>
+        /// <returns></returns>
+        private int Type()
+        {
+            if (IsError)
+                return -1;
 
+            Debug(true, "Type()");
+            if (IsSimpleType())
+                SimpleType();
+            else if (Scanner.TokenCode == ARRAY)
+            {
+                GetNextToken();
+                if (Scanner.TokenCode == LEFT_BRACKET)
+                {
+                    GetNextToken();
+                    if (Scanner.TokenCode == INTTYPE)
+                    {
+                        GetNextToken();
+                        if (Scanner.TokenCode == RIGHT_BRACKET)
+                        {
+                            GetNextToken();
+                            if (Scanner.TokenCode == OF)
+                            {
+                                GetNextToken();
+                                if (Scanner.TokenCode == INTEGER)
+                                {
+                                    GetNextToken();
+                                }
+                                else
+                                    Error("INTEGER");
+                            }
+                            else
+                                Error("OF");
+                        }
+                        else
+                            Error("RIGHT_BRACKET");
+                    }
+                    else
+                        Error("INTTYPE");
+                }
+                else
+                    Error("LEFT_BRACKET");
+            }
+            else
+                Error("Simple Type or ARRAY");
+
+            Debug(false, "Type()");
+            return -1;
+        }
+
+        /// <summary>
+        /// Implements CFG Rule: <simple type> -> $INTEGER | $FLOAT | $STRING
+        /// </summary>
+        /// <returns></returns>
+        private int SimpleType()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "SimpleType()");
+
+            if (Scanner.TokenCode == INTEGER || Scanner.TokenCode == FLOAT || Scanner.TokenCode == STRING)
+                GetNextToken();
+            else
+                Error("INTEGER or FLOAT or STRING");
+
+            Debug(false, "SimpleType()");
+            return -1;
+        }
+
+        /// <summary>
+        /// Implements CFG Rule: <constant> -> [<sign>] <unsigned constant>
+        /// </summary>
+        /// <returns></returns>
+        private int Constant()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "Constant()");
+
+            if (isSign())
+                Sign();
+            UnsignedConstant();
+
+            Debug(false, "Constant()");
+            return -1;
+        }
 
         /// <summary>
         /// Implements CFG Rule: <unsigned constant>-> <unsigned number>
@@ -706,6 +857,26 @@ namespace KyleBushCompiler
                 Error("IDENTIFIER");
 
             Debug(false, "Identifier()");
+            return -1;
+        }
+
+        /// <summary>
+        /// Implements CFG Rule: <stringconst> -> $STRINGTYPE
+        /// </summary>
+        /// <returns></returns>
+        private int StringConst()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "StringConst()");
+
+            if (Scanner.TokenCode == STRINGTYPE)
+                GetNextToken();
+            else
+                Error("STRINGYPE");
+
+            Debug(false, "StringConst()");
             return -1;
         }
 
@@ -844,19 +1015,55 @@ namespace KyleBushCompiler
             }
         }
 
+        /// <summary>
+        /// Determines if the current token is the start of a simple expression.
+        /// </summary>
+        /// <returns></returns>
         private bool IsSimpleExpression()
+        {
+            if (isSign() || isUnsignedConstant() || isVariable() || Scanner.TokenCode == LPAR)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Determines if the current token is a simple type keyword.
+        /// </summary>
+        /// <returns></returns>
+        private bool IsSimpleType()
         {
             switch (Scanner.TokenCode)
             {
-                case isSign():
-                case isUnsignedConstant():
-                case isVariable():
-                case LPAR:
+                case INTEGER:
+                case REAL:
+                case STRING:
                     return true;
                 default:
                     return false;
-
             }
+        }
+
+        /// <summary>
+        /// Determines if the current token is a label.
+        /// </summary>
+        /// <returns></returns>
+        private bool IsLabel()
+        {
+            if (Scanner.TokenCode == IDENTIFIER)
+            {
+                int labelIndex = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken);
+                if (labelIndex != -1)
+                {
+                    Symbol labelSymbol = Scanner.SymbolTable.GetSymbol(labelIndex);
+
+                    if (labelSymbol.Kind == SymbolKind.Label)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         #endregion

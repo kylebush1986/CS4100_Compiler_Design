@@ -32,15 +32,22 @@ namespace KyleBushCompiler
          * <prog-identifier> -> <identifier>
          * <statement> -> <variable> $ASSIGN <simple expression>
          * <variable> -> <identifier> [$LEFT_BRACKET <simple expression> $RIGHT_BRACKET]
+         * <label> -> <identifier>
+         * <relexpression> -> <simple expression> <relop> <simple expression>
+         * <relop> -> $EQ | $LSS | $GTR | $NEQ | $LEQ | $GEQ
          * <simple expression> -> [<sign>] <term> {<addop> <term>}*
          * <addop> -> $PLUS | $MINUS
          * <sign> -> $PLUS | $MINUS
          * <term> -> <factor> {<mulop> <factor> }*
          * <mulop> -> $MULTIPLY | $DIVIDE
          * <factor> -> <unsigned constant> | <variable> | $LPAR <simple expression> $RPAR
+         * <type> -> <simple type> | $ARRAY $LBRACK $INTTYPE $RBRACK $OF $INTEGER
+         * <simple type> -> $INTEGER | $FLOAT | $STRING
+         * <constant> -> [<sign>] <unsigned constant>
          * <unsigned constant>-> <unsigned number>
          * <unsigned number>-> $FLOAT | $INTTYPE
          * <identifier> -> $IDENTIFIER
+         * <stringconst> -> $STRINGTYPE
          */
         static void Main(string[] args)
         {

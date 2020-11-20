@@ -52,10 +52,10 @@ namespace KyleBushCompiler
         static void Main(string[] args)
         {
             // Provided GOOD test file
-            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\GoodtreeA.txt";
+            // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3BGOOD-1.txt";
 
             // Provided BAD test file with syntax error
-            // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\BadProg1.txt";
+            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\BadProg1.txt";
 
             // Provided BAD test file with lexical and syntax error
             // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\BadProg2.txt";

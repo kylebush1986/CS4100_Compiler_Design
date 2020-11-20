@@ -140,13 +140,11 @@ namespace KyleBushCompiler
             Debug(true, "Block()");
             if (Scanner.TokenCode == LABEL)
             {
-                GetNextToken();
                 LabelDeclaration();
             }
 
             while (Scanner.TokenCode == VAR && !IsError)
             {
-                GetNextToken();
                 VariableDecSec();
             }
 
@@ -159,7 +157,17 @@ namespace KyleBushCompiler
                 IsError = false;
                 while (IsError == false && !Scanner.EndOfFile)
                 {
+                    if (Scanner.TokenCode == SEMICOLON) // Account for END
+                        GetNextToken();
+
                     Statement();
+
+                    if (Scanner.TokenCode == END)
+                    {
+                        GetNextToken();
+                        if (Scanner.TokenCode == PERIOD)
+                            GetNextToken();
+                    }
                 }
             }
 
@@ -184,6 +192,7 @@ namespace KyleBushCompiler
                 while (Scanner.TokenCode == SEMICOLON && !IsError)
                 {
                     GetNextToken();
+                    // Seems to be called an extra time at the end of the program.
                     x = Statement();
                 }
 
@@ -212,10 +221,16 @@ namespace KyleBushCompiler
             if (Scanner.TokenCode == LABEL)
             {
                 GetNextToken();
+                if (Scanner.TokenCode == IDENTIFIER)
+                    UpdateLabelSymbol();
                 int x = Identifier();
+                
+
                 while (Scanner.TokenCode == COMMA && !IsError)
                 {
                     GetNextToken();
+                    if (Scanner.TokenCode == IDENTIFIER)
+                        UpdateLabelSymbol();
                     x = Identifier();
                 }
 
@@ -323,7 +338,6 @@ namespace KyleBushCompiler
             }
             if (Scanner.TokenCode == IDENTIFIER)
             {
-                GetNextToken();
                 Variable();
                 if (Scanner.TokenCode == ASSIGN)
                 {
@@ -335,121 +349,123 @@ namespace KyleBushCompiler
                     else
                         Error("SIMPLE EXPRESSION or STRING");
                 }
-                else if (Scanner.TokenCode == BEGIN)
-                {
-                    BlockBody();
-                }
-                else if (Scanner.TokenCode == IF)
+                else
+                    Error("IDENTIFIER");
+            }
+            else if (Scanner.TokenCode == BEGIN)
+            {
+                BlockBody();
+            }
+            else if (Scanner.TokenCode == IF)
+            {
+                GetNextToken();
+                RelExpression();
+                if (Scanner.TokenCode == THEN)
                 {
                     GetNextToken();
-                    RelExpression();
-                    if (Scanner.TokenCode == THEN)
+                    Statement();
+                    if (Scanner.TokenCode == ELSE)
                     {
                         GetNextToken();
                         Statement();
-                        if (Scanner.TokenCode == ELSE)
+                    }
+                }
+                else
+                    Error("THEN");
+            }
+            else if (Scanner.TokenCode == WHILE)
+            {
+                GetNextToken();
+                RelExpression();
+                if (Scanner.TokenCode == DO)
+                {
+                    GetNextToken();
+                    Statement();
+                }
+                else
+                    Error("DO");
+            }
+            else if (Scanner.TokenCode == REPEAT)
+            {
+                GetNextToken();
+                Statement();
+                if (Scanner.TokenCode == UNTIL)
+                {
+                    GetNextToken();
+                    RelExpression();
+                }
+                else
+                    Error("UNTIL");
+            }
+            else if (Scanner.TokenCode == FOR)
+            {
+                GetNextToken();
+                Variable();
+                if (Scanner.TokenCode == ASSIGN)
+                {
+                    GetNextToken();
+                    SimpleExpression();
+                    if (Scanner.TokenCode == TO)
+                    {
+                        GetNextToken();
+                        SimpleExpression();
+                        if (Scanner.TokenCode == DO)
                         {
                             GetNextToken();
                             Statement();
                         }
-                    }
-                    else
-                        Error("THEN");
-                }
-                else if (Scanner.TokenCode == WHILE)
-                {
-                    GetNextToken();
-                    RelExpression();
-                    if (Scanner.TokenCode == DO)
-                    {
-                        GetNextToken();
-                        Statement();
-                    }
-                    else
-                        Error("DO");
-                }
-                else if (Scanner.TokenCode == REPEAT)
-                {
-                    GetNextToken();
-                    Statement();
-                    if (Scanner.TokenCode == UNTIL)
-                    {
-                        GetNextToken();
-                        RelExpression();
-                    }
-                    else
-                        Error("UNTIL");
-                }
-                else if (Scanner.TokenCode == FOR)
-                {
-                    GetNextToken();
-                    Variable();
-                    if (Scanner.TokenCode == ASSIGN)
-                    {
-                        GetNextToken();
-                        SimpleExpression();
-                        if (Scanner.TokenCode == TO)
-                        {
-                            GetNextToken();
-                            SimpleExpression();
-                            if (Scanner.TokenCode == DO)
-                            {
-                                GetNextToken();
-                                Statement();
-                            }
-                            else
-                                Error("DO");
-                        }
                         else
-                            Error("TO");
+                            Error("DO");
                     }
                     else
-                        Error("ASSIGN");
-                }
-                else if (Scanner.TokenCode == GOTO)
-                {
-                    GetNextToken();
-                    Label();
-                }
-                else if (Scanner.TokenCode == WRITELN)
-                {
-                    GetNextToken();
-                    if (Scanner.TokenCode == LPAR)
-                    {
-                        GetNextToken();
-                        if (IsSimpleExpression())
-                        {
-                            SimpleExpression();
-                            if (Scanner.TokenCode == RPAR)
-                                GetNextToken();
-                            else
-                                Error("RPAR");
-                        }
-                        else if (Scanner.TokenCode == IDENTIFIER)
-                        {
-                            Identifier();
-                            if (Scanner.TokenCode == RPAR)
-                                GetNextToken();
-                            else
-                                Error("RPAR");
-                        }
-                        else if (Scanner.TokenCode == STRINGTYPE)
-                        {
-                            StringConst();
-                            if (Scanner.TokenCode == RPAR)
-                                GetNextToken();
-                            else
-                                Error("RPAR");
-                        }
-                        else
-                            Error("SimpleExpression or IDENTIFIER or STRINGTYPE");
-                    }
-                    else
-                        Error("LPAR");
+                        Error("TO");
                 }
                 else
-                    Error("Statement Token");
+                    Error("ASSIGN");
             }
+            else if (Scanner.TokenCode == GOTO)
+            {
+                GetNextToken();
+                Label();
+            }
+            else if (Scanner.TokenCode == WRITELN)
+            {
+                GetNextToken();
+                if (Scanner.TokenCode == LPAR)
+                {
+                    GetNextToken();
+                    if (IsSimpleExpression())
+                    {
+                        SimpleExpression();
+                        if (Scanner.TokenCode == RPAR)
+                            GetNextToken();
+                        else
+                            Error("RPAR");
+                    }
+                    else if (Scanner.TokenCode == IDENTIFIER)
+                    {
+                        Identifier();
+                        if (Scanner.TokenCode == RPAR)
+                            GetNextToken();
+                        else
+                            Error("RPAR");
+                    }
+                    else if (Scanner.TokenCode == STRINGTYPE)
+                    {
+                        StringConst();
+                        if (Scanner.TokenCode == RPAR)
+                            GetNextToken();
+                        else
+                            Error("RPAR");
+                    }
+                    else
+                        Error("SimpleExpression or IDENTIFIER or STRINGTYPE");
+                }
+                else
+                    Error("LPAR");
+            }
+            else
+                Error("Statement Token");
 
             Debug(false, "Statement()");
             return -1;
@@ -465,6 +481,7 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "ProgIdentifier()");
+            // Change kind to program name
             Identifier();
             Debug(false, "ProgIdentifier()");
             return -1;
@@ -775,7 +792,7 @@ namespace KyleBushCompiler
 
             Debug(true, "SimpleType()");
 
-            if (Scanner.TokenCode == INTEGER || Scanner.TokenCode == FLOAT || Scanner.TokenCode == STRING)
+            if (Scanner.TokenCode == INTEGER || Scanner.TokenCode == REAL || Scanner.TokenCode == STRING)
                 GetNextToken();
             else
                 Error("INTEGER or FLOAT or STRING");
@@ -872,6 +889,7 @@ namespace KyleBushCompiler
             Debug(true, "StringConst()");
 
             if (Scanner.TokenCode == STRINGTYPE)
+
                 GetNextToken();
             else
                 Error("STRINGYPE");
@@ -891,8 +909,10 @@ namespace KyleBushCompiler
         private void Error(string expectedToken)
         {
             IsError = true;
-            Console.WriteLine("Line #{0}: {1}", Scanner.CurrentLineIndex + 1, Scanner.CurrentLine);
+            Console.WriteLine("\n********** Error **********");
+            Console.WriteLine("Line #{0}: {1}", Scanner.CurrentLineIndex, Scanner.CurrentLine);
             Console.WriteLine("ERROR: {0} expected, but {1} found.", expectedToken, Scanner.NextToken);
+            Console.WriteLine("***************************\n");
         }
         
 
@@ -1064,6 +1084,19 @@ namespace KyleBushCompiler
                 }
             }
             return false;
+        }
+
+        private void UpdateLabelSymbol()
+        {
+            int tokenIndex = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken.ToUpper());
+            if (tokenIndex != -1)
+            {
+                Scanner.SymbolTable.UpdateSymbol(tokenIndex, SymbolKind.Label, "");
+            }
+            else
+            {
+                Console.WriteLine("Symbol not found in symbol table.");
+            }
         }
 
         #endregion

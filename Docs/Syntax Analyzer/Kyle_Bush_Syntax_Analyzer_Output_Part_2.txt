@@ -1,0 +1,682 @@
+Program Description:
+The syntax analyzer uses the output of the lexical analyzer, which is each token as it is found.
+The syntax analyzer recursively implements a context free grammar describing the language it is
+designed to analyze. Each non-terminal is implemented in a function while each terminal is 
+represented by a constant variable. The syntax analyzer recursively calls the non-terminal functions
+based on the current token returned by the lexical analyzer until a non-terminal is found.
+This implementation of the syntax analyzer also handles syntax errors when a token is discovered
+that does not match the specified pattern in the CFG.
+
+NOTE: I declared that variable 'I' so that no errors would be generated.
+
+-----------------------------------
+Part3BGOOD-1.txt - Verbose - Output
+-----------------------------------
+
+Line #1
+Line #2 UNIT GOOD3B;
+ENTERING Program()
+Lexeme: GOOD3B Mnemonic: IDNT
+ENTERING ProgIdentifier()
+ENTERING Identifier()
+Lexeme: ; Mnemonic: SEMI
+EXITING Identifier()
+EXITING ProgIdentifier()
+Line #3
+Line #4 (* This Part 3B test file should have NO errors! *)
+Line #5 LABEL LOOP_START, JUMP;
+Lexeme: LABEL Mnemonic: LABL
+ENTERING Block()
+ENTERING LabelDeclaration()
+Lexeme: LOOP_START Mnemonic: IDNT
+ENTERING Identifier()
+Lexeme: , Mnemonic: COMM
+EXITING Identifier()
+Lexeme: JUMP Mnemonic: IDNT
+ENTERING Identifier()
+Lexeme: ; Mnemonic: SEMI
+EXITING Identifier()
+Line #6 VAR COUNT, TOTAL : INTEGER;
+Lexeme: VAR Mnemonic: _VAR
+EXITING LabelDeclaration()
+ENTERING VariableDecSec()
+Lexeme: COUNT Mnemonic: IDNT
+ENTERING VariableDeclaration()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: , Mnemonic: COMM
+EXITING Identifier()
+EXITING Variable()
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: : Mnemonic: COLN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: INTEGER Mnemonic: _INT
+ENTERING Type()
+ENTERING SimpleType()
+Lexeme: ; Mnemonic: SEMI
+EXITING SimpleType()
+EXITING Type()
+Line #7 VAR ST : STRING;
+Lexeme: VAR Mnemonic: _VAR
+EXITING VariableDeclaration()
+EXITING VariableDecSec()
+ENTERING VariableDecSec()
+Lexeme: ST Mnemonic: IDNT
+ENTERING VariableDeclaration()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: : Mnemonic: COLN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: STRING Mnemonic: _STR
+ENTERING Type()
+ENTERING SimpleType()
+Lexeme: ; Mnemonic: SEMI
+EXITING SimpleType()
+EXITING Type()
+Line #8 VAR SUM, SUBTOTAL, MAX : REAL;
+Lexeme: VAR Mnemonic: _VAR
+EXITING VariableDeclaration()
+EXITING VariableDecSec()
+ENTERING VariableDecSec()
+Lexeme: SUM Mnemonic: IDNT
+ENTERING VariableDeclaration()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: , Mnemonic: COMM
+EXITING Identifier()
+EXITING Variable()
+Lexeme: SUBTOTAL Mnemonic: IDNT
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: , Mnemonic: COMM
+EXITING Identifier()
+EXITING Variable()
+Lexeme: MAX Mnemonic: IDNT
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: : Mnemonic: COLN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: REAL Mnemonic: REAL
+ENTERING Type()
+ENTERING SimpleType()
+Lexeme: ; Mnemonic: SEMI
+EXITING SimpleType()
+EXITING Type()
+Line #9
+Line #10 BEGIN
+Lexeme: BEGIN Mnemonic: _BEG
+EXITING VariableDeclaration()
+EXITING VariableDecSec()
+ENTERING BlockBody()
+Line #11   FOR I := 1 TO 10 DO
+Lexeme: FOR Mnemonic: _FOR
+ENTERING Statement()
+Lexeme: I Mnemonic: IDNT
+ENTERING Variable()
+
+********** Warning **********
+Line #11:   FOR I := 1 TO 10 DO
+WARNING: I undeclared.
+***************************
+
+ENTERING Identifier()
+Lexeme: := Mnemonic: ASGN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: 1 Mnemonic: INTC
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: TO Mnemonic: __TO
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+Lexeme: 10 Mnemonic: INTC
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: DO Mnemonic: __DO
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+Line #12     BEGIN
+Lexeme: BEGIN Mnemonic: _BEG
+ENTERING Statement()
+ENTERING BlockBody()
+Line #13     TOTAL := TOTAL + I
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING Statement()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: := Mnemonic: ASGN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: + Mnemonic: _ADD
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+ENTERING AddOp()
+Lexeme: I Mnemonic: IDNT
+EXITING AddOp()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Line #14     END;
+Lexeme: END Mnemonic: _END
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Statement()
+Lexeme: ; Mnemonic: SEMI
+EXITING BlockBody()
+EXITING Statement()
+EXITING Statement()
+Line #15
+Line #16   REPEAT
+Lexeme: REPEAT Mnemonic: REPT
+ENTERING Statement()
+Line #17     TOTAL := TOTAL - 1
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING Statement()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: := Mnemonic: ASGN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: - Mnemonic: _SUB
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+ENTERING AddOp()
+Lexeme: 1 Mnemonic: INTC
+EXITING AddOp()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Line #18   UNTIL TOTAL <= 20;
+Lexeme: UNTIL Mnemonic: UNTL
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Statement()
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING Label()
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: <= Mnemonic: LTEQ
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+ENTERING Label()
+Lexeme: 20 Mnemonic: INTC
+EXITING Label()
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: ; Mnemonic: SEMI
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Label()
+EXITING Statement()
+Line #19
+Line #20   IF TOTAL > 15 THEN
+Lexeme: IF Mnemonic: __IF
+ENTERING Statement()
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING Label()
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: > Mnemonic: __GT
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+ENTERING Label()
+Lexeme: 15 Mnemonic: INTC
+EXITING Label()
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: THEN Mnemonic: THEN
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Label()
+Line #21     BEGIN
+Lexeme: BEGIN Mnemonic: _BEG
+ENTERING Statement()
+ENTERING BlockBody()
+Line #22     WHILE TOTAL > 10 DO
+Lexeme: WHILE Mnemonic: WHIL
+ENTERING Statement()
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING Label()
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: > Mnemonic: __GT
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+ENTERING Label()
+Lexeme: 10 Mnemonic: INTC
+EXITING Label()
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: DO Mnemonic: __DO
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Label()
+Line #23       TOTAL := TOTAL - (2 * 1)
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING Statement()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: := Mnemonic: ASGN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: - Mnemonic: _SUB
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+ENTERING AddOp()
+Lexeme: ( Mnemonic: LPAR
+EXITING AddOp()
+ENTERING Term()
+ENTERING Factor()
+Lexeme: 2 Mnemonic: INTC
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: * Mnemonic: _MUL
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: 1 Mnemonic: INTC
+EXITING MulOp()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: ) Mnemonic: RPAR
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+Line #24     END
+Lexeme: END Mnemonic: _END
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Statement()
+EXITING Statement()
+Line #25   ELSE
+Lexeme: ELSE Mnemonic: ELSE
+EXITING BlockBody()
+EXITING Statement()
+Line #26     IF TOTAL < 12 THEN
+Lexeme: IF Mnemonic: __IF
+ENTERING Statement()
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING Label()
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: < Mnemonic: __LT
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+ENTERING Label()
+Lexeme: 12 Mnemonic: INTC
+EXITING Label()
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: THEN Mnemonic: THEN
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Label()
+Line #27       WRITELN(TOTAL);
+Lexeme: WRITELN Mnemonic: WTLN
+ENTERING Statement()
+Lexeme: ( Mnemonic: LPAR
+Lexeme: TOTAL Mnemonic: IDNT
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: ) Mnemonic: RPAR
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+Lexeme: ; Mnemonic: SEMI
+EXITING Statement()
+EXITING Statement()
+EXITING Statement()
+Line #28
+Line #29   JUMP: SUM := 275.55 / 200.77;
+Lexeme: JUMP Mnemonic: IDNT
+ENTERING Statement()
+ENTERING Label()
+ENTERING Identifier()
+Lexeme: : Mnemonic: COLN
+EXITING Identifier()
+EXITING Label()
+Lexeme: SUM Mnemonic: IDNT
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: := Mnemonic: ASGN
+EXITING Identifier()
+EXITING Variable()
+Lexeme: 275.55 Mnemonic: FLTC
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: / Mnemonic: _DIV
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+ENTERING MulOp()
+Lexeme: 200.77 Mnemonic: FLTC
+EXITING MulOp()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: ; Mnemonic: SEMI
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Statement()
+Line #30
+Line #31   IF SUM > 5.0 THEN
+Lexeme: IF Mnemonic: __IF
+ENTERING Statement()
+Lexeme: SUM Mnemonic: IDNT
+ENTERING Label()
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING Variable()
+ENTERING Identifier()
+Lexeme: > Mnemonic: __GT
+EXITING Identifier()
+EXITING Variable()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+ENTERING Label()
+Lexeme: 5.0 Mnemonic: FLTC
+EXITING Label()
+ENTERING SimpleExpression()
+ENTERING Term()
+ENTERING Factor()
+ENTERING UnsignedConstant()
+ENTERING UnsignedNumber()
+Lexeme: THEN Mnemonic: THEN
+EXITING UnsignedNumber()
+EXITING UnsignedConstant()
+EXITING Factor()
+EXITING Term()
+EXITING SimpleExpression()
+EXITING Label()
+Line #32     GOTO JUMP
+Lexeme: GOTO Mnemonic: GOTO
+ENTERING Statement()
+Lexeme: JUMP Mnemonic: IDNT
+ENTERING Label()
+ENTERING Identifier()
+Line #33 END.
+Lexeme: END Mnemonic: _END
+EXITING Identifier()
+EXITING Label()
+EXITING Statement()
+EXITING Statement()
+Lexeme: . Mnemonic: _DOT
+EXITING BlockBody()
+EXITING Block()
+Lexeme: . Mnemonic: _DOT
+EXITING Program()
+SYMBOL TABLE
+---------------------------------------------------------------------------------------------------------
+|Name                                    |      Kind|  DataType|                                   Value|
+---------------------------------------------------------------------------------------------------------
+|GOOD3B                                  |  ProgName|   Integer|                                       0|
+|LOOP_START                              |     Label|   Integer|                                       0|
+|JUMP                                    |     Label|   Integer|                                       0|
+|COUNT                                   |  Variable|   Integer|                                       0|
+|TOTAL                                   |  Variable|   Integer|                                       0|
+|ST                                      |  Variable|    String|                                  string|
+|SUM                                     |  Variable|    Double|                                     1.1|
+|SUBTOTAL                                |  Variable|    Double|                                     1.1|
+|MAX                                     |  Variable|    Double|                                     1.1|
+|I                                       |  Variable|   Integer|                                       0|
+|1                                       |  Constant|   Integer|                                       1|
+|10                                      |  Constant|   Integer|                                      10|
+|20                                      |  Constant|   Integer|                                      20|
+|15                                      |  Constant|   Integer|                                      15|
+|2                                       |  Constant|   Integer|                                       2|
+|12                                      |  Constant|   Integer|                                      12|
+|275.55                                  |  Constant|    Double|                                  275.55|
+|200.77                                  |  Constant|    Double|                                  200.77|
+|5.0                                     |  Constant|    Double|                                       5|
+---------------------------------------------------------------------------------------------------------
+
+----------------------------------------------
+Part3B-BadTestfile1.txt - Non-Verbose - Output
+----------------------------------------------
+
+Line #1 unit MyBadProgram;  {This file will have several errors, as identified below}
+Line #2
+Line #3 {The declarations below are intended to be syntactically correct}
+Line #4
+Line #5 LABEL Exit, Enter;  {at the end, Exit should be flagged as 'unused label' }
+Line #6 VAR i, j : integer;
+Line #7 var sum, total: integer;
+Line #8
+Line #9 BEGIN
+Line #10 sum := 0; total := 50;
+Line #11
+Line #12 ENTER:
+Line #13 IF sum > total THEN
+Line #14   BEGIN
+Line #15   i := i + sum * 2
+Line #16   END;
+Line #17 sum := i + total;
+Line #18
+Line #19 (* First error: undeclared variable-- add to symbols, but keep going without worst case mode *)
+Line #20 mysum := 2 * sum;
+
+********** Warning **********
+Line #20: mysum := 2 * sum;
+WARNING: mysum undeclared.
+***************************
+
+Line #21 { Note: mysum should not be flagged again-- is ok now }
+Line #22 while mysum > 5 do
+Line #23   begin
+Line #24   if i > 3 then
+Line #25     i := 3;
+Line #26   writeln(i)
+Line #27   end;
+Line #28 { Now things go bad and parser should begin statement-level parsing after this }
+Line #29 until x > y do;
+
+********** Error **********
+Line #29: until x > y do;
+ERROR: Statement Token expected, but until found.
+***************************
+
+
+********** Warning **********
+Line #29: until x > y do;
+WARNING: x undeclared.
+***************************
+
+
+********** Error **********
+Line #29: until x > y do;
+ERROR: IDENTIFIER expected, but > found.
+***************************
+
+
+********** Warning **********
+Line #29: until x > y do;
+WARNING: y undeclared.
+***************************
+
+
+********** Error **********
+Line #29: until x > y do;
+ERROR: IDENTIFIER expected, but do found.
+***************************
+
+Line #30 sum := ;
+
+********** Error **********
+Line #30: sum := ;
+ERROR: SIMPLE EXPRESSION or STRING expected, but ; found.
+***************************
+
+Line #31 if sum := 5 do while i;
+
+********** Error **********
+Line #31: if sum := 5 do while i;
+ERROR: Relational Operator expected, but := found.
+***************************
+
+
+********** Error **********
+Line #31: if sum := 5 do while i;
+ERROR: Relational Operator expected, but ; found.
+***************************
+
+Line #32 { missing semicolon below }
+Line #33 writeln("Looks like errors")
+Line #34 { the rest should be legal... try to resynch ASAP }
+Line #35 sum := 50;
+
+********** Error **********
+Line #35: sum := 50;
+ERROR: END or SEMICOLON expected, but sum found.
+***************************
+
+Line #36 for i := 1 to 10 do
+Line #37   begin
+Line #38   j := i + 1;
+Line #39   writeln(j);
+Line #40   writeln(i)
+Line #41   end
+Line #42
+Line #43 END.
+Line #44
+Line #45
+SYMBOL TABLE
+---------------------------------------------------------------------------------------------------------
+|Name                                    |      Kind|  DataType|                                   Value|
+---------------------------------------------------------------------------------------------------------
+|MYBADPROGRAM                            |  ProgName|   Integer|                                       0|
+|EXIT                                    |     Label|   Integer|                                       0|
+|ENTER                                   |     Label|   Integer|                                       0|
+|I                                       |  Variable|   Integer|                                       0|
+|J                                       |  Variable|   Integer|                                       0|
+|SUM                                     |  Variable|   Integer|                                       0|
+|TOTAL                                   |  Variable|   Integer|                                       0|
+|0                                       |  Constant|   Integer|                                       0|
+|50                                      |  Constant|   Integer|                                      50|
+|2                                       |  Constant|   Integer|                                       2|
+|MYSUM                                   |  Variable|   Integer|                                       0|
+|5                                       |  Constant|   Integer|                                       5|
+|3                                       |  Constant|   Integer|                                       3|
+|X                                       |  Variable|   Integer|                                       0|
+|Y                                       |  Variable|   Integer|                                       0|
+|Looks like errors                       |  Constant|    String|                       Looks like errors|
+|1                                       |  Constant|   Integer|                                       1|
+|10                                      |  Constant|   Integer|                                      10|
+---------------------------------------------------------------------------------------------------------

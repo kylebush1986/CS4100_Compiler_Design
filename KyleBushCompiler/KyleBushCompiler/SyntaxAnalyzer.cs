@@ -72,6 +72,9 @@ namespace KyleBushCompiler
         private ReserveTable TokenCodes { get; set; }
         private bool ScannerEchoOn { get; set; }
         private bool Verbose { get; set; }
+        private List<string> DeclaredVariables { get; set; }
+        private List<string> DeclaredLabels { get; set; }
+        private string ProgramName { get; set; }
 
         #endregion
 
@@ -80,6 +83,9 @@ namespace KyleBushCompiler
             Scanner = scanner;
             ScannerEchoOn = scannerEchoOn;
             TokenCodes = tokenCodes;
+            DeclaredLabels = new List<string>();
+            DeclaredVariables = new List<string>();
+            PrintError = true;
         }
 
         #region CFG Methods
@@ -109,17 +115,17 @@ namespace KyleBushCompiler
                     }
                     else
                     {
-                        Error("PERIOD");
+                        UnexpectedTokenError("PERIOD");
                     }
                 }
                 else
                 {
-                    Error("SEMICOLON");
+                    UnexpectedTokenError("SEMICOLON");
                 }
             }
             else
             {
-                Error("UNIT");
+                UnexpectedTokenError("UNIT");
             }
 
             Debug(false, "Program()");
@@ -155,11 +161,9 @@ namespace KyleBushCompiler
             {
                 Resync();
                 IsError = false;
+                PrintError = true;
                 while (IsError == false && !Scanner.EndOfFile)
                 {
-                    if (Scanner.TokenCode == SEMICOLON) // Account for END
-                        GetNextToken();
-
                     Statement();
 
                     if (Scanner.TokenCode == END)
@@ -167,7 +171,13 @@ namespace KyleBushCompiler
                         GetNextToken();
                         if (Scanner.TokenCode == PERIOD)
                             GetNextToken();
+                        else
+                            UnexpectedTokenError("PERIOD");
                     }
+                    else if (Scanner.TokenCode == SEMICOLON)
+                        GetNextToken();
+                    else
+                        UnexpectedTokenError("END or SEMICOLON");
                 }
             }
 
@@ -192,17 +202,16 @@ namespace KyleBushCompiler
                 while (Scanner.TokenCode == SEMICOLON && !IsError)
                 {
                     GetNextToken();
-                    // Seems to be called an extra time at the end of the program.
                     x = Statement();
                 }
 
                 if (Scanner.TokenCode == END)
                     GetNextToken();
                 else
-                    Error("END");
+                    UnexpectedTokenError("END or SEMICOLON");
             }
             else
-                Error("BEGIN");
+                UnexpectedTokenError("BEGIN");
 
             Debug(false, "BlockBody()");
             return -1;
@@ -222,29 +231,39 @@ namespace KyleBushCompiler
             {
                 GetNextToken();
                 if (Scanner.TokenCode == IDENTIFIER)
-                    UpdateLabelSymbol();
-                int x = Identifier();
-                
-
-                while (Scanner.TokenCode == COMMA && !IsError)
                 {
-                    GetNextToken();
-                    if (Scanner.TokenCode == IDENTIFIER)
-                        UpdateLabelSymbol();
-                    x = Identifier();
-                }
+                    if (isNotPreviouslyDeclaredIdentifier(SymbolKind.Label))
+                    {
+                        int x = Identifier();
 
-                if (Scanner.TokenCode == SEMICOLON)
-                    GetNextToken();
-                else
-                    Error("SEMICOLON");
+
+                        while (Scanner.TokenCode == COMMA && !IsError)
+                        {
+                            GetNextToken();
+                            if (Scanner.TokenCode == IDENTIFIER)
+                            {
+                                if (isNotPreviouslyDeclaredIdentifier(SymbolKind.Label))
+                                {
+                                    x = Identifier();
+                                }
+                            }
+                        }
+
+                        if (Scanner.TokenCode == SEMICOLON)
+                            GetNextToken();
+                        else
+                            UnexpectedTokenError("SEMICOLON");
+                    }
+                }
             }
             else
-                Error("LABEL");
+                UnexpectedTokenError("LABEL");
 
             Debug(false, "LabelDeclaration()");
             return -1;
         }
+
+        
 
         /// <summary>
         /// Implements CFG Rule: <variable-dec-sec> -> $VAR <variable-declaration>
@@ -262,7 +281,7 @@ namespace KyleBushCompiler
                 int x = VariableDeclaration();
             }
             else
-                Error("VAR");
+                UnexpectedTokenError("VAR");
 
             Debug(false, "VariableDecSec()");
             return -1;
@@ -274,40 +293,67 @@ namespace KyleBushCompiler
         /// <returns></returns>
         private int VariableDeclaration()
         {
+            List<string> variables = new List<string>();
+            string type = "";
+
             if (IsError)
                 return -1;
 
             Debug(true, "VariableDeclaration()");
-            do
+
+            if (DeclaredLabels.Contains(Scanner.NextToken))
             {
-                int x = Identifier();
-                while (Scanner.TokenCode == COMMA && !IsError)
+                RedeclaredIdentifierError("LABEL", "VARIABLE");
+            }
+            else if (ProgramName == Scanner.NextToken)
+            {
+                RedeclaredIdentifierError("ProgramName", "VARIABLE");
+            }
+            else
+            {
+                do
                 {
-                    GetNextToken();
-                    x = Identifier();
-                }
-                if (Scanner.TokenCode == COLON)
-                {
-                    GetNextToken();
-                    x = Type();
-                    if (Scanner.TokenCode == SEMICOLON)
+                    variables.Add(Scanner.NextToken);
+                    DeclaredVariables.Add(Scanner.NextToken);
+                    int x = Variable();
+                    while (Scanner.TokenCode == COMMA && !IsError)
                     {
                         GetNextToken();
+                        variables.Add(Scanner.NextToken);
+                        DeclaredVariables.Add(Scanner.NextToken);
+                        x = Variable();
+                    }
+                    if (Scanner.TokenCode == COLON)
+                    {
+                        GetNextToken();
+                        type = Scanner.NextToken;
+                        x = Type();
+                        if (Scanner.TokenCode == SEMICOLON)
+                        {
+                            GetNextToken();
+                        }
+                        else
+                        {
+                            UnexpectedTokenError("SEMICOLON");
+                        }
+
+                        SetVariableType(variables, type);
                     }
                     else
                     {
-                        Error("SEMICOLON");
+                        UnexpectedTokenError("COMMA");
                     }
-                }
-                else
-                {
-                    Error("COMMA");
-                }
-            } while (Scanner.TokenCode == IDENTIFIER && !IsError);
+                } while (Scanner.TokenCode == IDENTIFIER && !IsError);
+            }
+            
 
             Debug(false, "VariableDeclaration()");
             return -1;
         }
+
+
+
+
 
 
         /// <summary>
@@ -336,7 +382,7 @@ namespace KyleBushCompiler
                 if (Scanner.TokenCode == COLON)
                     GetNextToken();
             }
-            if (Scanner.TokenCode == IDENTIFIER)
+            if (isVariable())
             {
                 Variable();
                 if (Scanner.TokenCode == ASSIGN)
@@ -347,10 +393,10 @@ namespace KyleBushCompiler
                     else if (Scanner.TokenCode == STRINGTYPE)
                         StringConst();
                     else
-                        Error("SIMPLE EXPRESSION or STRING");
+                        UnexpectedTokenError("SIMPLE EXPRESSION or STRING");
                 }
                 else
-                    Error("IDENTIFIER");
+                    UnexpectedTokenError("IDENTIFIER");
             }
             else if (Scanner.TokenCode == BEGIN)
             {
@@ -371,7 +417,7 @@ namespace KyleBushCompiler
                     }
                 }
                 else
-                    Error("THEN");
+                    UnexpectedTokenError("THEN");
             }
             else if (Scanner.TokenCode == WHILE)
             {
@@ -383,7 +429,7 @@ namespace KyleBushCompiler
                     Statement();
                 }
                 else
-                    Error("DO");
+                    UnexpectedTokenError("DO");
             }
             else if (Scanner.TokenCode == REPEAT)
             {
@@ -395,7 +441,7 @@ namespace KyleBushCompiler
                     RelExpression();
                 }
                 else
-                    Error("UNTIL");
+                    UnexpectedTokenError("UNTIL");
             }
             else if (Scanner.TokenCode == FOR)
             {
@@ -415,13 +461,13 @@ namespace KyleBushCompiler
                             Statement();
                         }
                         else
-                            Error("DO");
+                            UnexpectedTokenError("DO");
                     }
                     else
-                        Error("TO");
+                        UnexpectedTokenError("TO");
                 }
                 else
-                    Error("ASSIGN");
+                    UnexpectedTokenError("ASSIGN");
             }
             else if (Scanner.TokenCode == GOTO)
             {
@@ -440,7 +486,7 @@ namespace KyleBushCompiler
                         if (Scanner.TokenCode == RPAR)
                             GetNextToken();
                         else
-                            Error("RPAR");
+                            UnexpectedTokenError("RPAR");
                     }
                     else if (Scanner.TokenCode == IDENTIFIER)
                     {
@@ -448,7 +494,7 @@ namespace KyleBushCompiler
                         if (Scanner.TokenCode == RPAR)
                             GetNextToken();
                         else
-                            Error("RPAR");
+                            UnexpectedTokenError("RPAR");
                     }
                     else if (Scanner.TokenCode == STRINGTYPE)
                     {
@@ -456,16 +502,16 @@ namespace KyleBushCompiler
                         if (Scanner.TokenCode == RPAR)
                             GetNextToken();
                         else
-                            Error("RPAR");
+                            UnexpectedTokenError("RPAR");
                     }
                     else
-                        Error("SimpleExpression or IDENTIFIER or STRINGTYPE");
+                        UnexpectedTokenError("SimpleExpression or IDENTIFIER or STRINGTYPE");
                 }
                 else
-                    Error("LPAR");
+                    UnexpectedTokenError("LPAR");
             }
             else
-                Error("Statement Token");
+                UnexpectedTokenError("Statement Token");
 
             Debug(false, "Statement()");
             return -1;
@@ -481,7 +527,8 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "ProgIdentifier()");
-            // Change kind to program name
+            UpdateSymbolKind(SymbolKind.ProgName);
+            ProgramName = Scanner.NextToken;
             Identifier();
             Debug(false, "ProgIdentifier()");
             return -1;
@@ -497,16 +544,40 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "Variable()");
-            Identifier();
 
-            if (Scanner.TokenCode == LEFT_BRACKET)
+            int index = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken);
+            if (index != -1)
             {
-                GetNextToken();
-                SimpleExpression();
-                if (Scanner.TokenCode == RIGHT_BRACKET)
-                    GetNextToken();
+                Symbol symbol = Scanner.SymbolTable.GetSymbol(index);
+                if (symbol.Kind == SymbolKind.Variable)
+                {
+                    if (DeclaredLabels.Contains(Scanner.NextToken))
+                    {
+                        DeclarationWarning(SymbolKind.Variable, SymbolKind.Label);
+                        DeclaredVariables.Add(Scanner.NextToken);
+                    }
+                    else if (!DeclaredVariables.Contains(Scanner.NextToken))
+                    {
+                        UndeclaredWarning();
+                        DeclaredVariables.Add(Scanner.NextToken);
+                    }
+                    
+                }
                 else
-                    Error("RIGHT_BRACKET");
+                    DeclarationWarning(SymbolKind.Variable, symbol.Kind);
+
+                Identifier();
+
+
+                if (Scanner.TokenCode == LEFT_BRACKET)
+                {
+                    GetNextToken();
+                    SimpleExpression();
+                    if (Scanner.TokenCode == RIGHT_BRACKET)
+                        GetNextToken();
+                    else
+                        UnexpectedTokenError("RIGHT_BRACKET");
+                }
             }
 
             Debug(false, "Variable()");
@@ -523,11 +594,11 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "Label()");
-            // Must check that the indentifier has been declared as type label 
+            // Checks that the indentifier has been declared as type label 
             if (IsLabel())
                 Identifier();
             else
-                Error("LABEL");
+                UnexpectedTokenError("LABEL");
                 
             Debug(false, "Label()");
             return -1;
@@ -571,7 +642,7 @@ namespace KyleBushCompiler
                     GetNextToken();
                     break;
                 default:
-                    Error("Relational Operator");
+                    UnexpectedTokenError("Relational Operator");
                     break;
             }
             Debug(false, "Label()");
@@ -621,7 +692,7 @@ namespace KyleBushCompiler
             if (Scanner.TokenCode == PLUS || Scanner.TokenCode == MINUS)
                 GetNextToken();
             else
-                Error("PLUS or MINUS");
+                UnexpectedTokenError("PLUS or MINUS");
             Debug(false, "AddOp()");
             return -1;
         }
@@ -643,7 +714,7 @@ namespace KyleBushCompiler
             else if (Scanner.TokenCode == MINUS)
                 GetNextToken();
             else
-                Error("PLUS or MINUS");
+                UnexpectedTokenError("PLUS or MINUS");
             Debug(false, "Sign()");
             return -1;
         }
@@ -685,7 +756,7 @@ namespace KyleBushCompiler
             if (Scanner.TokenCode == MULTIPLY || Scanner.TokenCode == DIVIDE)
                 GetNextToken();
             else
-                Error("MULTIPLY or DIVIDE");
+                UnexpectedTokenError("MULTIPLY or DIVIDE");
 
             Debug(false, "MulOp()");
             return -1;
@@ -719,10 +790,10 @@ namespace KyleBushCompiler
                 if (Scanner.TokenCode == RPAR)
                     GetNextToken();
                 else
-                    Error("RPAR");
+                    UnexpectedTokenError("RPAR");
             }
             else
-                Error("UNSIGNED CONSTANT or VARIABLE or LPAR");
+                UnexpectedTokenError("UNSIGNED CONSTANT or VARIABLE or LPAR");
 
             Debug(false, "Factor()");
             return -1;
@@ -760,22 +831,22 @@ namespace KyleBushCompiler
                                     GetNextToken();
                                 }
                                 else
-                                    Error("INTEGER");
+                                    UnexpectedTokenError("INTEGER");
                             }
                             else
-                                Error("OF");
+                                UnexpectedTokenError("OF");
                         }
                         else
-                            Error("RIGHT_BRACKET");
+                            UnexpectedTokenError("RIGHT_BRACKET");
                     }
                     else
-                        Error("INTTYPE");
+                        UnexpectedTokenError("INTTYPE");
                 }
                 else
-                    Error("LEFT_BRACKET");
+                    UnexpectedTokenError("LEFT_BRACKET");
             }
             else
-                Error("Simple Type or ARRAY");
+                UnexpectedTokenError("Simple Type or ARRAY");
 
             Debug(false, "Type()");
             return -1;
@@ -795,7 +866,7 @@ namespace KyleBushCompiler
             if (Scanner.TokenCode == INTEGER || Scanner.TokenCode == REAL || Scanner.TokenCode == STRING)
                 GetNextToken();
             else
-                Error("INTEGER or FLOAT or STRING");
+                UnexpectedTokenError("INTEGER or FLOAT or STRING");
 
             Debug(false, "SimpleType()");
             return -1;
@@ -849,7 +920,7 @@ namespace KyleBushCompiler
             if (Scanner.TokenCode == FLOAT || Scanner.TokenCode == INTTYPE)
                 GetNextToken();
             else
-                Error("FLOAT or INTTYPE");
+                UnexpectedTokenError("FLOAT or INTTYPE");
 
             Debug(false, "UnsignedNumber()");
             return -1;
@@ -871,7 +942,7 @@ namespace KyleBushCompiler
             if (Scanner.TokenCode == IDENTIFIER)
                 GetNextToken();
             else
-                Error("IDENTIFIER");
+                UnexpectedTokenError("IDENTIFIER");
 
             Debug(false, "Identifier()");
             return -1;
@@ -892,7 +963,7 @@ namespace KyleBushCompiler
 
                 GetNextToken();
             else
-                Error("STRINGYPE");
+                UnexpectedTokenError("STRINGYPE");
 
             Debug(false, "StringConst()");
             return -1;
@@ -900,58 +971,71 @@ namespace KyleBushCompiler
 
         #endregion
 
-        #region Utility Methods
+        #region Errors and Warnings
 
         /// <summary>
         /// Prints an error with the expected token type and the actual token found.
         /// </summary>
         /// <param name="expectedToken">The expected token type.</param>
-        private void Error(string expectedToken)
+        private void UnexpectedTokenError(string expectedToken)
         {
             IsError = true;
+            ErrorOcurred = true;
+
+            if (PrintError)
+            {
+                Console.WriteLine("\n********** Error **********");
+                Console.WriteLine("Line #{0}: {1}", Scanner.CurrentLineIndex, Scanner.CurrentLine);
+                Console.WriteLine("ERROR: {0} expected, but {1} found.", expectedToken, Scanner.NextToken);
+                Console.WriteLine("***************************\n");
+            }
+
+            PrintError = false;
+        }
+
+        /// <summary>
+        /// Prints a warning message when an identifier is detected that was undeclared.
+        /// </summary>
+        private void UndeclaredWarning()
+        {
+            Console.WriteLine("\n********** Warning **********");
+            Console.WriteLine("Line #{0}: {1}", Scanner.CurrentLineIndex, Scanner.CurrentLine);
+            Console.WriteLine("WARNING: {0} undeclared.", Scanner.NextToken);
+            Console.WriteLine("*****************************\n");
+        }
+
+        /// <summary>
+        /// Prints a warning message when an identifier is used as a different Kind than what it was declared.
+        /// </summary>
+        /// <param name="expected"></param>
+        /// <param name="found"></param>
+        private void DeclarationWarning(SymbolKind expected, SymbolKind found)
+        {
+            Console.WriteLine("\n********** Warning **********");
+            Console.WriteLine("Line #{0}: {1}", Scanner.CurrentLineIndex, Scanner.CurrentLine);
+            Console.WriteLine("WARNING: {0} declared as expected, but used as {1}.", Scanner.NextToken, expected, found);
+            Console.WriteLine("*****************************\n");
+        }
+
+        /// <summary>
+        /// Displays 
+        /// </summary>
+        /// <param name="used"></param>
+        /// <param name="declared"></param>
+        private void RedeclaredIdentifierError(string used, string declared)
+        {
+            IsError = true;
+            ErrorOcurred = true;
+
             Console.WriteLine("\n********** Error **********");
             Console.WriteLine("Line #{0}: {1}", Scanner.CurrentLineIndex, Scanner.CurrentLine);
-            Console.WriteLine("ERROR: {0} expected, but {1} found.", expectedToken, Scanner.NextToken);
+            Console.WriteLine("WARNING: {0} used, but {1} declared.", used, declared);
             Console.WriteLine("***************************\n");
         }
-        
 
-        /// <summary>
-        /// Prints the method that is being entered or exited if TraceOn is set to true
-        /// </summary>
-        /// <param name="entering"></param>
-        /// <param name="name"></param>
-        private void Debug(bool entering, string name)
-        {
-            if (TraceOn)
-            {
-                if (entering)
-                    Console.WriteLine("ENTERING " + name);
-                else
-                    Console.WriteLine("EXITING " + name);
-            }
-        }
+        #endregion
 
-        /// <summary>
-        /// Gets the next token and prints the token lexeme and mneumonic if Trace is on.
-        /// </summary>
-        private void GetNextToken()
-        {
-            Scanner.GetNextToken(ScannerEchoOn);
-            if (TraceOn)
-                Console.WriteLine("Lexeme: {0} Mnemonic: {1}", Scanner.NextToken, TokenCodes.LookupCode(Scanner.TokenCode));
-        }
-
-        /// <summary>
-        /// After an error occurs this finds the begining of the next statement.
-        /// </summary>
-        private void Resync()
-        {
-            while(!IsStatementStart() && !Scanner.EndOfFile)
-            {
-                GetNextToken();
-            }
-        }
+        #region Type Testing
 
         /// <summary>
         /// Checks if the next token is a Sign token.
@@ -996,9 +1080,16 @@ namespace KyleBushCompiler
         private bool isVariable()
         {
             if (Scanner.TokenCode == IDENTIFIER)
-                return true;
-            else
-                return false;
+            {
+                int index = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken);
+                if (index != -1)
+                {
+                    Symbol symbol = Scanner.SymbolTable.GetSymbol(index);
+                    if (symbol.Kind == SymbolKind.Variable)
+                        return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -1019,7 +1110,7 @@ namespace KyleBushCompiler
         /// <returns>True if the token could start a statement, False if not.</returns>
         private bool IsStatementStart()
         {
-            switch(Scanner.TokenCode)
+            switch (Scanner.TokenCode)
             {
                 case IDENTIFIER:
                 case BEGIN:
@@ -1082,21 +1173,198 @@ namespace KyleBushCompiler
                         return true;
                     }
                 }
+                else
+                {
+                    Console.WriteLine("Error: The current token is not in the symbol table.");
+                }
             }
             return false;
         }
 
-        private void UpdateLabelSymbol()
+        #endregion
+
+        #region Utility Methods
+
+        /// <summary>
+        /// Prints the method that is being entered or exited if TraceOn is set to true
+        /// </summary>
+        /// <param name="entering"></param>
+        /// <param name="name"></param>
+        private void Debug(bool entering, string name)
         {
-            int tokenIndex = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken.ToUpper());
+            if (TraceOn)
+            {
+                if (entering)
+                    Console.WriteLine("ENTERING " + name);
+                else
+                    Console.WriteLine("EXITING " + name);
+            }
+        }
+
+        /// <summary>
+        /// Gets the next token and prints the token lexeme and mneumonic if Trace is on.
+        /// </summary>
+        private void GetNextToken()
+        {
+            Scanner.GetNextToken(ScannerEchoOn);
+            if (TraceOn)
+                Console.WriteLine("Lexeme: {0} Mnemonic: {1}", Scanner.NextToken, TokenCodes.LookupCode(Scanner.TokenCode));
+        }
+
+        /// <summary>
+        /// After an error occurs this finds the begining of the next statement.
+        /// </summary>
+        private void Resync()
+        {
+            while(!IsStatementStart() && !Scanner.EndOfFile)
+            {
+                GetNextToken();
+            }
+        }
+
+
+        /// <summary>
+        /// Updates the 'kind' of the current token in the symbol table.
+        /// </summary>
+        private void UpdateSymbolKind(SymbolKind kind)
+        {
+            int tokenIndex = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken);
             if (tokenIndex != -1)
             {
-                Scanner.SymbolTable.UpdateSymbol(tokenIndex, SymbolKind.Label, "");
+                Scanner.SymbolTable.UpdateSymbol(tokenIndex, kind, 0);
             }
             else
             {
                 Console.WriteLine("Symbol not found in symbol table.");
             }
+        }
+
+        /// <summary>
+        /// Sets the DataType and the default value of all the provided variables in the symbol table.
+        /// </summary>
+        /// <param name="variables"></param>
+        /// <param name="type"></param>
+        private void SetVariableType(List<string> variables, string type)
+        {
+            int index;
+            Symbol symbol;
+            DataType dataType = ConvertDataType(type);
+            int defaultIntValue = 0;
+            double defaultRealValue = 1.1;
+            string defaultStringValue = "string"; 
+
+            foreach (string variable in variables)
+            {
+                index = Scanner.SymbolTable.LookupSymbol(variable);
+                if (index != -1)
+                {
+                    symbol = Scanner.SymbolTable.GetSymbol(index);
+                    if (dataType != DataType.Invalid)
+                        symbol.DataType = dataType;
+                    else
+                        Console.WriteLine("Could not set value due to invalid data type.");
+
+                    if (dataType == DataType.Integer)
+                        symbol.SetValue(defaultIntValue);
+                    else if (dataType == DataType.Double)
+                        symbol.SetValue(defaultRealValue);
+                    else if (dataType == DataType.String)
+                        symbol.SetValue(defaultStringValue);
+                    else
+                        Console.WriteLine("Could not set value dues to invalid data type.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Converts a string representation of a 'type' to an instance of the enum DataType
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private DataType ConvertDataType(string type)
+        {
+            DataType dataType = DataType.Invalid;
+
+            switch (type.ToUpper())
+            {
+                case "INTEGER":
+                    dataType = DataType.Integer;
+                    break;
+                case "REAL":
+                    dataType = DataType.Double;
+                    break;
+                case "STRING":
+                    dataType = DataType.String;
+                    break;
+                default:
+                    Console.WriteLine("Error: Invalid Data Type.");
+                    break;
+            }
+
+            return dataType;
+        }
+
+        /// <summary>
+        /// Determines if the identifier has been previously declared as a different type.
+        /// </summary>
+        /// <param name="identifierType"></param>
+        /// <returns></returns>
+        private bool isNotPreviouslyDeclaredIdentifier(SymbolKind kind)
+        {
+            string declaredAs = "";
+            string identifierType = "";
+            List<string> identifierList = new List<string>();
+
+            switch (kind)
+            {
+                case SymbolKind.Label:
+                    identifierList = DeclaredVariables;
+                    declaredAs = "VARIABLE";
+                    identifierType = "LABEL";
+                    break;
+                case SymbolKind.Variable:
+                    identifierList = DeclaredLabels;
+                    declaredAs = "LABEL";
+                    identifierType = "VARIABLE";
+                    break;
+                default:
+                    Console.WriteLine("Invalid Identifier Type");
+                    return false;
+            }
+
+            if (identifierList.Contains(Scanner.NextToken))
+            {
+                RedeclaredIdentifierError(identifierType, declaredAs);
+                return false;
+            }
+            else if (Scanner.NextToken == ProgramName)
+            {
+                RedeclaredIdentifierError(identifierType, "ProgramName");
+                return false;
+            }
+            else
+            {
+                AddToDeclaredIdentifiers(kind);
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Adds the identifier to the appropriate declated identifier list.
+        /// </summary>
+        /// <param name="kind"></param>
+        private void AddToDeclaredIdentifiers(SymbolKind kind)
+        {
+            UpdateSymbolKind(kind);
+            if (kind == SymbolKind.Variable)
+            {
+                DeclaredVariables.Add(Scanner.NextToken);
+            } else if (kind == SymbolKind.Label)
+            {
+                DeclaredLabels.Add(Scanner.NextToken);
+            }
+            else
+                Console.WriteLine("This kind of symbol does not need to be added to declared identifiers.");
         }
 
         #endregion

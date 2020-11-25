@@ -1,0 +1,33 @@
+
+UNIT GOOD3B;
+
+(* This Part 3B test file should have NO errors! *)
+LABEL LOOP_START, JUMP;
+VAR COUNT, TOTAL : INTEGER;
+VAR ST : STRING;
+VAR SUM, SUBTOTAL, MAX : REAL;
+
+BEGIN
+  FOR I := 1 TO 10 DO
+    BEGIN
+    TOTAL := TOTAL + I
+    END;
+
+  REPEAT
+    TOTAL := TOTAL - 1
+  UNTIL TOTAL <= 20;
+
+  IF TOTAL > 15 THEN
+    BEGIN
+    WHILE TOTAL > 10 DO
+      TOTAL := TOTAL - (2 * 1)
+    END
+  ELSE
+    IF TOTAL < 12 THEN
+      WRITELN(TOTAL);
+
+  JUMP: SUM := 275.55 / 200.77;
+
+  IF SUM > 5.0 THEN
+    GOTO JUMP
+END.

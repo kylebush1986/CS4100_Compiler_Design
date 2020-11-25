@@ -1,0 +1,45 @@
+unit MyBadProgram;  {This file will have several errors, as identified below}
+
+{The declarations below are intended to be syntactically correct}
+
+LABEL Exit, Enter;  {at the end, Exit should be flagged as 'unused label' }
+VAR i, j : integer;
+var sum, total: integer;
+
+BEGIN
+sum := 0; total := 50;
+
+ENTER: 
+IF sum > total THEN
+  BEGIN
+  i := i + sum * 2
+  END;
+sum := i + total;
+
+(* First error: undeclared variable-- add to symbols, but keep going without worst case mode *)
+mysum := 2 * sum;
+{ Note: mysum should not be flagged again-- is ok now }
+while mysum > 5 do
+  begin
+  if i > 3 then
+    i := 3;
+  writeln(i)
+  end;
+{ Now things go bad and parser should begin statement-level parsing after this }
+until x > y do;
+sum := ;
+if sum := 5 do while i;
+{ missing semicolon below }
+writeln("Looks like errors")
+{ the rest should be legal... try to resynch ASAP }
+sum := 50;
+for i := 1 to 10 do
+  begin
+  j := i + 1;
+  writeln(j);
+  writeln(i)
+  end
+
+END.
+
+

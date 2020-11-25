@@ -12,7 +12,8 @@ namespace KyleBushCompiler
     {
         Integer,
         Double,
-        String
+        String,
+        Invalid
     }
 
     /// <summary>
@@ -22,7 +23,8 @@ namespace KyleBushCompiler
     {
         Label,
         Variable,
-        Constant
+        Constant,
+        ProgName
     }
 
     public class Symbol

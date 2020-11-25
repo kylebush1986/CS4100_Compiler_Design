@@ -75,7 +75,7 @@ namespace KyleBushCompiler
         /// <returns>The index of the symbol or -1 if not found</returns>
         public int LookupSymbol(string symbol)
         {
-            return SymbolTableData.FindIndex(s => s.Name == symbol);
+            return SymbolTableData.FindIndex(s => s.Name == symbol.ToUpper());
         }
 
         /// <summary>

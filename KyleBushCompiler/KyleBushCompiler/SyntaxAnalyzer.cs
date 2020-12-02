@@ -63,6 +63,34 @@ namespace KyleBushCompiler
         private const int UNDEFINED = 99;
         #endregion
 
+        #region Quad OpCode Constants
+
+        private const int STOP = 0;
+        private const int DIV = 1;
+        private const int MUL = 2;
+        private const int SUB = 3;
+        private const int ADD = 4;
+        private const int MOV = 5;
+        private const int STI = 6;
+        private const int LDI = 7;
+        private const int BNZ = 8;
+        private const int BNP = 9;
+        private const int BNN = 10;
+        private const int BZ = 11;
+        private const int BP = 12;
+        private const int BN = 13;
+        private const int BR = 14;
+        private const int BINDR = 15;
+        private const int PRINT = 16;
+
+        #endregion
+
+        #region Symbol Table Constants
+        private const int Minus1Index = 0;
+        private const int Plus1Index = 1;
+
+        #endregion
+
         #region Properties
         public bool TraceOn { get; set; }
         public bool IsError { get; set; }
@@ -70,6 +98,7 @@ namespace KyleBushCompiler
         private bool PrintError { get; set; }
         private LexicalAnalyzer Scanner { get; set; }
         private ReserveTable TokenCodes { get; set; }
+        private QuadTable Quads { get; set; }
         private bool ScannerEchoOn { get; set; }
         private bool Verbose { get; set; }
         private List<string> DeclaredVariables { get; set; }
@@ -78,11 +107,12 @@ namespace KyleBushCompiler
 
         #endregion
 
-        public SyntaxAnalyzer(LexicalAnalyzer scanner, ReserveTable tokenCodes, bool scannerEchoOn)
+        public SyntaxAnalyzer(LexicalAnalyzer scanner, ReserveTable tokenCodes, bool scannerEchoOn, QuadTable quads)
         {
             Scanner = scanner;
             ScannerEchoOn = scannerEchoOn;
             TokenCodes = tokenCodes;
+            Quads = quads;
             DeclaredLabels = new List<string>();
             DeclaredVariables = new List<string>();
             PrintError = true;
@@ -351,11 +381,6 @@ namespace KyleBushCompiler
             return -1;
         }
 
-
-
-
-
-
         /// <summary>
         /// Implements CFG Rule: <statement>-> {<label> $COLON]}*
         ///                                    [
@@ -376,6 +401,9 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "Statement()");
+
+            int left, right;
+
             while (IsLabel() && !IsError)
             {
                 int x = Label();
@@ -384,14 +412,19 @@ namespace KyleBushCompiler
             }
             if (isVariable())
             {
-                Variable();
+                left = Variable();
                 if (Scanner.TokenCode == ASSIGN)
                 {
                     GetNextToken();
                     if (IsSimpleExpression())
-                        SimpleExpression();
+                    {
+                        right = SimpleExpression();
+                        Quads.AddQuad(MovCode, right, 0, left);
+                    }
                     else if (Scanner.TokenCode == STRINGTYPE)
-                        StringConst();
+                    {
+                        right = StringConst();
+                    }
                     else
                         UnexpectedTokenError("SIMPLE EXPRESSION or STRING");
                 }
@@ -545,6 +578,8 @@ namespace KyleBushCompiler
 
             Debug(true, "Variable()");
 
+            int result = -1;
+
             int index = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken);
             if (index != -1)
             {
@@ -566,7 +601,7 @@ namespace KyleBushCompiler
                 else
                     DeclarationWarning(SymbolKind.Variable, symbol.Kind);
 
-                Identifier();
+                result = Identifier();
 
 
                 if (Scanner.TokenCode == LEFT_BRACKET)
@@ -581,7 +616,7 @@ namespace KyleBushCompiler
             }
 
             Debug(false, "Variable()");
-            return -1;
+            return result;
         }
 
         /// <summary>
@@ -660,23 +695,47 @@ namespace KyleBushCompiler
 
             Debug(true, "SimpleExpression()");
 
-            int x;
+            int left = -1;
+            int right = -1;
+            int signVal = 0;
+            int temp = 0;
+            int opcode = 0;
 
             if (isSign())
             {
-                x = Sign();
+                signVal = Sign();
             }
 
-            x = Term();
+            left = Term();
+
+            if (signVal == -1)
+            {
+                Quads.AddQuad(MULTIPLY, left, Minus1Index, left);
+            }
 
             while (isAddOp() && !IsError)
             {
-                x = AddOp();
-                x = Term();
+                opcode = AddOp();
+                right = Term();
+                temp = GenSymbol();
+                Quads.AddQuad(opcode, left, right, temp);
+                left = temp;
             }
 
             Debug(false, "SimpleExpression()");
-            return -1;
+            return left;
+        }
+
+        private int GenSymbol()
+        {
+            int index = Scanner.SymbolTable.LookupSymbol("temp");
+
+            if (index == -1)
+            {
+                index = Scanner.SymbolTable.AddSymbol("temp", SymbolKind.Variable, 0);
+            }
+
+            return index;
         }
 
         /// <summary>
@@ -689,12 +748,23 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "AddOp()");
-            if (Scanner.TokenCode == PLUS || Scanner.TokenCode == MINUS)
+
+            int result = -1;
+
+            if (Scanner.TokenCode == PLUS)
+            {
+                result = ADD;
                 GetNextToken();
+            }
+            else if (Scanner.TokenCode == MINUS)
+            {
+                result = SUB;
+                GetNextToken();
+            }
             else
                 UnexpectedTokenError("PLUS or MINUS");
             Debug(false, "AddOp()");
-            return -1;
+            return result;
         }
 
 
@@ -709,14 +779,23 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "Sign()");
+
+            int result = 0;
+
             if (Scanner.TokenCode == PLUS)
+            {
+                result = 1;
                 GetNextToken();
+            }
             else if (Scanner.TokenCode == MINUS)
+            {
+                result = -1;
                 GetNextToken();
+            }
             else
                 UnexpectedTokenError("PLUS or MINUS");
             Debug(false, "Sign()");
-            return -1;
+            return result;
         }
 
 
@@ -900,10 +979,12 @@ namespace KyleBushCompiler
             if (IsError)
                 return -1;
 
+            int index = -1;
+
             Debug(true, "UnsignedConstant()");
-            UnsignedNumber();
+            index = UnsignedNumber();
             Debug(false, "UnsignedConstant()");
-            return -1;
+            return index;
         }
 
         /// <summary>
@@ -917,13 +998,18 @@ namespace KyleBushCompiler
 
             Debug(true, "UnsignedNumber()");
 
+            int index = -1;
+
             if (Scanner.TokenCode == FLOAT || Scanner.TokenCode == INTTYPE)
+            {
+                index = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken);
                 GetNextToken();
+            }
             else
                 UnexpectedTokenError("FLOAT or INTTYPE");
 
             Debug(false, "UnsignedNumber()");
-            return -1;
+            return index;
         }
 
         
@@ -939,13 +1025,18 @@ namespace KyleBushCompiler
 
             Debug(true, "Identifier()");
 
+            int index = -1;
+
             if (Scanner.TokenCode == IDENTIFIER)
+            {
+                index = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken);
                 GetNextToken();
+            }
             else
                 UnexpectedTokenError("IDENTIFIER");
 
             Debug(false, "Identifier()");
-            return -1;
+            return index;
         }
 
         /// <summary>
@@ -959,14 +1050,18 @@ namespace KyleBushCompiler
 
             Debug(true, "StringConst()");
 
-            if (Scanner.TokenCode == STRINGTYPE)
+            int index = -1;
 
+            if (Scanner.TokenCode == STRINGTYPE)
+            {
+                index = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken);
                 GetNextToken();
+            }
             else
                 UnexpectedTokenError("STRINGYPE");
 
             Debug(false, "StringConst()");
-            return -1;
+            return index;
         }
 
         #endregion

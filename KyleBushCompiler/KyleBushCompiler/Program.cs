@@ -63,7 +63,8 @@ namespace KyleBushCompiler
             // Initialize structures
             ReserveTable reserveWords = InitializeReserveWordTable();
             ReserveTable tokenCodes = InitializeTokenCodeTable();
-            SymbolTable symbolTable = new SymbolTable();
+            SymbolTable symbolTable = InitializeSymbolTable();
+            QuadTable quadTable = new QuadTable(tokenCodes);
 
             try
             {
@@ -88,6 +89,20 @@ namespace KyleBushCompiler
             {
                 Console.WriteLine(e.Message);
             }
+        }
+
+        /// <summary>
+        /// Creates a symbol table and initializes default constants.
+        /// </summary>
+        /// <returns></returns>
+        private static SymbolTable InitializeSymbolTable()
+        {
+            SymbolTable symbolTable = new SymbolTable();
+
+            symbolTable.AddSymbol("-1", SymbolKind.Constant, -1);
+            symbolTable.AddSymbol("1", SymbolKind.Constant, 1);
+
+            return symbolTable;
         }
 
         /// <summary>

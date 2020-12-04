@@ -40,7 +40,7 @@ namespace KyleBushCompiler
         /// <param name="op3"></param>
         public void PrintTrace(int opcode, int op1, int op2, int op3)
         {
-            Console.WriteLine($"PC = {ProgramCounter}: {QuadTable.GetMnemonic(opcode)} {op1}, {op2}, {op3}");
+            Console.WriteLine($"PC = {ProgramCounter}, Executing: {QuadTable.GetMnemonic(opcode)} {op1}, {op2}, {op3}");
         }
 
         /// <summary>

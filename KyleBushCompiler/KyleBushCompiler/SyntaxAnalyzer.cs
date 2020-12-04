@@ -726,6 +726,10 @@ namespace KyleBushCompiler
             return left;
         }
 
+        /// <summary>
+        /// Creates a temp symbol or modifies it in the symbol table.
+        /// </summary>
+        /// <returns></returns>
         private int GenSymbol()
         {
             int index = Scanner.SymbolTable.LookupSymbol("temp");

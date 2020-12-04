@@ -13,7 +13,7 @@ namespace KyleBushCompiler
     {
         private const int TABLEWIDTH = 105;
         private const char DIVIDER_CHAR = '-';
-        private List<Symbol> SymbolTableData { get; set; }
+        public List<Symbol> SymbolTableData { get; set; }
 
         /// <summary>
         /// Creates a new, empty Symbol Table.
@@ -34,7 +34,7 @@ namespace KyleBushCompiler
         /// <returns>The index of the added symbol in the symbol table as an integer</returns>
         public int AddSymbol(string symbol, SymbolKind kind, int value)
         {
-            SymbolTableData.Add(new Symbol(symbol, kind, DataType.Integer, value));
+            SymbolTableData.Add(new Symbol(symbol.ToUpper(), kind, DataType.Integer, value));
             return SymbolTableData.Count - 1;
         }
 
@@ -49,7 +49,7 @@ namespace KyleBushCompiler
         /// <returns>The index of the added symbol in the symbol table as an integer</returns>
         public int AddSymbol(string symbol, SymbolKind kind, double value)
         {
-            SymbolTableData.Add(new Symbol(symbol, kind, DataType.Double, value));
+            SymbolTableData.Add(new Symbol(symbol.ToUpper(), kind, DataType.Double, value));
             return SymbolTableData.Count - 1;
         }
 
@@ -64,7 +64,7 @@ namespace KyleBushCompiler
         /// <returns>The index of the added symbol in the symbol table as an integer</returns>
         public int AddSymbol(string symbol, SymbolKind kind, string value)
         {
-            SymbolTableData.Add(new Symbol(symbol, kind, DataType.String, value));
+            SymbolTableData.Add(new Symbol(symbol.ToUpper(), kind, DataType.String, value));
             return SymbolTableData.Count - 1;
         }
 

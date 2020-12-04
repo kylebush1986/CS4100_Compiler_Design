@@ -62,6 +62,7 @@ namespace KyleBushCompiler
         public bool TokenFound { get; set; }
         public bool EchoOn { get; set; }
         public bool EndOfLine { get; private set; }
+        public bool PastDeclarationSection { get; set; }
 
         /// <summary>
         /// Initializes the Lexical Analyzer to a baseline state.
@@ -510,6 +511,9 @@ namespace KyleBushCompiler
         /// </summary>
         private void AddTokenToSymbolTable()
         {
+            
+
+
             string tokenToAdd;
             if (TokenCode == IDENTIFIER)
                 tokenToAdd = NextToken.ToUpper();
@@ -518,10 +522,14 @@ namespace KyleBushCompiler
 
             int symbolIndex = SymbolTable.LookupSymbol(tokenToAdd);
             if (symbolIndex == -1)
-            {
+            {                
                 switch (TokenCode)
                 {
                     case IDENTIFIER:
+                        if (PastDeclarationSection)
+                        {
+                            Console.WriteLine("Error: Undeclared Identifier - '{0}'", NextToken);
+                        }
                         SymbolTable.AddSymbol(tokenToAdd, SymbolKind.Variable, 0);
                         break;
                     case INTEGER:

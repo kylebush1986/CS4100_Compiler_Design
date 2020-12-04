@@ -3,7 +3,7 @@ UNIT GOOD3B;
 
 (* This Part 3B test file should have NO errors! *)
 LABEL LOOP_START, JUMP;
-VAR COUNT, TOTAL : INTEGER;
+VAR COUNT, TOTAL, I : INTEGER;
 VAR ST : STRING;
 VAR SUM, SUBTOTAL, MAX : REAL;
 

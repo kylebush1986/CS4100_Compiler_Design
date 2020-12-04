@@ -52,10 +52,10 @@ namespace KyleBushCompiler
         static void Main(string[] args)
         {
             // Provided GOOD test file
-            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3BGOOD-1.txt";
+            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3BGOOD-1.txt";
 
             // Provided BAD test file with syntax error
-            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3B-BadTestfile1.txt";
+            // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3B-BadTestfile1.txt";
 
             // Provided BAD test file with lexical and syntax error
             // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\BadProg2.txt";
@@ -63,8 +63,10 @@ namespace KyleBushCompiler
             // Initialize structures
             ReserveTable reserveWords = InitializeReserveWordTable();
             ReserveTable tokenCodes = InitializeTokenCodeTable();
+            ReserveTable quadOpCodes = InitializeQuadCodesTable();
             SymbolTable symbolTable = InitializeSymbolTable();
-            QuadTable quadTable = new QuadTable(tokenCodes);
+            QuadTable quadTable = new QuadTable(quadOpCodes);
+            Interpreter interpreter = new Interpreter();
 
             try
             {
@@ -77,19 +79,51 @@ namespace KyleBushCompiler
                 scanner.Initialize(fileText, symbolTable, reserveWords);
                 bool echoOn = true;
 
-                SyntaxAnalyzer parser = new SyntaxAnalyzer(scanner, tokenCodes, echoOn);
+                SyntaxAnalyzer parser = new SyntaxAnalyzer(scanner, tokenCodes, echoOn, quadTable);
 
                 scanner.GetNextToken(echoOn);
                 parser.TraceOn = false;
                 int val = parser.Program();
 
+                interpreter.InterpretQuads(quadTable, symbolTable, true);
+
                 symbolTable.PrintSymbolTable();
+                quadTable.PrintQuadTable();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
         }
+
+        /// <summary>
+        /// Initializes the reserve table containing the quad op codes and mnemonics
+        /// </summary>
+        /// <returns>Reserve table containing the quad op codes and mnemonics</returns>
+        private static ReserveTable InitializeQuadCodesTable()
+        {
+            ReserveTable quadOpCodes = new ReserveTable();
+            quadOpCodes.Add("STOP", 0);
+            quadOpCodes.Add("DIV", 1);
+            quadOpCodes.Add("MUL", 2);
+            quadOpCodes.Add("SUB", 3);
+            quadOpCodes.Add("ADD", 4);
+            quadOpCodes.Add("MOV", 5);
+            quadOpCodes.Add("STI", 6);
+            quadOpCodes.Add("LDI", 7);
+            quadOpCodes.Add("BNZ", 8);
+            quadOpCodes.Add("BNP", 9);
+            quadOpCodes.Add("BNN", 10);
+            quadOpCodes.Add("BZ", 11);
+            quadOpCodes.Add("BP", 12);
+            quadOpCodes.Add("BN", 13);
+            quadOpCodes.Add("BR", 14);
+            quadOpCodes.Add("BINDR", 15);
+            quadOpCodes.Add("PRINT", 16);
+
+            return quadOpCodes;
+        }
+
 
         /// <summary>
         /// Creates a symbol table and initializes default constants.

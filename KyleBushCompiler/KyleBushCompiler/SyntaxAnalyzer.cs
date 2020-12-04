@@ -131,6 +131,8 @@ namespace KyleBushCompiler
 
             Debug(true, "Program()");
 
+            Scanner.PastDeclarationSection = false;
+
             if (Scanner.TokenCode == UNIT)
             {
                 GetNextToken();
@@ -174,15 +176,20 @@ namespace KyleBushCompiler
                 return -1;
 
             Debug(true, "Block()");
+
             if (Scanner.TokenCode == LABEL)
             {
+                Scanner.PastDeclarationSection = false;
                 LabelDeclaration();
             }
 
             while (Scanner.TokenCode == VAR && !IsError)
             {
+                Scanner.PastDeclarationSection = false;
                 VariableDecSec();
             }
+
+            Scanner.PastDeclarationSection = true;
 
             BlockBody();
 
@@ -228,11 +235,11 @@ namespace KyleBushCompiler
             if (Scanner.TokenCode == BEGIN)
             {
                 GetNextToken();
-                int x = Statement();
+                Statement();
                 while (Scanner.TokenCode == SEMICOLON && !IsError)
                 {
                     GetNextToken();
-                    x = Statement();
+                    Statement();
                 }
 
                 if (Scanner.TokenCode == END)
@@ -264,8 +271,7 @@ namespace KyleBushCompiler
                 {
                     if (isNotPreviouslyDeclaredIdentifier(SymbolKind.Label))
                     {
-                        int x = Identifier();
-
+                        Identifier();
 
                         while (Scanner.TokenCode == COMMA && !IsError)
                         {
@@ -274,7 +280,7 @@ namespace KyleBushCompiler
                             {
                                 if (isNotPreviouslyDeclaredIdentifier(SymbolKind.Label))
                                 {
-                                    x = Identifier();
+                                    Identifier();
                                 }
                             }
                         }
@@ -308,7 +314,7 @@ namespace KyleBushCompiler
             if (Scanner.TokenCode == VAR)
             {
                 GetNextToken();
-                int x = VariableDeclaration();
+                VariableDeclaration();
             }
             else
                 UnexpectedTokenError("VAR");
@@ -345,19 +351,19 @@ namespace KyleBushCompiler
                 {
                     variables.Add(Scanner.NextToken);
                     DeclaredVariables.Add(Scanner.NextToken);
-                    int x = Variable();
+                    Variable();
                     while (Scanner.TokenCode == COMMA && !IsError)
                     {
                         GetNextToken();
                         variables.Add(Scanner.NextToken);
                         DeclaredVariables.Add(Scanner.NextToken);
-                        x = Variable();
+                        Variable();
                     }
                     if (Scanner.TokenCode == COLON)
                     {
                         GetNextToken();
                         type = Scanner.NextToken;
-                        x = Type();
+                        Type();
                         if (Scanner.TokenCode == SEMICOLON)
                         {
                             GetNextToken();
@@ -402,7 +408,7 @@ namespace KyleBushCompiler
 
             Debug(true, "Statement()");
 
-            int left, right;
+            int left, right, branchTarget, branchQuad, saveTop, limit, patchElse;
 
             while (IsLabel() && !IsError)
             {
@@ -419,7 +425,7 @@ namespace KyleBushCompiler
                     if (IsSimpleExpression())
                     {
                         right = SimpleExpression();
-                        Quads.AddQuad(MovCode, right, 0, left);
+                        Quads.AddQuad(MOV, right, 0, left);
                     }
                     else if (Scanner.TokenCode == STRINGTYPE)
                     {
@@ -429,7 +435,7 @@ namespace KyleBushCompiler
                         UnexpectedTokenError("SIMPLE EXPRESSION or STRING");
                 }
                 else
-                    UnexpectedTokenError("IDENTIFIER");
+                    UnexpectedTokenError("ASSIGN");
             }
             else if (Scanner.TokenCode == BEGIN)
             {
@@ -438,15 +444,27 @@ namespace KyleBushCompiler
             else if (Scanner.TokenCode == IF)
             {
                 GetNextToken();
-                RelExpression();
+                branchQuad = RelExpression();
                 if (Scanner.TokenCode == THEN)
                 {
                     GetNextToken();
                     Statement();
+
                     if (Scanner.TokenCode == ELSE)
                     {
                         GetNextToken();
+
+                        patchElse = Quads.NextQuad();
+                        Quads.AddQuad(BR, 0, 0, 0);
+                        Quads.SetQuadOp3(branchQuad, Quads.NextQuad());
+
                         Statement();
+
+                        Quads.SetQuadOp3(branchQuad, Quads.NextQuad());
+                    }
+                    else
+                    {
+                        Quads.SetQuadOp3(branchQuad, Quads.NextQuad());
                     }
                 }
                 else
@@ -455,11 +473,16 @@ namespace KyleBushCompiler
             else if (Scanner.TokenCode == WHILE)
             {
                 GetNextToken();
-                RelExpression();
+
+                saveTop = Quads.NextQuad();
+                branchQuad = RelExpression();
+
                 if (Scanner.TokenCode == DO)
                 {
                     GetNextToken();
                     Statement();
+                    Quads.AddQuad(BR, 0, 0, saveTop);
+                    Quads.SetQuadOp3(branchQuad, Quads.NextQuad());
                 }
                 else
                     UnexpectedTokenError("DO");
@@ -467,11 +490,14 @@ namespace KyleBushCompiler
             else if (Scanner.TokenCode == REPEAT)
             {
                 GetNextToken();
+
+                branchTarget = Quads.NextQuad();
                 Statement();
                 if (Scanner.TokenCode == UNTIL)
                 {
                     GetNextToken();
-                    RelExpression();
+                    branchQuad = RelExpression();
+                    Quads.SetQuadOp3(branchQuad, branchTarget);
                 }
                 else
                     UnexpectedTokenError("UNTIL");
@@ -479,15 +505,18 @@ namespace KyleBushCompiler
             else if (Scanner.TokenCode == FOR)
             {
                 GetNextToken();
-                Variable();
+                saveTop = Quads.NextQuad();
+
+                right = Variable();
                 if (Scanner.TokenCode == ASSIGN)
                 {
                     GetNextToken();
-                    SimpleExpression();
+                    left = SimpleExpression();
+                    Quads.AddQuad(MOV, left, 0, right); // Save the value of the expression in the variable.
                     if (Scanner.TokenCode == TO)
                     {
                         GetNextToken();
-                        SimpleExpression();
+                        limit = SimpleExpression();
                         if (Scanner.TokenCode == DO)
                         {
                             GetNextToken();
@@ -505,7 +534,8 @@ namespace KyleBushCompiler
             else if (Scanner.TokenCode == GOTO)
             {
                 GetNextToken();
-                Label();
+                right = Label();
+                Quads.AddQuad(BR, 0, 0, right);
             }
             else if (Scanner.TokenCode == WRITELN)
             {
@@ -523,7 +553,8 @@ namespace KyleBushCompiler
                     }
                     else if (Scanner.TokenCode == IDENTIFIER)
                     {
-                        Identifier();
+                        left = Identifier();
+                        Quads.AddQuad(PRINT, left, 0, 0);
                         if (Scanner.TokenCode == RPAR)
                             GetNextToken();
                         else
@@ -570,7 +601,7 @@ namespace KyleBushCompiler
         /// <summary>
         /// Implements CFG Rule: <variable> -> <identifier> [$LEFT_BRACKET <simple expression> $RIGHT_BRACKET]
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The index of the variable in the symbol table.</returns>
         private int Variable()
         {
             if (IsError)
@@ -578,7 +609,7 @@ namespace KyleBushCompiler
 
             Debug(true, "Variable()");
 
-            int result = -1;
+            int varIndex = -1;
 
             int index = Scanner.SymbolTable.LookupSymbol(Scanner.NextToken);
             if (index != -1)
@@ -601,7 +632,7 @@ namespace KyleBushCompiler
                 else
                     DeclarationWarning(SymbolKind.Variable, symbol.Kind);
 
-                result = Identifier();
+                varIndex = Identifier();
 
 
                 if (Scanner.TokenCode == LEFT_BRACKET)
@@ -616,7 +647,7 @@ namespace KyleBushCompiler
             }
 
             Debug(false, "Variable()");
-            return result;
+            return varIndex;
         }
 
         /// <summary>
@@ -628,15 +659,17 @@ namespace KyleBushCompiler
             if (IsError)
                 return -1;
 
+            int result = -1;
+
             Debug(true, "Label()");
             // Checks that the indentifier has been declared as type label 
             if (IsLabel())
-                Identifier();
+                result = Identifier();
             else
                 UnexpectedTokenError("LABEL");
                 
             Debug(false, "Label()");
-            return -1;
+            return result;
         }
 
         /// <summary>
@@ -648,12 +681,21 @@ namespace KyleBushCompiler
             if (IsError)
                 return -1;
 
+            int left, right, saveRelop, result, temp;
+
             Debug(true, "Label()");
-            SimpleExpression();
-            RelOp();
-            SimpleExpression();
+
+            left = SimpleExpression(); 
+            saveRelop = RelOp();
+            right = SimpleExpression();
+
+            temp = GenSymbol();
+            Quads.AddQuad(SUB, left, right, temp); // Compare left and right operands
+            result = Quads.NextQuad(); // Index where branch will be
+            Quads.AddQuad(RelopToOpcode(saveRelop), temp, 0, 0); // Op3 will be set later
+
             Debug(false, "Label()");
-            return -1;
+            return result;
         }
 
         /// <summary>
@@ -665,15 +707,33 @@ namespace KyleBushCompiler
             if (IsError)
                 return -1;
 
+            int opCode = -1;
+
             Debug(true, "Label()");
             switch (Scanner.TokenCode)
             {
                 case EQUAL:
+                    opCode = EQUAL;
+                    GetNextToken();
+                    break;
                 case LESS_THAN:
+                    opCode = LESS_THAN;
+                    GetNextToken();
+                    break;
                 case GREATER_THAN:
+                    opCode = GREATER_THAN;
+                    GetNextToken();
+                    break;
                 case LESS_THAN_OR_EQUAL:
+                    opCode = LESS_THAN_OR_EQUAL;
+                    GetNextToken();
+                    break;
                 case GREATER_THAN_OR_EQUAL:
+                    opCode = GREATER_THAN_OR_EQUAL;
+                    GetNextToken();
+                    break;
                 case NOT_EQUAL:
+                    opCode = NOT_EQUAL;
                     GetNextToken();
                     break;
                 default:
@@ -681,13 +741,13 @@ namespace KyleBushCompiler
                     break;
             }
             Debug(false, "Label()");
-            return -1;
+            return opCode;
         }
 
         /// <summary>
         /// Implements CFG Rule: <simple expression> -> [<sign>] <term> {<addop> <term>}*
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The result of the expression.</returns>
         private int SimpleExpression()
         {
             if (IsError)
@@ -695,11 +755,8 @@ namespace KyleBushCompiler
 
             Debug(true, "SimpleExpression()");
 
-            int left = -1;
-            int right = -1;
+            int left, right, temp, opcode;
             int signVal = 0;
-            int temp = 0;
-            int opcode = 0;
 
             if (isSign())
             {
@@ -776,11 +833,11 @@ namespace KyleBushCompiler
         /// <summary>
         /// Implements CFG Rule: <sign> -> $PLUS | $MINUS
         /// </summary>
-        /// <returns></returns>
+        /// <returns>0 if ERROR, 1 if PLUS, -1 if MINUS</returns>
         private int Sign()
         {
             if (IsError)
-                return -1;
+                return 0;
 
             Debug(true, "Sign()");
 
@@ -811,38 +868,59 @@ namespace KyleBushCompiler
         {
             if (IsError)
                 return -1;
+            int left, right, opCode, temp;
 
             Debug(true, "Term()");
-            int x = Factor();
+            left = Factor();
 
             while (isMulOp() && !IsError)
             {
-                x = MulOp();
-                x = Factor();
+                opCode = MulOp();
+                right = Factor();
+                temp = GenSymbol();
+                try
+                {
+                    Quads.AddQuad(opCode, left, right, temp);
+                }
+                catch (DivideByZeroException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                left = temp;
             }
 
             Debug(false, "Term()");
-            return -1;
+            return left;
         }
 
         /// <summary>
         /// Implements CFG Rule: <mulop> -> $MULTIPLY | $DIVIDE
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The op code for multiply or divide.</returns>
         private int MulOp()
         {
             if (IsError)
                 return -1;
 
+            int result = -1;
+
             Debug(true, "MulOp()");
 
-            if (Scanner.TokenCode == MULTIPLY || Scanner.TokenCode == DIVIDE)
+            if (Scanner.TokenCode == MULTIPLY)
+            {
+                result = MUL;
                 GetNextToken();
+            }
+            else if (Scanner.TokenCode == DIVIDE)
+            {
+                result = DIV;
+                GetNextToken();
+            }
             else
                 UnexpectedTokenError("MULTIPLY or DIVIDE");
 
             Debug(false, "MulOp()");
-            return -1;
+            return result;
         }
 
         /// <summary>
@@ -856,20 +934,20 @@ namespace KyleBushCompiler
 
             Debug(true, "Factor()");
 
-            int x;
+            int index = 0;
 
             if (isUnsignedConstant())
             {
-                x = UnsignedConstant();
+                index = UnsignedConstant();
             }
             else if (isVariable())
             {
-                Variable();
+                index = Variable();
             }
             else if (Scanner.TokenCode == LPAR)
             {
                 GetNextToken();
-                SimpleExpression();
+                index = SimpleExpression();
                 if (Scanner.TokenCode == RPAR)
                     GetNextToken();
                 else
@@ -879,7 +957,7 @@ namespace KyleBushCompiler
                 UnexpectedTokenError("UNSIGNED CONSTANT or VARIABLE or LPAR");
 
             Debug(false, "Factor()");
-            return -1;
+            return index;
         }
 
         /// <summary>
@@ -1464,6 +1542,44 @@ namespace KyleBushCompiler
             }
             else
                 Console.WriteLine("This kind of symbol does not need to be added to declared identifiers.");
+        }
+
+        /// <summary>
+        /// Converts a given relational operator into its corresponding
+        /// FALSE BRANCH opcode in order to facilitate Quad creation
+        /// </summary>
+        /// <param name="relop"></param>
+        /// <returns>corresponding FALSE BRANCH opcode</returns>
+        private int RelopToOpcode(int relop)
+        {
+            int result;
+
+            switch (relop)
+            {
+                case EQUAL:
+                    result = BNZ;
+                    break;
+                case NOT_EQUAL:
+                    result = BZ;
+                    break;
+                case LESS_THAN:
+                    result = BNN;
+                    break;
+                case GREATER_THAN:
+                    result = BNP;
+                    break;
+                case LESS_THAN_OR_EQUAL:
+                    result = BP;
+                    break;
+                case GREATER_THAN_OR_EQUAL:
+                    result = BN;
+                    break;
+                default:
+                    result = -1;
+                    break;
+            }
+
+            return result;
         }
 
         #endregion

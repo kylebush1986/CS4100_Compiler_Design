@@ -12,7 +12,7 @@ namespace KyleBushCompiler
     {
         private const int TABLEWIDTH = 27;
         private const char DIVIDER_CHAR = '-';
-        private List<Quad> QuadTableData { get; set; }
+        public List<Quad> QuadTableData { get; set; }
         public ReserveTable ReserveTable { get; set; }
 
         /// <summary>
@@ -76,6 +76,12 @@ namespace KyleBushCompiler
         public void SetQuad(int index, int opcode, int op1, int op2, int op3)
         {
             QuadTableData[index] = new Quad(opcode, op1, op2, op3);
+        }
+
+        public void SetQuadOp3(int branchQuad, int branchTarget)
+        {
+            Quad quad = GetQuad(branchQuad);
+            quad.Op3 = branchTarget;
         }
 
         /// <summary>

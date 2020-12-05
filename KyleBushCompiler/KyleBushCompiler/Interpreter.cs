@@ -115,8 +115,8 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                                 }
-                                symbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable,
-                                    (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() / symbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
+                                double quotient = Convert.ToDouble(symbolTable.GetSymbol(CurrentQuad.Op1).GetValue()) / symbolTable.GetSymbol(CurrentQuad.Op2).GetValue();
+                                symbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable, quotient);
                                 ProgramCounter++;
                                 break;
                             // MUL

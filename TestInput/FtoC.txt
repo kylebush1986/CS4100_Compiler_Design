@@ -1,0 +1,9 @@
+UNIT FtoC;
+
+VAR FAR, CEL : REAL;
+
+BEGIN
+  FAR := 85;
+  CEL := (FAR - 32) * (5 / 9);
+  WRITELN(CEL)
+END.

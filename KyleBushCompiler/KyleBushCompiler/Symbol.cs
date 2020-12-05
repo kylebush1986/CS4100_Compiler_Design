@@ -88,7 +88,15 @@ namespace KyleBushCompiler
         /// <param name="value">The integer value of the symbol</param>
         public void SetValue(int value)
         {
-            _intValue = value;
+            if (DataType == DataType.Double)
+            {
+                SetValue(Convert.ToDouble(value));
+            } 
+            else
+            {
+                _intValue = value;
+                DataType = DataType.Integer;
+            }
         }
 
         /// <summary>
@@ -98,6 +106,7 @@ namespace KyleBushCompiler
         public void SetValue(string value)
         {
             _stringValue = value;
+            DataType = DataType.String;
         }
 
         /// <summary>
@@ -107,6 +116,7 @@ namespace KyleBushCompiler
         public void SetValue(double value)
         {
             _doubleValue = value;
+            DataType = DataType.Double;
         }
 
         /// <summary>

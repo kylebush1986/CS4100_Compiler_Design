@@ -52,7 +52,7 @@ namespace KyleBushCompiler
         static void Main(string[] args)
         {
             // Provided GOOD test file
-            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3BGOOD-1.txt";
+            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3BGOOD-1.txt";
 
             // Provided BAD test file with syntax error
             // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3B-BadTestfile1.txt";
@@ -69,6 +69,8 @@ namespace KyleBushCompiler
             //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\IfElseTest.txt";
 
             //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\MathTest.txt";
+
+            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\FtoC.txt";
 
             // Initialize structures
             ReserveTable reserveWords = InitializeReserveWordTable();

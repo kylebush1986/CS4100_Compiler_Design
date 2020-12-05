@@ -104,6 +104,7 @@ namespace KyleBushCompiler
         private List<string> DeclaredVariables { get; set; }
         private List<string> DeclaredLabels { get; set; }
         private string ProgramName { get; set; }
+        private int _tempNumber = 1;
 
         #endregion
 
@@ -800,14 +801,20 @@ namespace KyleBushCompiler
         /// <returns></returns>
         private int GenSymbol()
         {
-            int index = Scanner.SymbolTable.LookupSymbol("temp");
-
-            if (index == -1)
-            {
-                index = Scanner.SymbolTable.AddSymbol("temp", SymbolKind.Variable, 0);
-            }
-
+            int index = Scanner.SymbolTable.AddSymbol("temp" + _tempNumber.ToString(), SymbolKind.Variable, 0);
+            _tempNumber++;
             return index;
+
+
+
+            //int index = Scanner.SymbolTable.LookupSymbol("temp");
+
+            //if (index == -1)
+            //{
+            //    index = Scanner.SymbolTable.AddSymbol("temp", SymbolKind.Variable, 0);
+            //}
+
+            //return index;
         }
 
         /// <summary>

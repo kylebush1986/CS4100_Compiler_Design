@@ -545,7 +545,8 @@ namespace KyleBushCompiler
                     GetNextToken();
                     if (IsSimpleExpression())
                     {
-                        SimpleExpression();
+                        left = SimpleExpression();
+                        Quads.AddQuad(PRINT, left, 0, 0);
                         if (Scanner.TokenCode == RPAR)
                             GetNextToken();
                         else
@@ -562,7 +563,8 @@ namespace KyleBushCompiler
                     }
                     else if (Scanner.TokenCode == STRINGTYPE)
                     {
-                        StringConst();
+                        left = StringConst();
+                        Quads.AddQuad(PRINT, left, 0, 0);
                         if (Scanner.TokenCode == RPAR)
                             GetNextToken();
                         else

@@ -1,0 +1,10 @@
+UNIT IFELSE;
+
+VAR TOTAL, I : INTEGER;
+
+BEGIN
+  TOTAL := 12;
+  IF TOTAL > 15 THEN
+    WRITELN("TOTAL GREATER THAN 15");
+  WRITELN("Outside if statement.")
+END.

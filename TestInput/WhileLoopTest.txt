@@ -1,0 +1,14 @@
+UNIT WHILETEST;
+
+VAR TOTAL, I : INTEGER;
+
+BEGIN
+  WHILE I < 10 DO
+    BEGIN
+    TOTAL := TOTAL + I;
+    WRITELN(TOTAL);
+    I := I + 1
+  END;
+
+  WRITELN(TOTAL)
+END.

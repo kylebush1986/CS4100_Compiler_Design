@@ -408,7 +408,7 @@ namespace KyleBushCompiler
 
             Debug(true, "Statement()");
 
-            int left, right, branchTarget, branchQuad, saveTop, limit, patchElse;
+            int left, right, branchTarget, branchQuad, saveTop, limit, patchElse, temp;
 
             while (IsLabel() && !IsError)
             {
@@ -460,7 +460,7 @@ namespace KyleBushCompiler
 
                         Statement();
 
-                        Quads.SetQuadOp3(branchQuad, Quads.NextQuad());
+                        Quads.SetQuadOp3(patchElse, Quads.NextQuad());
                     }
                     else
                     {
@@ -505,22 +505,31 @@ namespace KyleBushCompiler
             else if (Scanner.TokenCode == FOR)
             {
                 GetNextToken();
-                saveTop = Quads.NextQuad();
-
+                
                 right = Variable();
                 if (Scanner.TokenCode == ASSIGN)
                 {
                     GetNextToken();
                     left = SimpleExpression();
                     Quads.AddQuad(MOV, left, 0, right); // Save the value of the expression in the variable.
+                    saveTop = Quads.NextQuad();
                     if (Scanner.TokenCode == TO)
                     {
                         GetNextToken();
                         limit = SimpleExpression();
+                        temp = GenSymbol();
+                        Quads.AddQuad(SUB, right, limit, temp);
+                        branchQuad = Quads.NextQuad();
+                        Quads.AddQuad(BNN, temp, 0, 0);
+
                         if (Scanner.TokenCode == DO)
                         {
                             GetNextToken();
                             Statement();
+
+                            Quads.AddQuad(ADD, right, Plus1Index, right);
+                            Quads.AddQuad(BR, 0, 0, saveTop);
+                            Quads.SetQuadOp3(branchQuad, Quads.NextQuad());
                         }
                         else
                             UnexpectedTokenError("DO");
@@ -1043,15 +1052,24 @@ namespace KyleBushCompiler
         {
             if (IsError)
                 return -1;
+            int sign = 1;
+            int index;
 
             Debug(true, "Constant()");
 
             if (isSign())
-                Sign();
-            UnsignedConstant();
+            {
+                sign = Sign();
+            }
+            index = UnsignedConstant();
+
+            if (sign == -1)
+            {
+                Quads.AddQuad(MUL, index, Minus1Index, index);
+            }
 
             Debug(false, "Constant()");
-            return -1;
+            return index;
         }
 
         /// <summary>

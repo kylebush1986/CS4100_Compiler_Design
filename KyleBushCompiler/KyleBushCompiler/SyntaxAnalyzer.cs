@@ -521,7 +521,7 @@ namespace KyleBushCompiler
                         temp = GenSymbol();
                         Quads.AddQuad(SUB, right, limit, temp);
                         branchQuad = Quads.NextQuad();
-                        Quads.AddQuad(BNN, temp, 0, 0);
+                        Quads.AddQuad(BP, temp, 0, 0);
 
                         if (Scanner.TokenCode == DO)
                         {
@@ -801,20 +801,9 @@ namespace KyleBushCompiler
         /// <returns></returns>
         private int GenSymbol()
         {
-            int index = Scanner.SymbolTable.AddSymbol("temp" + _tempNumber.ToString(), SymbolKind.Variable, 0);
+            int index = Scanner.SymbolTable.AddSymbol("#temp" + _tempNumber.ToString(), SymbolKind.Variable, 0);
             _tempNumber++;
             return index;
-
-
-
-            //int index = Scanner.SymbolTable.LookupSymbol("temp");
-
-            //if (index == -1)
-            //{
-            //    index = Scanner.SymbolTable.AddSymbol("temp", SymbolKind.Variable, 0);
-            //}
-
-            //return index;
         }
 
         /// <summary>

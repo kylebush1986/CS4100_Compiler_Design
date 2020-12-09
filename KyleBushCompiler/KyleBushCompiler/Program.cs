@@ -62,7 +62,7 @@ namespace KyleBushCompiler
 
             //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\HelloWorld.txt";
 
-            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\ForLoopTest.txt";
+            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\ForLoopTest.txt";
 
             //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\WhileLoopTest.txt";
 
@@ -70,7 +70,7 @@ namespace KyleBushCompiler
 
             //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\MathTest.txt";
 
-            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\FtoC.txt";
+            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\FtoC.txt";
 
             // Initialize structures
             ReserveTable reserveWords = InitializeReserveWordTable();

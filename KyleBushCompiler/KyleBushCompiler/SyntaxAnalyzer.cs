@@ -351,13 +351,13 @@ namespace KyleBushCompiler
                 do
                 {
                     variables.Add(Scanner.NextToken);
-                    DeclaredVariables.Add(Scanner.NextToken);
+                    DeclaredVariables.Add(Scanner.NextToken.ToUpper());
                     Variable();
                     while (Scanner.TokenCode == COMMA && !IsError)
                     {
                         GetNextToken();
                         variables.Add(Scanner.NextToken);
-                        DeclaredVariables.Add(Scanner.NextToken);
+                        DeclaredVariables.Add(Scanner.NextToken.ToUpper());
                         Variable();
                     }
                     if (Scanner.TokenCode == COLON)
@@ -629,15 +629,15 @@ namespace KyleBushCompiler
                 Symbol symbol = Scanner.SymbolTable.GetSymbol(index);
                 if (symbol.Kind == SymbolKind.Variable)
                 {
-                    if (DeclaredLabels.Contains(Scanner.NextToken))
+                    if (DeclaredLabels.Contains(Scanner.NextToken.ToUpper()))
                     {
                         DeclarationWarning(SymbolKind.Variable, SymbolKind.Label);
-                        DeclaredVariables.Add(Scanner.NextToken);
+                        DeclaredVariables.Add(Scanner.NextToken.ToUpper());
                     }
-                    else if (!DeclaredVariables.Contains(Scanner.NextToken))
+                    else if (!DeclaredVariables.Contains(Scanner.NextToken.ToUpper()))
                     {
                         UndeclaredWarning();
-                        DeclaredVariables.Add(Scanner.NextToken);
+                        DeclaredVariables.Add(Scanner.NextToken.ToUpper());
                     }
                     
                 }
@@ -1551,10 +1551,10 @@ namespace KyleBushCompiler
             UpdateSymbolKind(kind);
             if (kind == SymbolKind.Variable)
             {
-                DeclaredVariables.Add(Scanner.NextToken);
+                DeclaredVariables.Add(Scanner.NextToken.ToUpper());
             } else if (kind == SymbolKind.Label)
             {
-                DeclaredLabels.Add(Scanner.NextToken);
+                DeclaredLabels.Add(Scanner.NextToken.ToUpper());
             }
             else
                 Console.WriteLine("This kind of symbol does not need to be added to declared identifiers.");

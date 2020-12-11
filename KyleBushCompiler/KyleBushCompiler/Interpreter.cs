@@ -303,7 +303,8 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1);
                                 }
-                                Console.WriteLine($"{ symbolTable.GetSymbol(CurrentQuad.Op1).Name} = {symbolTable.GetSymbol(CurrentQuad.Op1).GetValue()}");
+                                // Console.WriteLine($"{ symbolTable.GetSymbol(CurrentQuad.Op1).Name} = {symbolTable.GetSymbol(CurrentQuad.Op1).GetValue()}");
+                                Console.WriteLine($"{symbolTable.GetSymbol(CurrentQuad.Op1).GetValue()}");
                                 ProgramCounter++;
                                 break;
                             default:

@@ -52,7 +52,7 @@ namespace KyleBushCompiler
         static void Main(string[] args)
         {
             // Provided GOOD test file
-            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3BGOOD-1.txt";
+            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\CS4100FinalProjGOODMinimumFA20.txt";
 
             // Provided BAD test file with syntax error
             // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3B-BadTestfile1.txt";
@@ -62,7 +62,7 @@ namespace KyleBushCompiler
 
             //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\HelloWorld.txt";
 
-            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\ForLoopTest.txt";
+            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\ForLoopTest.txt";
 
             //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\WhileLoopTest.txt";
 
@@ -97,7 +97,7 @@ namespace KyleBushCompiler
                 parser.TraceOn = false;
                 int val = parser.Program();
 
-                interpreter.InterpretQuads(quadTable, symbolTable, true);
+                interpreter.InterpretQuads(quadTable, symbolTable, false);
 
                 symbolTable.PrintSymbolTable();
                 quadTable.PrintQuadTable();

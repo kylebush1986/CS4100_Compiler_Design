@@ -64,7 +64,7 @@ namespace KyleBushCompiler
         /// <returns>The index of the added symbol in the symbol table as an integer</returns>
         public int AddSymbol(string symbol, SymbolKind kind, string value)
         {
-            SymbolTableData.Add(new Symbol(symbol.ToUpper(), kind, DataType.String, value));
+            SymbolTableData.Add(new Symbol(symbol.ToUpper(), kind, DataType.String, value.ToUpper()));
             return SymbolTableData.Count - 1;
         }
 

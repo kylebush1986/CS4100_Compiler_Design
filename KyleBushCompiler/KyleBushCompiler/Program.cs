@@ -49,10 +49,23 @@ namespace KyleBushCompiler
          * <identifier> -> $IDENTIFIER
          * <stringconst> -> $STRINGTYPE
          */
+
+        static int TABLEWIDTH = 86;
+        static char DIVIDER_CHAR = '-';
+
         static void Main(string[] args)
         {
             // Provided GOOD test file
-            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\CS4100FinalProjGOODMinimumFA20.txt";
+            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\CS4100FinalProjGOODMinimumFA20.txt";
+
+            // Provided GOOD test file
+            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\FinalProjFloat20.txt";
+
+            // Provided GOOD test file
+            //string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\FinalProjLabels20.txt";
+
+            // Provided GOOD test file
+            string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\FinalProjRepeat20.txt";
 
             // Provided BAD test file with syntax error
             // string inputFilePath = @"C:\projects\CS4100_Compiler_Design\TestInput\Part3B-BadTestfile1.txt";
@@ -97,10 +110,18 @@ namespace KyleBushCompiler
                 parser.TraceOn = false;
                 int val = parser.Program();
 
+                // Symbol table before interpretter execution
+                symbolTable.PrintSymbolTable();
+
+                // Quad table
+                QuadTableDump(quadTable, symbolTable);
+                
+                // Quad execution and program output
                 interpreter.InterpretQuads(quadTable, symbolTable, false);
 
+                // Symbol table after execution
                 symbolTable.PrintSymbolTable();
-                quadTable.PrintQuadTable();
+                
             }
             catch (Exception e)
             {
@@ -292,6 +313,74 @@ namespace KyleBushCompiler
         static string[] InitializeInputFile(string filePath)
         {
             return File.ReadAllLines(filePath);
+        }
+
+        /// <summary>
+        /// Outputs the symbol table in the following format
+        /// MOV | #TEMP1<5>| ––---- | I <1>
+        /// </summary>
+        /// <param name="quadTable"></param>
+        static void QuadTableDump(QuadTable quadTable, SymbolTable symbolTable)
+        {
+            string OpCode, Op1, Op2, Op3;
+
+            Console.WriteLine("\nQUAD TABLE");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
+            Console.WriteLine($"|{ "Opcode",-7 }|{ "Op1",44 }|{ "Op2",10 }|{ "Op3",20 }|");
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
+            foreach (var quad in quadTable.QuadTableData)
+            {
+                OpCode = quadTable.GetMnemonic(quad.OpCode);
+
+                if (quad.Op1 == -1)
+                {
+                    Op1 = "------";
+                }
+                else
+                {
+                    Op1 = symbolTable.GetSymbol(quad.Op1).Name + "<" + quad.Op1 + ">";
+                }
+
+                if (quad.Op2 == -1)
+                {
+                    Op2 = "------";
+                }
+                else
+                {
+                    Op2 = symbolTable.GetSymbol(quad.Op2).Name + "<" + quad.Op2 + ">";
+                }
+
+                if (quad.Op3 == -1)
+                {
+                    Op3 = "------";
+                }
+                else if (quad.OpCode >= 8 && quad.OpCode <= 15)
+                {
+                    Op3 = "<" + quad.Op3 + ">";
+                }
+                else
+                {
+                    Op3 = symbolTable.GetSymbol(quad.Op3).Name + "<" + quad.Op3 + ">";
+                }
+
+                Console.WriteLine($"|{ OpCode,-7 }|{ Op1,44 }|{ Op2,10 }|{ Op3,20 }|");
+            }
+            DrawHorizontalBorder(TABLEWIDTH, DIVIDER_CHAR);
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Draws a horizontal border using the given character repeated by the given length
+        /// </summary>
+        /// <param name="length">number of times to repeat character</param>
+        /// <param name="character">character used to draw the border</param>
+        static void DrawHorizontalBorder(int length, char character)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                Console.Write(character);
+            }
+            Console.WriteLine();
         }
     }
 }

@@ -263,6 +263,7 @@ namespace KyleBushCompiler
         {
             if (IsError)
                 return -1;
+            int index;
 
             Debug(true, "LabelDeclaration()");
             if (Scanner.TokenCode == LABEL)
@@ -272,7 +273,8 @@ namespace KyleBushCompiler
                 {
                     if (isNotPreviouslyDeclaredIdentifier(SymbolKind.Label))
                     {
-                        Identifier();
+                        index = Identifier();
+                        Scanner.SymbolTable.UpdateSymbol(index, SymbolKind.Label, -1); ;
 
                         while (Scanner.TokenCode == COMMA && !IsError)
                         {
@@ -281,7 +283,8 @@ namespace KyleBushCompiler
                             {
                                 if (isNotPreviouslyDeclaredIdentifier(SymbolKind.Label))
                                 {
-                                    Identifier();
+                                    index = Identifier();
+                                    Scanner.SymbolTable.UpdateSymbol(index, SymbolKind.Label, -1);
                                 }
                             }
                         }
@@ -409,11 +412,32 @@ namespace KyleBushCompiler
 
             Debug(true, "Statement()");
 
-            int left, right, branchTarget, branchQuad, saveTop, limit, patchElse, temp;
+            int left, right, branchTarget, branchQuad, saveTop, limit, patchElse, temp, index;
 
             while (IsLabel() && !IsError)
             {
-                int x = Label();
+                index = Label();
+                Symbol label = Scanner.SymbolTable.GetSymbol(index);
+
+                // If the label is not associated with a quad already then set it
+                if (label.GetValue() == -1)
+                {
+                    Scanner.SymbolTable.UpdateSymbol(index, SymbolKind.Label, Quads.NextQuad());
+                }
+                else
+                {
+                    Quad quad = Quads.GetQuad(label.GetValue());
+                    if (quad.Op3 == -1)
+                    {
+                        branchQuad = Quads.GetQuadIndex(quad);
+                        if (branchQuad != -1)
+                        {
+                            Quads.SetQuadOp3(branchQuad, Quads.NextQuad());
+                        }
+                    }
+                }
+
+
                 if (Scanner.TokenCode == COLON)
                     GetNextToken();
             }
@@ -426,7 +450,7 @@ namespace KyleBushCompiler
                     if (IsSimpleExpression())
                     {
                         right = SimpleExpression();
-                        Quads.AddQuad(MOV, right, 0, left);
+                        Quads.AddQuad(MOV, right, -1, left);
                     }
                     else if (Scanner.TokenCode == STRINGTYPE)
                     {
@@ -456,7 +480,7 @@ namespace KyleBushCompiler
                         GetNextToken();
 
                         patchElse = Quads.NextQuad();
-                        Quads.AddQuad(BR, 0, 0, 0);
+                        Quads.AddQuad(BR, -1, -1, 0);
                         Quads.SetQuadOp3(branchQuad, Quads.NextQuad());
 
                         Statement();
@@ -482,7 +506,7 @@ namespace KyleBushCompiler
                 {
                     GetNextToken();
                     Statement();
-                    Quads.AddQuad(BR, 0, 0, saveTop);
+                    Quads.AddQuad(BR, -1, -1, saveTop);
                     Quads.SetQuadOp3(branchQuad, Quads.NextQuad());
                 }
                 else
@@ -512,7 +536,7 @@ namespace KyleBushCompiler
                 {
                     GetNextToken();
                     left = SimpleExpression();
-                    Quads.AddQuad(MOV, left, 0, right); // Save the value of the expression in the variable.
+                    Quads.AddQuad(MOV, left, -1, right); // Save the value of the expression in the variable.
                     saveTop = Quads.NextQuad();
                     if (Scanner.TokenCode == TO)
                     {
@@ -521,7 +545,7 @@ namespace KyleBushCompiler
                         temp = GenSymbol();
                         Quads.AddQuad(SUB, right, limit, temp);
                         branchQuad = Quads.NextQuad();
-                        Quads.AddQuad(BP, temp, 0, 0);
+                        Quads.AddQuad(BP, temp, -1, 0);
 
                         if (Scanner.TokenCode == DO)
                         {
@@ -529,7 +553,7 @@ namespace KyleBushCompiler
                             Statement();
 
                             Quads.AddQuad(ADD, right, Plus1Index, right);
-                            Quads.AddQuad(BR, 0, 0, saveTop);
+                            Quads.AddQuad(BR, -1, -1, saveTop);
                             Quads.SetQuadOp3(branchQuad, Quads.NextQuad());
                         }
                         else
@@ -544,8 +568,16 @@ namespace KyleBushCompiler
             else if (Scanner.TokenCode == GOTO)
             {
                 GetNextToken();
-                right = Label();
-                Quads.AddQuad(BR, 0, 0, right);
+                index = Label();
+                Symbol label = Scanner.SymbolTable.GetSymbol(index);
+                right = label.GetValue();
+
+                if (right == -1)
+                {
+                    Scanner.SymbolTable.UpdateSymbol(index, SymbolKind.Label, Quads.NextQuad());
+                }
+                
+                Quads.AddQuad(BR, -1, -1, right);
             }
             else if (Scanner.TokenCode == WRITELN)
             {
@@ -556,7 +588,7 @@ namespace KyleBushCompiler
                     if (IsSimpleExpression())
                     {
                         left = SimpleExpression();
-                        Quads.AddQuad(PRINT, left, 0, 0);
+                        Quads.AddQuad(PRINT, left, -1, -1);
                         if (Scanner.TokenCode == RPAR)
                             GetNextToken();
                         else
@@ -565,7 +597,7 @@ namespace KyleBushCompiler
                     else if (Scanner.TokenCode == IDENTIFIER)
                     {
                         left = Identifier();
-                        Quads.AddQuad(PRINT, left, 0, 0);
+                        Quads.AddQuad(PRINT, left, -1, -1);
                         if (Scanner.TokenCode == RPAR)
                             GetNextToken();
                         else
@@ -574,7 +606,7 @@ namespace KyleBushCompiler
                     else if (Scanner.TokenCode == STRINGTYPE)
                     {
                         left = StringConst();
-                        Quads.AddQuad(PRINT, left, 0, 0);
+                        Quads.AddQuad(PRINT, left, -1, -1);
                         if (Scanner.TokenCode == RPAR)
                             GetNextToken();
                         else
@@ -676,7 +708,9 @@ namespace KyleBushCompiler
             Debug(true, "Label()");
             // Checks that the indentifier has been declared as type label 
             if (IsLabel())
+            {
                 result = Identifier();
+            }
             else
                 UnexpectedTokenError("LABEL");
                 
@@ -704,7 +738,7 @@ namespace KyleBushCompiler
             temp = GenSymbol();
             Quads.AddQuad(SUB, left, right, temp); // Compare left and right operands
             result = Quads.NextQuad(); // Index where branch will be
-            Quads.AddQuad(RelopToOpcode(saveRelop), temp, 0, 0); // Op3 will be set later
+            Quads.AddQuad(RelopToOpcode(saveRelop), temp, -1, 0); // Op3 will be set later
 
             Debug(false, "Label()");
             return result;
@@ -796,6 +830,76 @@ namespace KyleBushCompiler
         }
 
         /// <summary>
+        /// Implements CFG Rule: <term> -> <factor> {<mulop> <factor> }*
+        /// </summary>
+        /// <returns></returns>
+        private int Term()
+        {
+            if (IsError)
+                return -1;
+            int left, right, opCode, temp;
+
+            Debug(true, "Term()");
+            left = Factor();
+
+            while (isMulOp() && !IsError)
+            {
+                opCode = MulOp();
+                right = Factor();
+                temp = GenSymbol();
+                try
+                {
+                    Quads.AddQuad(opCode, left, right, temp);
+                }
+                catch (DivideByZeroException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                left = temp;
+            }
+
+            Debug(false, "Term()");
+            return left;
+        }
+
+        /// <summary>
+        /// Implements CFG Rule: <factor> -> <unsigned constant> | <variable> | $LPAR <simple expression> $RPAR
+        /// </summary>
+        /// <returns></returns>
+        private int Factor()
+        {
+            if (IsError)
+                return -1;
+
+            Debug(true, "Factor()");
+
+            int index = 0;
+
+            if (isUnsignedConstant())
+            {
+                index = UnsignedConstant();
+            }
+            else if (isVariable())
+            {
+                index = Variable();
+            }
+            else if (Scanner.TokenCode == LPAR)
+            {
+                GetNextToken();
+                index = SimpleExpression();
+                if (Scanner.TokenCode == RPAR)
+                    GetNextToken();
+                else
+                    UnexpectedTokenError("RPAR");
+            }
+            else
+                UnexpectedTokenError("UNSIGNED CONSTANT or VARIABLE or LPAR");
+
+            Debug(false, "Factor()");
+            return index;
+        }
+
+        /// <summary>
         /// Creates a temp symbol or modifies it in the symbol table.
         /// </summary>
         /// <returns></returns>
@@ -836,7 +940,6 @@ namespace KyleBushCompiler
         }
 
 
-
         /// <summary>
         /// Implements CFG Rule: <sign> -> $PLUS | $MINUS
         /// </summary>
@@ -864,40 +967,6 @@ namespace KyleBushCompiler
                 UnexpectedTokenError("PLUS or MINUS");
             Debug(false, "Sign()");
             return result;
-        }
-
-
-        /// <summary>
-        /// Implements CFG Rule: <term> -> <factor> {<mulop> <factor> }*
-        /// </summary>
-        /// <returns></returns>
-        private int Term()
-        {
-            if (IsError)
-                return -1;
-            int left, right, opCode, temp;
-
-            Debug(true, "Term()");
-            left = Factor();
-
-            while (isMulOp() && !IsError)
-            {
-                opCode = MulOp();
-                right = Factor();
-                temp = GenSymbol();
-                try
-                {
-                    Quads.AddQuad(opCode, left, right, temp);
-                }
-                catch (DivideByZeroException e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-                left = temp;
-            }
-
-            Debug(false, "Term()");
-            return left;
         }
 
         /// <summary>
@@ -928,43 +997,6 @@ namespace KyleBushCompiler
 
             Debug(false, "MulOp()");
             return result;
-        }
-
-        /// <summary>
-        /// Implements CFG Rule: <factor> -> <unsigned constant> | <variable> | $LPAR <simple expression> $RPAR
-        /// </summary>
-        /// <returns></returns>
-        private int Factor()
-        {
-            if (IsError)
-                return -1;
-
-            Debug(true, "Factor()");
-
-            int index = 0;
-
-            if (isUnsignedConstant())
-            {
-                index = UnsignedConstant();
-            }
-            else if (isVariable())
-            {
-                index = Variable();
-            }
-            else if (Scanner.TokenCode == LPAR)
-            {
-                GetNextToken();
-                index = SimpleExpression();
-                if (Scanner.TokenCode == RPAR)
-                    GetNextToken();
-                else
-                    UnexpectedTokenError("RPAR");
-            }
-            else
-                UnexpectedTokenError("UNSIGNED CONSTANT or VARIABLE or LPAR");
-
-            Debug(false, "Factor()");
-            return index;
         }
 
         /// <summary>

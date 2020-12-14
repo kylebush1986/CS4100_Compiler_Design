@@ -30,6 +30,7 @@ namespace KyleBushCompiler
         private int ProgramCounter { get; set; }
         private Quad CurrentQuad { get; set; }
         public QuadTable QuadTable { get; set; }
+        public SymbolTable SymbolTable { get; private set; }
 
         /// <summary>
         /// Prints the relevant Quad Code information when the interpretter is run in Trace Mode
@@ -40,7 +41,7 @@ namespace KyleBushCompiler
         /// <param name="op3"></param>
         public void PrintTrace(int opcode, int op1, int op2, int op3)
         {
-            Console.WriteLine($"PC = {ProgramCounter}, Executing: {QuadTable.GetMnemonic(opcode)} {op1}, {op2}, {op3}");
+            Console.WriteLine($"PC = {ProgramCounter}, " + $"Executing: {QuadTable.GetMnemonic(opcode)} {SymbolTable.GetSymbol(op1).Name}, {SymbolTable.GetSymbol(op2).Name}, {SymbolTable.GetSymbol(op3).Name}");
         }
 
         /// <summary>
@@ -52,19 +53,24 @@ namespace KyleBushCompiler
         /// <param name="op3"></param>
         public void PrintTrace(int opcode, int op1, int op2)
         {
-            Console.WriteLine($"PC = {ProgramCounter}: {QuadTable.GetMnemonic(opcode)} {op1}, {op2}");
+            Console.WriteLine($"PC = {ProgramCounter}: {QuadTable.GetMnemonic(opcode)} {SymbolTable.GetSymbol(op1).Name}, {SymbolTable.GetSymbol(op2).Name}");
         }
 
         /// <summary>
         /// Prints the relevant Quad Code information when the interpretter is run in Trace Mode
         /// </summary>
         /// <param name="opcode"></param>
-        /// <param name="op1"></param>
-        /// <param name="op2"></param>
-        /// <param name="op3"></param>
+        /// <param name="op"></param>
         public void PrintTrace(int opcode, int op)
         {
-            Console.WriteLine($"PC = {ProgramCounter}: {QuadTable.GetMnemonic(opcode)} {op}");
+            if (opcode >= BNZ && opcode <= BINDR)
+            {
+                Console.WriteLine($"PC = {ProgramCounter}: {QuadTable.GetMnemonic(opcode)} {op}");
+            }
+            else
+            {
+                Console.WriteLine($"PC = {ProgramCounter}: {QuadTable.GetMnemonic(opcode)} {SymbolTable.GetSymbol(op).Name}");
+            }
         }
 
         /// <summary>
@@ -89,6 +95,7 @@ namespace KyleBushCompiler
         public void InterpretQuads(QuadTable quadTable, SymbolTable symbolTable, bool TraceOn = false)
         {
             QuadTable = quadTable;
+            SymbolTable = symbolTable;
             ProgramCounter = 0;
             while (ProgramCounter < QuadTable.NextQuad())
             {
@@ -115,8 +122,8 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                                 }
-                                double quotient = Convert.ToDouble(symbolTable.GetSymbol(CurrentQuad.Op1).GetValue()) / symbolTable.GetSymbol(CurrentQuad.Op2).GetValue();
-                                symbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable, quotient);
+                                double quotient = Convert.ToDouble(SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue()) / SymbolTable.GetSymbol(CurrentQuad.Op2).GetValue();
+                                SymbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable, quotient);
                                 ProgramCounter++;
                                 break;
                             // MUL
@@ -126,8 +133,8 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                                 }
-                                symbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable,
-                                    (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() * symbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
+                                SymbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable,
+                                    (SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue() * SymbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
                                 ProgramCounter++;
                                 break;
                             // SUB
@@ -137,8 +144,8 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                                 }
-                                symbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable,
-                                    (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() - symbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
+                                SymbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable,
+                                    (SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue() - SymbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
                                 ProgramCounter++;
                                 break;
                             // ADD
@@ -148,8 +155,8 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                                 }
-                                symbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable,
-                                    (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() + symbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
+                                SymbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable,
+                                    (SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue() + SymbolTable.GetSymbol(CurrentQuad.Op2).GetValue()));
                                 ProgramCounter++;
                                 break;
                             // MOV
@@ -159,7 +166,7 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op3);
                                 }
-                                symbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable, symbolTable.GetSymbol(CurrentQuad.Op1).GetValue());
+                                SymbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable, SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue());
                                 ProgramCounter++;
                                 break;
                             // STI
@@ -169,7 +176,7 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                                 }
-                                symbolTable.UpdateSymbol((CurrentQuad.Op2 + CurrentQuad.Op3), SymbolKind.Variable, symbolTable.GetSymbol(CurrentQuad.Op1).GetValue());
+                                SymbolTable.UpdateSymbol((CurrentQuad.Op2 + CurrentQuad.Op3), SymbolKind.Variable, SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue());
                                 ProgramCounter++;
                                 break;
                             // LDI
@@ -179,7 +186,7 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1, CurrentQuad.Op2, CurrentQuad.Op3);
                                 }
-                                symbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable, symbolTable.GetSymbol(CurrentQuad.Op1 + CurrentQuad.Op2).GetValue());
+                                SymbolTable.UpdateSymbol(CurrentQuad.Op3, SymbolKind.Variable, SymbolTable.GetSymbol(CurrentQuad.Op1 + CurrentQuad.Op2).GetValue());
                                 ProgramCounter++;
                                 break;
                             // BNZ
@@ -189,7 +196,7 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op3);
                                 }
-                                if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() != 0)
+                                if (SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue() != 0)
                                 {
                                     ProgramCounter = CurrentQuad.Op3;
                                 }
@@ -205,7 +212,7 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op3);
                                 }
-                                if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() <= 0)
+                                if (SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue() <= 0)
                                 {
                                     ProgramCounter = CurrentQuad.Op3;
                                 }
@@ -221,7 +228,7 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op3);
                                 }
-                                if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() >= 0)
+                                if (SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue() >= 0)
                                 {
                                     ProgramCounter = CurrentQuad.Op3;
                                 }
@@ -237,7 +244,7 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op3);
                                 }
-                                if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() == 0)
+                                if (SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue() == 0)
                                 {
                                     ProgramCounter = CurrentQuad.Op3;
                                 }
@@ -253,7 +260,7 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op3);
                                 }
-                                if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() > 0)
+                                if (SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue() > 0)
                                 {
                                     ProgramCounter = CurrentQuad.Op3;
                                 }
@@ -269,7 +276,7 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op3);
                                 }
-                                if (symbolTable.GetSymbol(CurrentQuad.Op1).GetValue() < 0)
+                                if (SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue() < 0)
                                 {
                                     ProgramCounter = CurrentQuad.Op3;
                                 }
@@ -292,9 +299,9 @@ namespace KyleBushCompiler
                             case BINDR:
                                 if (TraceOn)
                                 {
-                                    PrintTrace(CurrentQuad.OpCode, symbolTable.GetSymbol(CurrentQuad.Op3).GetValue());
+                                    PrintTrace(CurrentQuad.OpCode, SymbolTable.GetSymbol(CurrentQuad.Op3).GetValue());
                                 }
-                                ProgramCounter = symbolTable.GetSymbol(CurrentQuad.Op3).GetValue();
+                                ProgramCounter = SymbolTable.GetSymbol(CurrentQuad.Op3).GetValue();
                                 break;
                             // PRINT
                             // Write symbol table name and value of op 1
@@ -303,8 +310,8 @@ namespace KyleBushCompiler
                                 {
                                     PrintTrace(CurrentQuad.OpCode, CurrentQuad.Op1);
                                 }
-                                // Console.WriteLine($"{ symbolTable.GetSymbol(CurrentQuad.Op1).Name} = {symbolTable.GetSymbol(CurrentQuad.Op1).GetValue()}");
-                                Console.WriteLine($"{symbolTable.GetSymbol(CurrentQuad.Op1).GetValue()}");
+                                // Console.WriteLine($"{ SymbolTable.GetSymbol(CurrentQuad.Op1).Name} = {SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue()}");
+                                Console.WriteLine($"{SymbolTable.GetSymbol(CurrentQuad.Op1).GetValue()}");
                                 ProgramCounter++;
                                 break;
                             default:
@@ -312,7 +319,7 @@ namespace KyleBushCompiler
                                 break;
                         }
                     }
-                    // Catches any expetion, prints the appropriate error message, and stops running the current program.
+                    // Catches any exception, prints the appropriate error message, and stops running the current program.
                     catch (Exception e)
                     {
                         Console.WriteLine("FATAL ERROR: " + e.Message + "\n");

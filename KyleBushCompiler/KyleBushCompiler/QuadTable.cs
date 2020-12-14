@@ -78,6 +78,11 @@ namespace KyleBushCompiler
             QuadTableData[index] = new Quad(opcode, op1, op2, op3);
         }
 
+        public int GetQuadIndex(Quad quad)
+        {
+            return QuadTableData.IndexOf(quad);
+        }
+
         public void SetQuadOp3(int branchQuad, int branchTarget)
         {
             Quad quad = GetQuad(branchQuad);

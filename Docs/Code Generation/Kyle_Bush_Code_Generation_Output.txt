@@ -1,0 +1,1373 @@
+###############################################################################
+
+BASE REQUIREMENTS - CS4100FinalProjGOODMinimumFA20.txt - OUPUT
+
+###############################################################################
+
+*******************************************************************************
+Section 1 - Source Lines
+*******************************************************************************
+Line #1 unit LastTest;
+Line #2 {Final compiler project test program
+Line #3    NO ERRORS INTENDED!  Notify A. Brouillette if errors are found. }
+Line #4
+Line #5 VAR I,J: integer;
+Line #6 var product, sum: integer;
+Line #7
+Line #8 begin
+Line #9 for i := 1 to 5 do
+Line #10 { Find summation 5 times }
+Line #11   begin
+Line #12   writeln("SUMMATIONS 1 THROUGH 5");
+Line #13   sum := 0;
+Line #14   for j := 1 to i do
+Line #15     begin
+Line #16     sum := sum + j
+Line #17     end;
+Line #18   writeln(sum)
+Line #19   end;
+Line #20
+Line #21 { Find 6 factorial }
+Line #22   product := 1;
+Line #23   i := 2;
+Line #24   while i <= 6 do
+Line #25     begin
+Line #26     product := product * i;
+Line #27     writeln("Product now is:");
+Line #28     writeln(product);
+Line #29     i := i + 1
+Line #30     end;
+Line #31   writeln("6! is:");
+Line #32   writeln(product);
+Line #33
+Line #34 {count powers of 2 needed to get over 1000  }
+Line #35 j := 0;
+Line #36 product := 1;
+Line #37 while product <= 1000 do
+Line #38   begin
+Line #39   product := product * 2;
+Line #40   j := j + 1;
+Line #41   writeln(j);
+Line #42   if product < 500 then
+Line #43     writeln("Product is less than 500")
+Line #44   else
+Line #45     writeln("Product is greater than or equal to 500")
+Line #46   end;
+Line #47 writeln("Iterations = ");
+Line #48 writeln(j);
+Line #49 writeln("Value of product:");
+Line #50 writeln(product);
+Line #51
+Line #52 writeln("Made it to the end.")
+Line #53
+Line #54 end.
+
+*******************************************************************************
+Section 2 - Symbol Table Dump Before Execution
+*******************************************************************************
+
+SYMBOL TABLE
+----------------------------------------------------------------------------------------------------------------
+|Index |Name                                    |      Kind|  DataType|                                   Value|
+----------------------------------------------------------------------------------------------------------------
+|0     |-1                                      |  Constant|   Integer|                                      -1|
+|1     |1                                       |  Constant|   Integer|                                       1|
+|2     |LASTTEST                                |  ProgName|   Integer|                                       0|
+|3     |I                                       |  Variable|   Integer|                                       0|
+|4     |J                                       |  Variable|   Integer|                                       0|
+|5     |PRODUCT                                 |  Variable|   Integer|                                       0|
+|6     |SUM                                     |  Variable|   Integer|                                       0|
+|7     |5                                       |  Constant|   Integer|                                       5|
+|8     |#TEMP1                                  |  Variable|   Integer|                                       0|
+|9     |SUMMATIONS 1 THROUGH 5                  |  Constant|    String|                  SUMMATIONS 1 THROUGH 5|
+|10    |0                                       |  Constant|   Integer|                                       0|
+|11    |#TEMP2                                  |  Variable|   Integer|                                       0|
+|12    |#TEMP3                                  |  Variable|   Integer|                                       0|
+|13    |2                                       |  Constant|   Integer|                                       2|
+|14    |6                                       |  Constant|   Integer|                                       6|
+|15    |#TEMP4                                  |  Variable|   Integer|                                       0|
+|16    |#TEMP5                                  |  Variable|   Integer|                                       0|
+|17    |PRODUCT NOW IS:                         |  Constant|    String|                         PRODUCT NOW IS:|
+|18    |#TEMP6                                  |  Variable|   Integer|                                       0|
+|19    |6! IS:                                  |  Constant|    String|                                  6! IS:|
+|20    |1000                                    |  Constant|   Integer|                                    1000|
+|21    |#TEMP7                                  |  Variable|   Integer|                                       0|
+|22    |#TEMP8                                  |  Variable|   Integer|                                       0|
+|23    |#TEMP9                                  |  Variable|   Integer|                                       0|
+|24    |500                                     |  Constant|   Integer|                                     500|
+|25    |#TEMP10                                 |  Variable|   Integer|                                       0|
+|26    |PRODUCT IS LESS THAN 500                |  Constant|    String|                PRODUCT IS LESS THAN 500|
+|27    |PRODUCT IS GREATER THAN OR EQUAL TO 500 |  Constant|    String| PRODUCT IS GREATER THAN OR EQUAL TO 500|
+|28    |ITERATIONS =                            |  Constant|    String|                           ITERATIONS = |
+|29    |VALUE OF PRODUCT:                       |  Constant|    String|                       VALUE OF PRODUCT:|
+|30    |MADE IT TO THE END.                     |  Constant|    String|                     MADE IT TO THE END.|
+----------------------------------------------------------------------------------------------------------------
+
+*******************************************************************************
+Section 3 - Quad Table Dump
+*******************************************************************************
+
+QUAD TABLE
+--------------------------------------------------------------------------------------
+|Opcode |                                         Op1|       Op2|                 Op3|
+--------------------------------------------------------------------------------------
+|MOV    |                                        1<1>|    ------|                I<3>|
+|SUB    |                                        I<3>|      5<7>|           #TEMP1<8>|
+|BP     |                                   #TEMP1<8>|    ------|                <15>|
+|PRINT  |                   SUMMATIONS 1 THROUGH 5<9>|    ------|              ------|
+|MOV    |                                       0<10>|    ------|              SUM<6>|
+|MOV    |                                        1<1>|    ------|                J<4>|
+|SUB    |                                        J<4>|      I<3>|          #TEMP2<11>|
+|BP     |                                  #TEMP2<11>|    ------|                <12>|
+|ADD    |                                      SUM<6>|      J<4>|          #TEMP3<12>|
+|MOV    |                                  #TEMP3<12>|    ------|              SUM<6>|
+|ADD    |                                        J<4>|      1<1>|                J<4>|
+|BR     |                                      ------|    ------|                 <6>|
+|PRINT  |                                      SUM<6>|    ------|              ------|
+|ADD    |                                        I<3>|      1<1>|                I<3>|
+|BR     |                                      ------|    ------|                 <1>|
+|MOV    |                                        1<1>|    ------|          PRODUCT<5>|
+|MOV    |                                       2<13>|    ------|                I<3>|
+|SUB    |                                        I<3>|     6<14>|          #TEMP4<15>|
+|BP     |                                  #TEMP4<15>|    ------|                <26>|
+|MUL    |                                  PRODUCT<5>|      I<3>|          #TEMP5<16>|
+|MOV    |                                  #TEMP5<16>|    ------|          PRODUCT<5>|
+|PRINT  |                         PRODUCT NOW IS:<17>|    ------|              ------|
+|PRINT  |                                  PRODUCT<5>|    ------|              ------|
+|ADD    |                                        I<3>|      1<1>|          #TEMP6<18>|
+|MOV    |                                  #TEMP6<18>|    ------|                I<3>|
+|BR     |                                      ------|    ------|                <17>|
+|PRINT  |                                  6! IS:<19>|    ------|              ------|
+|PRINT  |                                  PRODUCT<5>|    ------|              ------|
+|MOV    |                                       0<10>|    ------|                J<4>|
+|MOV    |                                        1<1>|    ------|          PRODUCT<5>|
+|SUB    |                                  PRODUCT<5>|  1000<20>|          #TEMP7<21>|
+|BP     |                                  #TEMP7<21>|    ------|                <43>|
+|MUL    |                                  PRODUCT<5>|     2<13>|          #TEMP8<22>|
+|MOV    |                                  #TEMP8<22>|    ------|          PRODUCT<5>|
+|ADD    |                                        J<4>|      1<1>|          #TEMP9<23>|
+|MOV    |                                  #TEMP9<23>|    ------|                J<4>|
+|PRINT  |                                        J<4>|    ------|              ------|
+|SUB    |                                  PRODUCT<5>|   500<24>|         #TEMP10<25>|
+|BNN    |                                 #TEMP10<25>|    ------|                <41>|
+|PRINT  |                PRODUCT IS LESS THAN 500<26>|    ------|              ------|
+|BR     |                                      ------|    ------|                <42>|
+|PRINT  | PRODUCT IS GREATER THAN OR EQUAL TO 500<27>|    ------|              ------|
+|BR     |                                      ------|    ------|                <30>|
+|PRINT  |                           ITERATIONS = <28>|    ------|              ------|
+|PRINT  |                                        J<4>|    ------|              ------|
+|PRINT  |                       VALUE OF PRODUCT:<29>|    ------|              ------|
+|PRINT  |                                  PRODUCT<5>|    ------|              ------|
+|PRINT  |                     MADE IT TO THE END.<30>|    ------|              ------|
+--------------------------------------------------------------------------------------
+
+*******************************************************************************
+Section 4A - Quad Execution Ouput with Trace On
+*******************************************************************************
+
+PC = 0: MOV 1, I
+PC = 1, Executing: SUB I, 5, #TEMP1
+PC = 2: BP 15
+PC = 3: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 4: MOV 0, SUM
+PC = 5: MOV 1, J
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 12: PRINT SUM
+1
+PC = 13, Executing: ADD I, 1, I
+PC = 14: BR 1
+PC = 1, Executing: SUB I, 5, #TEMP1
+PC = 2: BP 15
+PC = 3: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 4: MOV 0, SUM
+PC = 5: MOV 1, J
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 12: PRINT SUM
+3
+PC = 13, Executing: ADD I, 1, I
+PC = 14: BR 1
+PC = 1, Executing: SUB I, 5, #TEMP1
+PC = 2: BP 15
+PC = 3: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 4: MOV 0, SUM
+PC = 5: MOV 1, J
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 12: PRINT SUM
+6
+PC = 13, Executing: ADD I, 1, I
+PC = 14: BR 1
+PC = 1, Executing: SUB I, 5, #TEMP1
+PC = 2: BP 15
+PC = 3: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 4: MOV 0, SUM
+PC = 5: MOV 1, J
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 12: PRINT SUM
+10
+PC = 13, Executing: ADD I, 1, I
+PC = 14: BR 1
+PC = 1, Executing: SUB I, 5, #TEMP1
+PC = 2: BP 15
+PC = 3: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 4: MOV 0, SUM
+PC = 5: MOV 1, J
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 8, Executing: ADD SUM, J, #TEMP3
+PC = 9: MOV #TEMP3, SUM
+PC = 10, Executing: ADD J, 1, J
+PC = 11: BR 6
+PC = 6, Executing: SUB J, I, #TEMP2
+PC = 7: BP 12
+PC = 12: PRINT SUM
+15
+PC = 13, Executing: ADD I, 1, I
+PC = 14: BR 1
+PC = 1, Executing: SUB I, 5, #TEMP1
+PC = 2: BP 15
+PC = 15: MOV 1, PRODUCT
+PC = 16: MOV 2, I
+PC = 17, Executing: SUB I, 6, #TEMP4
+PC = 18: BP 26
+PC = 19, Executing: MUL PRODUCT, I, #TEMP5
+PC = 20: MOV #TEMP5, PRODUCT
+PC = 21: PRINT PRODUCT NOW IS:
+PRODUCT NOW IS:
+PC = 22: PRINT PRODUCT
+2
+PC = 23, Executing: ADD I, 1, #TEMP6
+PC = 24: MOV #TEMP6, I
+PC = 25: BR 17
+PC = 17, Executing: SUB I, 6, #TEMP4
+PC = 18: BP 26
+PC = 19, Executing: MUL PRODUCT, I, #TEMP5
+PC = 20: MOV #TEMP5, PRODUCT
+PC = 21: PRINT PRODUCT NOW IS:
+PRODUCT NOW IS:
+PC = 22: PRINT PRODUCT
+6
+PC = 23, Executing: ADD I, 1, #TEMP6
+PC = 24: MOV #TEMP6, I
+PC = 25: BR 17
+PC = 17, Executing: SUB I, 6, #TEMP4
+PC = 18: BP 26
+PC = 19, Executing: MUL PRODUCT, I, #TEMP5
+PC = 20: MOV #TEMP5, PRODUCT
+PC = 21: PRINT PRODUCT NOW IS:
+PRODUCT NOW IS:
+PC = 22: PRINT PRODUCT
+24
+PC = 23, Executing: ADD I, 1, #TEMP6
+PC = 24: MOV #TEMP6, I
+PC = 25: BR 17
+PC = 17, Executing: SUB I, 6, #TEMP4
+PC = 18: BP 26
+PC = 19, Executing: MUL PRODUCT, I, #TEMP5
+PC = 20: MOV #TEMP5, PRODUCT
+PC = 21: PRINT PRODUCT NOW IS:
+PRODUCT NOW IS:
+PC = 22: PRINT PRODUCT
+120
+PC = 23, Executing: ADD I, 1, #TEMP6
+PC = 24: MOV #TEMP6, I
+PC = 25: BR 17
+PC = 17, Executing: SUB I, 6, #TEMP4
+PC = 18: BP 26
+PC = 19, Executing: MUL PRODUCT, I, #TEMP5
+PC = 20: MOV #TEMP5, PRODUCT
+PC = 21: PRINT PRODUCT NOW IS:
+PRODUCT NOW IS:
+PC = 22: PRINT PRODUCT
+720
+PC = 23, Executing: ADD I, 1, #TEMP6
+PC = 24: MOV #TEMP6, I
+PC = 25: BR 17
+PC = 17, Executing: SUB I, 6, #TEMP4
+PC = 18: BP 26
+PC = 26: PRINT 6! IS:
+6! IS:
+PC = 27: PRINT PRODUCT
+720
+PC = 28: MOV 0, J
+PC = 29: MOV 1, PRODUCT
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 32, Executing: MUL PRODUCT, 2, #TEMP8
+PC = 33: MOV #TEMP8, PRODUCT
+PC = 34, Executing: ADD J, 1, #TEMP9
+PC = 35: MOV #TEMP9, J
+PC = 36: PRINT J
+1
+PC = 37, Executing: SUB PRODUCT, 500, #TEMP10
+PC = 38: BNN 41
+PC = 39: PRINT PRODUCT IS LESS THAN 500
+PRODUCT IS LESS THAN 500
+PC = 40: BR 42
+PC = 42: BR 30
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 32, Executing: MUL PRODUCT, 2, #TEMP8
+PC = 33: MOV #TEMP8, PRODUCT
+PC = 34, Executing: ADD J, 1, #TEMP9
+PC = 35: MOV #TEMP9, J
+PC = 36: PRINT J
+2
+PC = 37, Executing: SUB PRODUCT, 500, #TEMP10
+PC = 38: BNN 41
+PC = 39: PRINT PRODUCT IS LESS THAN 500
+PRODUCT IS LESS THAN 500
+PC = 40: BR 42
+PC = 42: BR 30
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 32, Executing: MUL PRODUCT, 2, #TEMP8
+PC = 33: MOV #TEMP8, PRODUCT
+PC = 34, Executing: ADD J, 1, #TEMP9
+PC = 35: MOV #TEMP9, J
+PC = 36: PRINT J
+3
+PC = 37, Executing: SUB PRODUCT, 500, #TEMP10
+PC = 38: BNN 41
+PC = 39: PRINT PRODUCT IS LESS THAN 500
+PRODUCT IS LESS THAN 500
+PC = 40: BR 42
+PC = 42: BR 30
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 32, Executing: MUL PRODUCT, 2, #TEMP8
+PC = 33: MOV #TEMP8, PRODUCT
+PC = 34, Executing: ADD J, 1, #TEMP9
+PC = 35: MOV #TEMP9, J
+PC = 36: PRINT J
+4
+PC = 37, Executing: SUB PRODUCT, 500, #TEMP10
+PC = 38: BNN 41
+PC = 39: PRINT PRODUCT IS LESS THAN 500
+PRODUCT IS LESS THAN 500
+PC = 40: BR 42
+PC = 42: BR 30
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 32, Executing: MUL PRODUCT, 2, #TEMP8
+PC = 33: MOV #TEMP8, PRODUCT
+PC = 34, Executing: ADD J, 1, #TEMP9
+PC = 35: MOV #TEMP9, J
+PC = 36: PRINT J
+5
+PC = 37, Executing: SUB PRODUCT, 500, #TEMP10
+PC = 38: BNN 41
+PC = 39: PRINT PRODUCT IS LESS THAN 500
+PRODUCT IS LESS THAN 500
+PC = 40: BR 42
+PC = 42: BR 30
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 32, Executing: MUL PRODUCT, 2, #TEMP8
+PC = 33: MOV #TEMP8, PRODUCT
+PC = 34, Executing: ADD J, 1, #TEMP9
+PC = 35: MOV #TEMP9, J
+PC = 36: PRINT J
+6
+PC = 37, Executing: SUB PRODUCT, 500, #TEMP10
+PC = 38: BNN 41
+PC = 39: PRINT PRODUCT IS LESS THAN 500
+PRODUCT IS LESS THAN 500
+PC = 40: BR 42
+PC = 42: BR 30
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 32, Executing: MUL PRODUCT, 2, #TEMP8
+PC = 33: MOV #TEMP8, PRODUCT
+PC = 34, Executing: ADD J, 1, #TEMP9
+PC = 35: MOV #TEMP9, J
+PC = 36: PRINT J
+7
+PC = 37, Executing: SUB PRODUCT, 500, #TEMP10
+PC = 38: BNN 41
+PC = 39: PRINT PRODUCT IS LESS THAN 500
+PRODUCT IS LESS THAN 500
+PC = 40: BR 42
+PC = 42: BR 30
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 32, Executing: MUL PRODUCT, 2, #TEMP8
+PC = 33: MOV #TEMP8, PRODUCT
+PC = 34, Executing: ADD J, 1, #TEMP9
+PC = 35: MOV #TEMP9, J
+PC = 36: PRINT J
+8
+PC = 37, Executing: SUB PRODUCT, 500, #TEMP10
+PC = 38: BNN 41
+PC = 39: PRINT PRODUCT IS LESS THAN 500
+PRODUCT IS LESS THAN 500
+PC = 40: BR 42
+PC = 42: BR 30
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 32, Executing: MUL PRODUCT, 2, #TEMP8
+PC = 33: MOV #TEMP8, PRODUCT
+PC = 34, Executing: ADD J, 1, #TEMP9
+PC = 35: MOV #TEMP9, J
+PC = 36: PRINT J
+9
+PC = 37, Executing: SUB PRODUCT, 500, #TEMP10
+PC = 38: BNN 41
+PC = 41: PRINT PRODUCT IS GREATER THAN OR EQUAL TO 500
+PRODUCT IS GREATER THAN OR EQUAL TO 500
+PC = 42: BR 30
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 32, Executing: MUL PRODUCT, 2, #TEMP8
+PC = 33: MOV #TEMP8, PRODUCT
+PC = 34, Executing: ADD J, 1, #TEMP9
+PC = 35: MOV #TEMP9, J
+PC = 36: PRINT J
+10
+PC = 37, Executing: SUB PRODUCT, 500, #TEMP10
+PC = 38: BNN 41
+PC = 41: PRINT PRODUCT IS GREATER THAN OR EQUAL TO 500
+PRODUCT IS GREATER THAN OR EQUAL TO 500
+PC = 42: BR 30
+PC = 30, Executing: SUB PRODUCT, 1000, #TEMP7
+PC = 31: BP 43
+PC = 43: PRINT ITERATIONS =
+ITERATIONS =
+PC = 44: PRINT J
+10
+PC = 45: PRINT VALUE OF PRODUCT:
+VALUE OF PRODUCT:
+PC = 46: PRINT PRODUCT
+1024
+PC = 47: PRINT MADE IT TO THE END.
+MADE IT TO THE END.
+
+*******************************************************************************
+Section 4B - Quad Execution Ouput with Trace Off
+*******************************************************************************
+
+SUMMATIONS 1 THROUGH 5
+1
+SUMMATIONS 1 THROUGH 5
+3
+SUMMATIONS 1 THROUGH 5
+6
+SUMMATIONS 1 THROUGH 5
+10
+SUMMATIONS 1 THROUGH 5
+15
+PRODUCT NOW IS:
+2
+PRODUCT NOW IS:
+6
+PRODUCT NOW IS:
+24
+PRODUCT NOW IS:
+120
+PRODUCT NOW IS:
+720
+6! IS:
+720
+1
+PRODUCT IS LESS THAN 500
+2
+PRODUCT IS LESS THAN 500
+3
+PRODUCT IS LESS THAN 500
+4
+PRODUCT IS LESS THAN 500
+5
+PRODUCT IS LESS THAN 500
+6
+PRODUCT IS LESS THAN 500
+7
+PRODUCT IS LESS THAN 500
+8
+PRODUCT IS LESS THAN 500
+9
+PRODUCT IS GREATER THAN OR EQUAL TO 500
+10
+PRODUCT IS GREATER THAN OR EQUAL TO 500
+ITERATIONS =
+10
+VALUE OF PRODUCT:
+1024
+MADE IT TO THE END.
+
+*******************************************************************************
+Section 5 - Symbol Table Dump After Execution
+*******************************************************************************
+
+SYMBOL TABLE
+----------------------------------------------------------------------------------------------------------------
+|Index |Name                                    |      Kind|  DataType|                                   Value|
+----------------------------------------------------------------------------------------------------------------
+|0     |-1                                      |  Constant|   Integer|                                      -1|
+|1     |1                                       |  Constant|   Integer|                                       1|
+|2     |LASTTEST                                |  ProgName|   Integer|                                       0|
+|3     |I                                       |  Variable|   Integer|                                       7|
+|4     |J                                       |  Variable|   Integer|                                      10|
+|5     |PRODUCT                                 |  Variable|   Integer|                                    1024|
+|6     |SUM                                     |  Variable|   Integer|                                      15|
+|7     |5                                       |  Constant|   Integer|                                       5|
+|8     |#TEMP1                                  |  Variable|   Integer|                                       1|
+|9     |SUMMATIONS 1 THROUGH 5                  |  Constant|    String|                  SUMMATIONS 1 THROUGH 5|
+|10    |0                                       |  Constant|   Integer|                                       0|
+|11    |#TEMP2                                  |  Variable|   Integer|                                       1|
+|12    |#TEMP3                                  |  Variable|   Integer|                                      15|
+|13    |2                                       |  Constant|   Integer|                                       2|
+|14    |6                                       |  Constant|   Integer|                                       6|
+|15    |#TEMP4                                  |  Variable|   Integer|                                       1|
+|16    |#TEMP5                                  |  Variable|   Integer|                                     720|
+|17    |PRODUCT NOW IS:                         |  Constant|    String|                         PRODUCT NOW IS:|
+|18    |#TEMP6                                  |  Variable|   Integer|                                       7|
+|19    |6! IS:                                  |  Constant|    String|                                  6! IS:|
+|20    |1000                                    |  Constant|   Integer|                                    1000|
+|21    |#TEMP7                                  |  Variable|   Integer|                                      24|
+|22    |#TEMP8                                  |  Variable|   Integer|                                    1024|
+|23    |#TEMP9                                  |  Variable|   Integer|                                      10|
+|24    |500                                     |  Constant|   Integer|                                     500|
+|25    |#TEMP10                                 |  Variable|   Integer|                                     524|
+|26    |PRODUCT IS LESS THAN 500                |  Constant|    String|                PRODUCT IS LESS THAN 500|
+|27    |PRODUCT IS GREATER THAN OR EQUAL TO 500 |  Constant|    String| PRODUCT IS GREATER THAN OR EQUAL TO 500|
+|28    |ITERATIONS =                            |  Constant|    String|                           ITERATIONS = |
+|29    |VALUE OF PRODUCT:                       |  Constant|    String|                       VALUE OF PRODUCT:|
+|30    |MADE IT TO THE END.                     |  Constant|    String|                     MADE IT TO THE END.|
+----------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################################################
+
+EXTRA CREDIT - FinalProjRepeat20.txt - OUPUT
+
+###############################################################################
+
+*******************************************************************************
+Section 1 - Source Lines
+*******************************************************************************
+
+Line #1 unit LastTest;
+Line #2 {Final compiler project test program
+Line #3    NO ERRORS INTENDED!  Notify A. Brouillette if errors are found. }
+Line #4
+Line #5 VAR I,J: integer;
+Line #6 var product, sum: integer;
+Line #7
+Line #8 begin
+Line #9 i := 1;
+Line #10 REPEAT
+Line #11 { Find summation 5 times }
+Line #12   begin
+Line #13   writeln("SUMMATIONS 1 THROUGH 5");
+Line #14   sum := 0;
+Line #15   for j := 1 to i do
+Line #16     begin
+Line #17     sum := sum + j
+Line #18     end;
+Line #19   writeln(sum);
+Line #20   i := i + 1
+Line #21   end
+Line #22 UNTIL I > 5;
+Line #23
+Line #24 writeln("Made it to the end.")
+Line #25
+Line #26 end.
+
+*******************************************************************************
+Section 2 - Symbol Table Dump Before Execution
+*******************************************************************************
+
+SYMBOL TABLE
+----------------------------------------------------------------------------------------------------------------
+|Index |Name                                    |      Kind|  DataType|                                   Value|
+----------------------------------------------------------------------------------------------------------------
+|0     |-1                                      |  Constant|   Integer|                                      -1|
+|1     |1                                       |  Constant|   Integer|                                       1|
+|2     |LASTTEST                                |  ProgName|   Integer|                                       0|
+|3     |I                                       |  Variable|   Integer|                                       0|
+|4     |J                                       |  Variable|   Integer|                                       0|
+|5     |PRODUCT                                 |  Variable|   Integer|                                       0|
+|6     |SUM                                     |  Variable|   Integer|                                       0|
+|7     |SUMMATIONS 1 THROUGH 5                  |  Constant|    String|                  SUMMATIONS 1 THROUGH 5|
+|8     |0                                       |  Constant|   Integer|                                       0|
+|9     |#TEMP1                                  |  Variable|   Integer|                                       0|
+|10    |#TEMP2                                  |  Variable|   Integer|                                       0|
+|11    |#TEMP3                                  |  Variable|   Integer|                                       0|
+|12    |5                                       |  Constant|   Integer|                                       5|
+|13    |#TEMP4                                  |  Variable|   Integer|                                       0|
+|14    |MADE IT TO THE END.                     |  Constant|    String|                     MADE IT TO THE END.|
+----------------------------------------------------------------------------------------------------------------
+
+*******************************************************************************
+Section 3 - Quad Table Dump
+*******************************************************************************
+
+QUAD TABLE
+--------------------------------------------------------------------------------------
+|Opcode |                                         Op1|       Op2|                 Op3|
+--------------------------------------------------------------------------------------
+|MOV    |                                        1<1>|    ------|                I<3>|
+|PRINT  |                   SUMMATIONS 1 THROUGH 5<7>|    ------|              ------|
+|MOV    |                                        0<8>|    ------|              SUM<6>|
+|MOV    |                                        1<1>|    ------|                J<4>|
+|SUB    |                                        J<4>|      I<3>|           #TEMP1<9>|
+|BP     |                                   #TEMP1<9>|    ------|                <10>|
+|ADD    |                                      SUM<6>|      J<4>|          #TEMP2<10>|
+|MOV    |                                  #TEMP2<10>|    ------|              SUM<6>|
+|ADD    |                                        J<4>|      1<1>|                J<4>|
+|BR     |                                      ------|    ------|                 <4>|
+|PRINT  |                                      SUM<6>|    ------|              ------|
+|ADD    |                                        I<3>|      1<1>|          #TEMP3<11>|
+|MOV    |                                  #TEMP3<11>|    ------|                I<3>|
+|SUB    |                                        I<3>|     5<12>|          #TEMP4<13>|
+|BNP    |                                  #TEMP4<13>|    ------|                 <1>|
+|PRINT  |                     MADE IT TO THE END.<14>|    ------|              ------|
+--------------------------------------------------------------------------------------
+
+*******************************************************************************
+Section 4A - Quad Execution Ouput with Trace On
+*******************************************************************************
+
+PC = 0: MOV 1, I
+PC = 1: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 2: MOV 0, SUM
+PC = 3: MOV 1, J
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 10: PRINT SUM
+1
+PC = 11, Executing: ADD I, 1, #TEMP3
+PC = 12: MOV #TEMP3, I
+PC = 13, Executing: SUB I, 5, #TEMP4
+PC = 14: BNP 1
+PC = 1: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 2: MOV 0, SUM
+PC = 3: MOV 1, J
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 10: PRINT SUM
+3
+PC = 11, Executing: ADD I, 1, #TEMP3
+PC = 12: MOV #TEMP3, I
+PC = 13, Executing: SUB I, 5, #TEMP4
+PC = 14: BNP 1
+PC = 1: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 2: MOV 0, SUM
+PC = 3: MOV 1, J
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 10: PRINT SUM
+6
+PC = 11, Executing: ADD I, 1, #TEMP3
+PC = 12: MOV #TEMP3, I
+PC = 13, Executing: SUB I, 5, #TEMP4
+PC = 14: BNP 1
+PC = 1: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 2: MOV 0, SUM
+PC = 3: MOV 1, J
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 10: PRINT SUM
+10
+PC = 11, Executing: ADD I, 1, #TEMP3
+PC = 12: MOV #TEMP3, I
+PC = 13, Executing: SUB I, 5, #TEMP4
+PC = 14: BNP 1
+PC = 1: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 2: MOV 0, SUM
+PC = 3: MOV 1, J
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 10: PRINT SUM
+15
+PC = 11, Executing: ADD I, 1, #TEMP3
+PC = 12: MOV #TEMP3, I
+PC = 13, Executing: SUB I, 5, #TEMP4
+PC = 14: BNP 1
+PC = 15: PRINT MADE IT TO THE END.
+MADE IT TO THE END.
+
+*******************************************************************************
+Section 4B - Quad Execution Ouput with Trace Off
+*******************************************************************************
+
+SUMMATIONS 1 THROUGH 5
+1
+SUMMATIONS 1 THROUGH 5
+3
+SUMMATIONS 1 THROUGH 5
+6
+SUMMATIONS 1 THROUGH 5
+10
+SUMMATIONS 1 THROUGH 5
+15
+MADE IT TO THE END.
+
+*******************************************************************************
+Section 5 - Symbol Table Dump After Execution
+*******************************************************************************
+
+SYMBOL TABLE
+----------------------------------------------------------------------------------------------------------------
+|Index |Name                                    |      Kind|  DataType|                                   Value|
+----------------------------------------------------------------------------------------------------------------
+|0     |-1                                      |  Constant|   Integer|                                      -1|
+|1     |1                                       |  Constant|   Integer|                                       1|
+|2     |LASTTEST                                |  ProgName|   Integer|                                       0|
+|3     |I                                       |  Variable|   Integer|                                       6|
+|4     |J                                       |  Variable|   Integer|                                       6|
+|5     |PRODUCT                                 |  Variable|   Integer|                                       0|
+|6     |SUM                                     |  Variable|   Integer|                                      15|
+|7     |SUMMATIONS 1 THROUGH 5                  |  Constant|    String|                  SUMMATIONS 1 THROUGH 5|
+|8     |0                                       |  Constant|   Integer|                                       0|
+|9     |#TEMP1                                  |  Variable|   Integer|                                       1|
+|10    |#TEMP2                                  |  Variable|   Integer|                                      15|
+|11    |#TEMP3                                  |  Variable|   Integer|                                       6|
+|12    |5                                       |  Constant|   Integer|                                       5|
+|13    |#TEMP4                                  |  Variable|   Integer|                                       1|
+|14    |MADE IT TO THE END.                     |  Constant|    String|                     MADE IT TO THE END.|
+----------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################################################
+
+EXTRA CREDIT - FinalProjLabels20.txt - OUPUT
+
+###############################################################################
+
+*******************************************************************************
+Section 1 - Source Lines
+*******************************************************************************
+
+Line #1 unit LastTest;
+Line #2 {Final compiler project test program
+Line #3    NO ERRORS INTENDED!  Notify A. Brouillette if errors are found. }
+Line #4 LABEL Loop, Stop;
+Line #5 VAR I,J: integer;
+Line #6 var product, sum: integer;
+Line #7
+Line #8 begin
+Line #9 i := 1;
+Line #10 LOOP:
+Line #11 { Find summation 5 times }
+Line #12   writeln("SUMMATIONS 1 THROUGH 5");
+Line #13   sum := 0;
+Line #14   for j := 1 to i do
+Line #15     begin
+Line #16     sum := sum + j
+Line #17     end;
+Line #18   writeln(sum);
+Line #19   i := i + 1;
+Line #20   IF I > 5 THEN GOTO STOP;
+Line #21 GOTO LOOP;
+Line #22
+Line #23 STOP: writeln("Made it to STOP!")
+Line #24
+Line #25 end.
+
+*******************************************************************************
+Section 2 - Symbol Table Dump Before Execution
+*******************************************************************************
+
+SYMBOL TABLE
+----------------------------------------------------------------------------------------------------------------
+|Index |Name                                    |      Kind|  DataType|                                   Value|
+----------------------------------------------------------------------------------------------------------------
+|0     |-1                                      |  Constant|   Integer|                                      -1|
+|1     |1                                       |  Constant|   Integer|                                       1|
+|2     |LASTTEST                                |  ProgName|   Integer|                                       0|
+|3     |LOOP                                    |     Label|   Integer|                                       1|
+|4     |STOP                                    |     Label|   Integer|                                      15|
+|5     |I                                       |  Variable|   Integer|                                       0|
+|6     |J                                       |  Variable|   Integer|                                       0|
+|7     |PRODUCT                                 |  Variable|   Integer|                                       0|
+|8     |SUM                                     |  Variable|   Integer|                                       0|
+|9     |SUMMATIONS 1 THROUGH 5                  |  Constant|    String|                  SUMMATIONS 1 THROUGH 5|
+|10    |0                                       |  Constant|   Integer|                                       0|
+|11    |#TEMP1                                  |  Variable|   Integer|                                       0|
+|12    |#TEMP2                                  |  Variable|   Integer|                                       0|
+|13    |#TEMP3                                  |  Variable|   Integer|                                       0|
+|14    |5                                       |  Constant|   Integer|                                       5|
+|15    |#TEMP4                                  |  Variable|   Integer|                                       0|
+|16    |MADE IT TO STOP!                        |  Constant|    String|                        MADE IT TO STOP!|
+----------------------------------------------------------------------------------------------------------------
+
+*******************************************************************************
+Section 3 - Quad Table Dump
+*******************************************************************************
+
+QUAD TABLE
+--------------------------------------------------------------------------------------
+|Opcode |                                         Op1|       Op2|                 Op3|
+--------------------------------------------------------------------------------------
+|MOV    |                                        1<1>|    ------|                I<5>|
+|PRINT  |                   SUMMATIONS 1 THROUGH 5<9>|    ------|              ------|
+|MOV    |                                       0<10>|    ------|              SUM<8>|
+|MOV    |                                        1<1>|    ------|                J<6>|
+|SUB    |                                        J<6>|      I<5>|          #TEMP1<11>|
+|BP     |                                  #TEMP1<11>|    ------|                <10>|
+|ADD    |                                      SUM<8>|      J<6>|          #TEMP2<12>|
+|MOV    |                                  #TEMP2<12>|    ------|              SUM<8>|
+|ADD    |                                        J<6>|      1<1>|                J<6>|
+|BR     |                                      ------|    ------|                 <4>|
+|PRINT  |                                      SUM<8>|    ------|              ------|
+|ADD    |                                        I<5>|      1<1>|          #TEMP3<13>|
+|MOV    |                                  #TEMP3<13>|    ------|                I<5>|
+|SUB    |                                        I<5>|     5<14>|          #TEMP4<15>|
+|BNP    |                                  #TEMP4<15>|    ------|                <16>|
+|BR     |                                      ------|    ------|                <17>|
+|BR     |                                      ------|    ------|                 <1>|
+|PRINT  |                        MADE IT TO STOP!<16>|    ------|              ------|
+--------------------------------------------------------------------------------------
+
+*******************************************************************************
+Section 4A - Quad Execution Ouput with Trace On
+*******************************************************************************
+
+PC = 0: MOV 1, I
+PC = 1: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 2: MOV 0, SUM
+PC = 3: MOV 1, J
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 10: PRINT SUM
+1
+PC = 11, Executing: ADD I, 1, #TEMP3
+PC = 12: MOV #TEMP3, I
+PC = 13, Executing: SUB I, 5, #TEMP4
+PC = 14: BNP 16
+PC = 16: BR 1
+PC = 1: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 2: MOV 0, SUM
+PC = 3: MOV 1, J
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 10: PRINT SUM
+3
+PC = 11, Executing: ADD I, 1, #TEMP3
+PC = 12: MOV #TEMP3, I
+PC = 13, Executing: SUB I, 5, #TEMP4
+PC = 14: BNP 16
+PC = 16: BR 1
+PC = 1: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 2: MOV 0, SUM
+PC = 3: MOV 1, J
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 10: PRINT SUM
+6
+PC = 11, Executing: ADD I, 1, #TEMP3
+PC = 12: MOV #TEMP3, I
+PC = 13, Executing: SUB I, 5, #TEMP4
+PC = 14: BNP 16
+PC = 16: BR 1
+PC = 1: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 2: MOV 0, SUM
+PC = 3: MOV 1, J
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 10: PRINT SUM
+10
+PC = 11, Executing: ADD I, 1, #TEMP3
+PC = 12: MOV #TEMP3, I
+PC = 13, Executing: SUB I, 5, #TEMP4
+PC = 14: BNP 16
+PC = 16: BR 1
+PC = 1: PRINT SUMMATIONS 1 THROUGH 5
+SUMMATIONS 1 THROUGH 5
+PC = 2: MOV 0, SUM
+PC = 3: MOV 1, J
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 6, Executing: ADD SUM, J, #TEMP2
+PC = 7: MOV #TEMP2, SUM
+PC = 8, Executing: ADD J, 1, J
+PC = 9: BR 4
+PC = 4, Executing: SUB J, I, #TEMP1
+PC = 5: BP 10
+PC = 10: PRINT SUM
+15
+PC = 11, Executing: ADD I, 1, #TEMP3
+PC = 12: MOV #TEMP3, I
+PC = 13, Executing: SUB I, 5, #TEMP4
+PC = 14: BNP 16
+PC = 15: BR 17
+PC = 17: PRINT MADE IT TO STOP!
+MADE IT TO STOP!
+
+*******************************************************************************
+Section 4B - Quad Execution Ouput with Trace Off
+*******************************************************************************
+
+SUMMATIONS 1 THROUGH 5
+1
+SUMMATIONS 1 THROUGH 5
+3
+SUMMATIONS 1 THROUGH 5
+6
+SUMMATIONS 1 THROUGH 5
+10
+SUMMATIONS 1 THROUGH 5
+15
+MADE IT TO STOP!
+
+*******************************************************************************
+Section 5 - Symbol Table Dump After Execution
+*******************************************************************************
+
+SYMBOL TABLE
+----------------------------------------------------------------------------------------------------------------
+|Index |Name                                    |      Kind|  DataType|                                   Value|
+----------------------------------------------------------------------------------------------------------------
+|0     |-1                                      |  Constant|   Integer|                                      -1|
+|1     |1                                       |  Constant|   Integer|                                       1|
+|2     |LASTTEST                                |  ProgName|   Integer|                                       0|
+|3     |LOOP                                    |     Label|   Integer|                                       1|
+|4     |STOP                                    |     Label|   Integer|                                      15|
+|5     |I                                       |  Variable|   Integer|                                       6|
+|6     |J                                       |  Variable|   Integer|                                       6|
+|7     |PRODUCT                                 |  Variable|   Integer|                                       0|
+|8     |SUM                                     |  Variable|   Integer|                                      15|
+|9     |SUMMATIONS 1 THROUGH 5                  |  Constant|    String|                  SUMMATIONS 1 THROUGH 5|
+|10    |0                                       |  Constant|   Integer|                                       0|
+|11    |#TEMP1                                  |  Variable|   Integer|                                       1|
+|12    |#TEMP2                                  |  Variable|   Integer|                                      15|
+|13    |#TEMP3                                  |  Variable|   Integer|                                       6|
+|14    |5                                       |  Constant|   Integer|                                       5|
+|15    |#TEMP4                                  |  Variable|   Integer|                                       1|
+|16    |MADE IT TO STOP!                        |  Constant|    String|                        MADE IT TO STOP!|
+----------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################################################
+
+EXTRA CREDIT - FinalProjFloat20.txt - OUPUT
+
+###############################################################################
+
+*******************************************************************************
+Section 1 - Source Lines
+*******************************************************************************
+
+Line #1 unit LastTest;
+Line #2 {Final compiler project test program
+Line #3    NO ERRORS INTENDED!  Notify A. Brouillette if errors are found. }
+Line #4
+Line #5 var product, sum: real;
+Line #6
+Line #7 begin
+Line #8 sum := 1.5;
+Line #9 product := (sum * 12.5)/ 2.0 + 7.0;
+Line #10
+Line #11 writeln("Product:");
+Line #12 writeln(product)
+Line #13
+Line #14 end.
+
+*******************************************************************************
+Section 2 - Symbol Table Dump Before Execution
+*******************************************************************************
+
+SYMBOL TABLE
+----------------------------------------------------------------------------------------------------------------
+|Index |Name                                    |      Kind|  DataType|                                   Value|
+----------------------------------------------------------------------------------------------------------------
+|0     |-1                                      |  Constant|   Integer|                                      -1|
+|1     |1                                       |  Constant|   Integer|                                       1|
+|2     |LASTTEST                                |  ProgName|   Integer|                                       0|
+|3     |PRODUCT                                 |  Variable|    Double|                                     1.1|
+|4     |SUM                                     |  Variable|    Double|                                     1.1|
+|5     |1.5                                     |  Constant|    Double|                                     1.5|
+|6     |12.5                                    |  Constant|    Double|                                    12.5|
+|7     |#TEMP1                                  |  Variable|   Integer|                                       0|
+|8     |2.0                                     |  Constant|    Double|                                       2|
+|9     |#TEMP2                                  |  Variable|   Integer|                                       0|
+|10    |7.0                                     |  Constant|    Double|                                       7|
+|11    |#TEMP3                                  |  Variable|   Integer|                                       0|
+|12    |PRODUCT:                                |  Constant|    String|                                PRODUCT:|
+----------------------------------------------------------------------------------------------------------------
+
+*******************************************************************************
+Section 3 - Quad Table Dump
+*******************************************************************************
+
+QUAD TABLE
+--------------------------------------------------------------------------------------
+|Opcode |                                         Op1|       Op2|                 Op3|
+--------------------------------------------------------------------------------------
+|MOV    |                                      1.5<5>|    ------|              SUM<4>|
+|MUL    |                                      SUM<4>|   12.5<6>|           #TEMP1<7>|
+|DIV    |                                   #TEMP1<7>|    2.0<8>|           #TEMP2<9>|
+|ADD    |                                   #TEMP2<9>|   7.0<10>|          #TEMP3<11>|
+|MOV    |                                  #TEMP3<11>|    ------|          PRODUCT<3>|
+|PRINT  |                                PRODUCT:<12>|    ------|              ------|
+|PRINT  |                                  PRODUCT<3>|    ------|              ------|
+--------------------------------------------------------------------------------------
+
+*******************************************************************************
+Section 4A - Quad Execution Ouput with Trace On
+*******************************************************************************
+
+PC = 0: MOV 1.5, SUM
+PC = 1, Executing: MUL SUM, 12.5, #TEMP1
+PC = 2, Executing: DIV #TEMP1, 2.0, #TEMP2
+PC = 3, Executing: ADD #TEMP2, 7.0, #TEMP3
+PC = 4: MOV #TEMP3, PRODUCT
+PC = 5: PRINT PRODUCT:
+PRODUCT:
+PC = 6: PRINT PRODUCT
+16.375
+
+*******************************************************************************
+Section 4B - Quad Execution Ouput with Trace Off
+*******************************************************************************
+
+PRODUCT:
+16.375
+
+*******************************************************************************
+Section 5 - Symbol Table Dump After Execution
+*******************************************************************************
+
+SYMBOL TABLE
+----------------------------------------------------------------------------------------------------------------
+|Index |Name                                    |      Kind|  DataType|                                   Value|
+----------------------------------------------------------------------------------------------------------------
+|0     |-1                                      |  Constant|   Integer|                                      -1|
+|1     |1                                       |  Constant|   Integer|                                       1|
+|2     |LASTTEST                                |  ProgName|   Integer|                                       0|
+|3     |PRODUCT                                 |  Variable|    Double|                                  16.375|
+|4     |SUM                                     |  Variable|    Double|                                     1.5|
+|5     |1.5                                     |  Constant|    Double|                                     1.5|
+|6     |12.5                                    |  Constant|    Double|                                    12.5|
+|7     |#TEMP1                                  |  Variable|    Double|                                   18.75|
+|8     |2.0                                     |  Constant|    Double|                                       2|
+|9     |#TEMP2                                  |  Variable|    Double|                                   9.375|
+|10    |7.0                                     |  Constant|    Double|                                       7|
+|11    |#TEMP3                                  |  Variable|    Double|                                  16.375|
+|12    |PRODUCT:                                |  Constant|    String|                                PRODUCT:|
+----------------------------------------------------------------------------------------------------------------
